@@ -25,17 +25,17 @@ window.__bootFail=show;window.__exportAll=exportAll;
 addEventListener('error',function(e){var f=(e&&e.filename)||'',base=location.href.split('#')[0].split('?')[0];if(e&&e.message==='Script error.')return;if(f&&f.indexOf(base)!==0&&f.indexOf(location.origin+'/')!==0)return;show((e&&e.message)+' @'+(e&&e.lineno))});
 setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 </script>
-<title>ElTabakha Glass</title>
+<title>فواتير</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0f766e">
 <script>try{if(/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)){const v=document.querySelector('meta[name="viewport"]');v.content+=', maximum-scale=1'}}catch(e){}try{if(localStorage.getItem('theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}try{var _p=localStorage.getItem('pal');if(_p)document.documentElement.setAttribute('data-pal',_p);var _a=localStorage.getItem('anim');if(_a==='0'||(_a===null&&navigator.deviceMemory&&navigator.deviceMemory<=2))document.documentElement.classList.add('noanim')}catch(e){}</script>
 <meta name="color-scheme" content="light">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="الطباخه">
+<meta name="apple-mobile-web-app-title" content="فواتير">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="css/style.css?v=150">
+<link rel="stylesheet" href="css/style.css?v=151">
 
 
 
@@ -43,11 +43,11 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <body>
 <div class="app-header">
   <div class="hdr-logo"><img id="hdrLogo" alt="" class="hide"></div>
-  <span class="app-title">الطباخه</span>
+  <span class="app-title">فواتير</span>
   <div class="hdr-end"><button type="button" id="cloudSt" class="hdr-cloud off" aria-label="حالة الحفظ على السحابة"><span class="cs-i">☁️</span><span class="cs-d"></span></button><button id="hdrSet" class="hdr-set" data-t="st" aria-label="إعدادات">⚙️</button></div>
 </div>
 <div id="welc" class="res-ov hide" style="z-index:80;padding-top:14vh"><div class="card res-in" style="max-width:360px;text-align:center">
-  <div style="font-size:44px">☁️</div><b style="font-size:18px">أهلاً بيك في الطباخه 👋</b>
+  <div style="font-size:44px">☁️</div><b style="font-size:18px">أهلاً بيك في فواتير 👋</b>
   <div class="mute" style="margin:8px 0 14px;line-height:1.8">لو كنت مستخدم البرنامج قبل كده على موبايل تاني، ادخل بحسابك وكل بياناتك هترجع لوحدها: العملاء والفواتير والمديونيات.</div>
   <button class="main" id="welcG" style="width:100%">☁️ رجّع بياناتي بحساب Google</button>
   <button class="lnk" id="welcMail" style="margin-top:8px">أو بالإيميل وكلمة السر</button>
@@ -61,7 +61,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <button class="lnk" id="acctNo" style="margin-top:8px">إلغاء الدخول</button></div></div>
 
 <div id="instOv" class="lock"><div style="font-size:42px">📱</div><b style="font-size:18px">البرنامج اتفتح في مكان تاني</b><div class="mute" style="max-width:320px;text-align:center;line-height:1.8">عشان البيانات متتلخبطش، البرنامج بيشتغل من مكان واحد بس على نفس الجهاز. كل اللي عملته هنا اتحفظ.</div><button class="main" id="instGo" style="width:240px">استخدمه هنا</button></div>
-<div id="lock" class="lock"><div style="font-size:42px">🔒</div><b style="font-size:18px">ElTabakha Glass</b><div class="mute">اكتب الرقم السري</div>
+<div id="lock" class="lock"><div style="font-size:42px">🔒</div><b style="font-size:18px">فواتير</b><div class="mute">اكتب الرقم السري</div>
   <input id="lkIn" type="password" inputmode="numeric" maxlength="6" autocomplete="off" style="max-width:200px;text-align:center;font-size:20px;letter-spacing:6px;height:44px">
   <div class="btns" style="width:200px"><button class="main" id="lkGo">فتح</button><button class="alt b-out hide" id="lkBioBtn">👆 بصمة</button></div><div class="info" id="lkErr" style="color:var(--danger)"></div><button class="lnk" id="lkForgot">نسيت الرقم السري؟</button>
   <div id="lkRec" class="hide" style="width:270px;flex-direction:column;gap:6px;display:flex"><button class="alt" id="lkRecG">🔑 افتح بحساب Google المربوط</button><div id="lkRecC" class="ro" style="gap:6px"><input id="lkRecIn" inputmode="numeric" autocomplete="off" placeholder="كود الاسترجاع" style="flex:1;text-align:center;direction:ltr;letter-spacing:2px"><button class="main" id="lkRecGo" style="flex:none">فتح</button></div><div class="info" id="lkRecMsg" style="text-align:center"></div></div></div>
@@ -439,10 +439,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=150"></script>
+<script src="js/app.js?v=151"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=150"></script>
-<script src="js/features.js?v=150"></script>
+<script src="js/cutlist.js?v=151"></script>
+<script src="js/features.js?v=151"></script>
 </body>
 </html>
 
