@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl" data-theme="light" data-pal="teal">
 <head>
 <meta charset="utf-8">
@@ -35,7 +35,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <meta name="apple-mobile-web-app-title" content="فواتير">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="css/style.css?v=151">
+<link rel="stylesheet" href="css/style.css?v=152">
 
 
 
@@ -46,13 +46,36 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <span class="app-title">فواتير</span>
   <div class="hdr-end"><button type="button" id="cloudSt" class="hdr-cloud off" aria-label="حالة الحفظ على السحابة"><span class="cs-i">☁️</span><span class="cs-d"></span></button><button id="hdrSet" class="hdr-set" data-t="st" aria-label="إعدادات">⚙️</button></div>
 </div>
-<div id="welc" class="res-ov hide" style="z-index:80;padding-top:14vh"><div class="card res-in" style="max-width:360px;text-align:center">
-  <div style="font-size:44px">☁️</div><b style="font-size:18px">أهلاً بيك في فواتير 👋</b>
-  <div class="mute" style="margin:8px 0 14px;line-height:1.8">لو كنت مستخدم البرنامج قبل كده على موبايل تاني، ادخل بحسابك وكل بياناتك هترجع لوحدها: العملاء والفواتير والمديونيات.</div>
-  <button class="main" id="welcG" style="width:100%">☁️ رجّع بياناتي بحساب Google</button>
-  <button class="lnk" id="welcMail" style="margin-top:8px">أو بالإيميل وكلمة السر</button>
-  <button class="alt" id="welcNew" style="width:100%;margin-top:10px">لأ، هبدأ جديد</button>
-  <div class="info" id="welcMsg" style="margin-top:8px"></div></div></div>
+<div id="busy" class="busy hide" role="status"></div>
+<div id="welc" class="auth hide"><div class="auth-in">
+  <img src="icon-192.png" alt="" class="auth-ic"><b class="auth-t">فواتير</b>
+  <div class="mute auth-sub" id="auSub"></div>
+  <div class="seg s" id="auTab"><button type="button" data-m="in" class="on">تسجيل الدخول</button><button type="button" data-m="new">حساب جديد</button></div>
+  <form id="auForm" novalidate>
+    <div id="auShopB" class="hide"><label for="auShop">اسم المحل</label><input id="auShop" autocomplete="organization"></div>
+    <label for="auMail">الإيميل</label><input id="auMail" type="email" inputmode="email" autocomplete="email" dir="ltr">
+    <div id="auPassB"><label for="auPass">كلمة السر</label><div class="auth-pw"><input id="auPass" type="password" autocomplete="current-password" dir="ltr"><button type="button" class="lnk" id="auEye">إظهار</button></div></div>
+    <button class="main" id="auGo" type="submit">دخول</button>
+  </form>
+  <button type="button" class="lnk" id="auForgot">نسيت كلمة السر؟</button>
+  <div class="info" id="welcMsg" aria-live="polite"></div>
+  <div id="auAlt"><div class="auth-or"><span>أو</span></div><button type="button" class="alt" id="welcG" style="width:100%">الدخول بحساب Google</button></div>
+  <button type="button" class="lnk" id="welcNew">كمّل من غير حساب</button>
+  <a class="lnk" href="privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a>
+</div></div>
+<div id="shopOv" class="res-ov hide" style="z-index:85;padding-top:14vh"><div class="card res-in" style="max-width:360px">
+  <b style="font-size:18px">اسم محلك إيه؟</b>
+  <div class="mute" style="margin:6px 0 10px;line-height:1.8">هيظهر فوق الفاتورة وفي رسايل الواتساب، وتقدر تغيّره في أي وقت من الإعدادات.</div>
+  <input id="shopAskIn" autocomplete="organization" aria-label="اسم المحل">
+  <div class="btns"><button class="main" id="shopAskGo">حفظ</button><button class="alt" id="shopAskNo">بعدين</button></div></div></div>
+<div id="delOv" class="res-ov hide" style="z-index:92;padding-top:10vh"><div class="card res-in" style="max-width:380px">
+  <b style="font-size:18px">حذف الحساب نهائيًا</b>
+  <div class="mute" style="margin:6px 0 10px;line-height:1.8">هيتمسح حسابك وكل بياناته من السحابة ومن الجهاز ده: العملاء والفواتير والأصناف والمصروفات والنسخ الاحتياطية وبيانات المحل. الخطوة دي مفيهاش رجوع.</div>
+  <button class="alt" id="delBk" style="width:100%">نزّل نسخة من بياناتي الأول</button>
+  <div id="delPwB" style="margin-top:8px"><label for="delPw">كلمة السر</label><input id="delPw" type="password" autocomplete="current-password" dir="ltr"></div>
+  <label for="delCf" style="margin-top:8px">للتأكيد اكتب كلمة: حذف</label><input id="delCf" autocomplete="off">
+  <div class="btns"><button class="alt b-red" id="delGo" disabled>احذف حسابي</button><button class="alt" id="delNo">إلغاء</button></div>
+  <div class="info" id="delMsg" aria-live="polite"></div></div></div>
 <div id="acctOv" class="res-ov hide" style="z-index:90;padding-top:14vh"><div class="card res-in" style="max-width:360px;text-align:center">
   <b id="acctT" style="font-size:18px"></b>
   <div class="mute" id="acctM" style="margin:8px 0 14px;line-height:1.8"></div>
@@ -241,7 +264,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <div class="card"><b>سطور ثابتة في الفاتورة</b><div class="mute">رقم الواتساب، العنوان، حساب إنستا، أرقام التحويل… بتظهر في كل الفواتير.</div>
   <label style="margin-top:6px">فوق اللوجو</label><textarea id="stTop" rows="2" placeholder="مثال: واتساب 01012345678"></textarea>
   <label style="margin-top:6px">تحت اللوجو</label><textarea id="stHead" rows="2" placeholder="مثال: العنوان · الفرع الرئيسي"></textarea>
-  <label style="margin-top:6px">آخر الفاتورة</label><textarea id="stFoot" rows="2" placeholder="مثال: إنستا: eltabakha · فودافون كاش: 010..."></textarea>
+  <label style="margin-top:6px">آخر الفاتورة</label><textarea id="stFoot" rows="2" placeholder="مثال: إنستا: اسم حسابك · فودافون كاش: 010..."></textarea>
   <div class="mute" style="margin-top:4px">السطور دي بتظهر مع التصميم الملون.</div></div>
 </div>
 <div class="stp hide" data-sp="des" id="invDes"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🎨 تصميم الفاتورة</b></div>
@@ -378,10 +401,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <div class="card"><b>📦 مساحة التخزين</b><div id="stMeter"></div></div>
 <div class="card"><b>☁️ الحفظ والمزامنة</b><div id="stor" class="stor"></div>
     <div id="fbStat" style="margin:4px 0 8px;font-size:14px">غير مربوطة.</div>
-    <div class="btns" style="margin:0"><button class="main" id="fbGoogle">دخول بحساب Google</button><button class="alt b-red" id="fbOff">تسجيل خروج</button></div>
-    <a href="#" id="fbMore" style="display:inline-block;margin-top:10px;font-size:14px">دخول بالإيميل بدلاً من Google</a>
-    <div id="fbMail" class="hide"><div class="g2" style="margin-top:6px"><input id="fbEmail" type="email" placeholder="الإيميل" style="direction:ltr"><input id="fbPass" type="password" placeholder="كلمة السر" style="direction:ltr"></div>
-    <div class="btns" style="margin-top:6px"><button class="alt" id="fbConnect">دخول بالإيميل</button></div></div></div>
+    <div class="mute num" id="fbWho" style="margin-bottom:6px;direction:ltr;text-align:right"></div>
+    <div class="btns" style="margin:0"><button class="main" id="fbAuth">دخول أو إنشاء حساب</button><button class="alt b-red hide" id="fbOff">تسجيل خروج</button></div>
+    <button class="lnk hide" id="fbDel" style="color:var(--danger);margin-top:8px">حذف الحساب</button>
+    <a class="lnk" href="privacy.html" target="_blank" rel="noopener" style="display:block;margin-top:4px">سياسة الخصوصية</a></div>
 <div class="card"><b>💾 نسخة احتياطية</b><div class="mute" id="bkInfo" style="margin-top:4px"></div>
   <div class="btns"><button class="main" id="bkSave">حفظ نسخة</button><button class="alt" id="bkLoad">استرجاع نسخة</button><input type="file" id="bkFile" accept=".json,application/json" class="hide"></div>
   <div class="btns"><button class="alt b-out" id="bkShare">📤 مشاركة نسخة (درايف / واتساب)</button></div><div class="info" id="bkMsg"></div>
@@ -439,10 +462,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=151"></script>
+<script src="js/app.js?v=152"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=151"></script>
-<script src="js/features.js?v=151"></script>
+<script src="js/cutlist.js?v=152"></script>
+<script src="js/features.js?v=152"></script>
 </body>
 </html>
 
