@@ -1,6 +1,6 @@
-﻿/* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
+/* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='152';
+const APP_VER='153';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -129,11 +129,16 @@ const tmo=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error(
 function mergeK(k,remote,full){const m=new Map(S[k].map(x=>[x.id,x])),up=[],took=[],rid=new Set(remote.map(r=>r.id));
   remote.forEach(r=>{const l=m.get(r.id);if(!l||(r.u||0)>(l.u||0)){m.set(r.id,r);took.push(r)}else if((l.u||0)>(r.u||0))up.push(l)});
   if(full)S[k].forEach(l=>{if(!rid.has(l.id))up.push(l)});if(k==='invoices')took.forEach(noteCode);DV++;S[k]=[...m.values()];lset(k,S[k]);return{up,took}}
-/* المزامنة: قراءة كاملة مرة في اليوم، وباقي المرات بتقرا اللي اتغير بس (حقل su = وقت السيرفر) */
+/* المزامنة: كل مرة بتقرا اللي اتغير بس (حقل su = وقت السيرفر). القراءة الكاملة مرة كل 30 يوم، أو لو عدّ المستندات اليومي لقى فرق.
+   ده عشان الخطة المجانية: قراءة كل الفواتير كل يوم كانت هتخلّص الحصة بعدد قليل من المستخدمين */
+const SYNC_LAP=2e4,FULL_MAX=30*864e5,FULL_BAD=3*864e5;
+async function cloudAudit(d){if(!d.count||Date.now()-(+lsv('cntAt','0'))<864e5||pupGet().size||lget('pdel').length)return;
+  try{localStorage.setItem('cntAt',String(Date.now()));let bad=false;for(const k of BIG){if(await tmo(d.count(k),8000)!==S[k].length){bad=true;break}}if(bad)localStorage.setItem('cntBad','1');else localStorage.removeItem('cntBad')}catch(e){}}
 async function loadCloud(){const d=FBDB;
   if(d){try{
-    const fullAt=+lsv('fullAt','0'),full=!fullAt||Date.now()-fullAt>864e5;let cur={};if(!full)try{cur=JSON.parse(lsv('syncCur','{}'))||{}}catch(e){}const nc={...cur};
-    const rdc=async c=>{const r=(await tmo(d.collection(c).get(full?null:Math.max(0,(cur[c]||0)-6e4)),15000)).docs||[];r.forEach(x=>{if(x.su>(nc[c]||0))nc[c]=x.su});return r.map(x=>x.data())};
+    const fullAt=+lsv('fullAt','0'),age=Date.now()-fullAt,full=!fullAt||age>FULL_MAX||(lsv('cntBad','')==='1'&&age>FULL_BAD);let cur={},at={};if(!full)try{cur=JSON.parse(lsv('syncCur','{}'))||{};at=JSON.parse(lsv('syncAt','{}'))||{}}catch(e){}const nc={...cur},na={...at},t0=Date.now();
+    /* الهامش بيتقرا مرة واحدة بعد آخر تغيير بس، مش كل مزامنة، عشان رفع كبير ما يتقراش كل مرة */
+    const rdc=async c=>{const m=cur[c]||0,r=(await tmo(d.collection(c).get(full?null:Math.max(0,(at[c]||0)>m+SYNC_LAP?m:m-SYNC_LAP)),15000)).docs||[];r.forEach(x=>{if(x.su>(nc[c]||0))nc[c]=x.su});na[c]=t0;return r.map(x=>x.data())};
     try{await tmo(flushDel(d),20000)}catch(e){}const pdl=new Set(lget('pdel').map(x=>x.k+':'+x.id));const [ri0,rc0,rv0,rt0,rk0,rq0,rx0,rs0,rp0,ro0]=await Promise.all([rdc('items'),rdc('customers'),rdc('invoices'),rdc('deleted').catch(()=>[]),rdc('cats').catch(()=>[]),rdc('quotes').catch(()=>[]),rdc('expenses').catch(()=>[]),rdc('suppliers').catch(()=>[]),rdc('purchases').catch(()=>[]),rdc('stock').catch(()=>[])]);
     const tmb=new Map(rt0.map(t=>[t.k+':'+t.tid,t.at||0])),dead=(k,x)=>{const t=tmb.get(k+':'+x.id);return t!==undefined&&(x.u||0)<=t};
     const fl=(k,a)=>a.filter(x=>!pdl.has(k+':'+x.id)&&!dead(k,x));
@@ -141,7 +146,8 @@ async function loadCloud(){const d=FBDB;
     [['items',fl('items',ri0)],['customers',fl('customers',rc0)],['invoices',fl('invoices',rv0)],['cats',fl('cats',rk0)],['quotes',fl('quotes',rq0)],['expenses',fl('expenses',rx0)],['suppliers',fl('suppliers',rs0)],['purchases',fl('purchases',rp0)],['stock',fl('stock',ro0)]].forEach(([k,r])=>mergeK(k,r,full).up.forEach(o=>pupMark(k,o)));
     migrate(true);db=d;
     let pushOk=true;try{await tmo(pushPending(d),20000)}catch(e){pushOk=false}
-    try{localStorage.setItem('syncCur',JSON.stringify(nc));if(full)localStorage.setItem('fullAt',String(Date.now()))}catch(e){}
+    try{localStorage.setItem('syncCur',JSON.stringify(nc));localStorage.setItem('syncAt',JSON.stringify(na));if(full){localStorage.setItem('fullAt',String(Date.now()));localStorage.setItem('cntAt',String(Date.now()));localStorage.removeItem('cntBad')}}catch(e){}
+    if(pushOk&&!full)await cloudAudit(d);
     /* متكتبش "تخزين سحابي" فوق تنبيه الفشل: لو في حاجات مترفعتش لازم تبان */
     $('stor').textContent=pushOk?'الحفظ: تخزين سحابي.':'تنبيه: في بيانات لسه مترفعتش على السحابة، هتترفع لوحدها لما النت يتحسن.';return true}catch(e){}}
   db=null;$('stor').textContent='الحفظ: على هذا الجهاز فقط.';return false}
@@ -1161,7 +1167,9 @@ async function fbStart(cfg,email,pass,google,create){
   const base=firebase.firestore().collection('users').doc(user.uid);
   const FV=firebase.firestore.FieldValue,TS=firebase.firestore.Timestamp,clean=o=>{if(o)delete o.su;return o};
   const rdSn=sn=>({docs:sn.docs.map(x=>{const o=x.data(),t=o.su;delete o.su;return{data:()=>o,su:t&&t.toMillis?t.toMillis():0}})});
-  FBDB={base,collection:k=>({get:async since=>{let q=base.collection(k);if(since!=null)q=q.where('su','>',TS.fromMillis(since));return rdSn(await q.get())},
+  /* عدّ مستندات مجموعة: بيتحسب قراءة واحدة لكل 1000 مستند، والمكتبة compat مفيهاش count فبيتعمل من REST */
+  const count=async k=>{const r=await fetch('https://firestore.googleapis.com/v1/projects/'+FBCFG.projectId+'/databases/(default)/documents/users/'+user.uid+':runAggregationQuery',{method:'POST',headers:{Authorization:'Bearer '+await user.getIdToken(),'Content-Type':'application/json'},body:JSON.stringify({structuredAggregationQuery:{aggregations:[{alias:'n',count:{}}],structuredQuery:{from:[{collectionId:k}]}}})});if(!r.ok)throw new Error('count');return +(await r.json())[0].result.aggregateFields.n.integerValue};
+  FBDB={base,count,collection:k=>({get:async since=>{let q=base.collection(k);if(since!=null)q=q.where('su','>',TS.fromMillis(since));return rdSn(await q.get())},
     /* Firestore بيرفض أي قيمة undefined: بننضف المستند قبل الرفع */
     doc:id=>({set:o=>base.collection(k).doc(id).set({...JSON.parse(JSON.stringify(o)),su:FV.serverTimestamp()}),delete:()=>base.collection(k).doc(id).delete(),get:async()=>{const d=await base.collection(k).doc(id).get();return{exists:d.exists,data:()=>clean(d.data())}}})})};
   return true}
@@ -1170,17 +1178,19 @@ const fbStat=t=>{$('fbStat').textContent=t};
 /* ---------- الجهاز بيشيل بيانات حساب واحد (fbUid = صاحبها): مفيش بيانات بتتنقل بين الحسابات من غير سؤال ---------- */
 /* الأصناف والفئات مش في الفحص عشان الجهاز الجديد ممكن يبدأ بأصناف جاهزة */
 const localHas=()=>['customers','invoices','quotes','expenses','suppliers','purchases','stock'].some(k=>S[k].length>0);
-const ACCT_LS=['pup','pdel','trash','fullAt','syncCur','closes','clStart','qtNo','ordNew','codeHW','lastBackup','cbAt','cbDay','bkSnooze','cloudNag','stkMin','dcSeen','wcSeen','mcSeen','welcDone','shopAskAt','setH','fbUid','fbCfg','fbOn','lkOn','lkHash','lkSalt','lkBio','lkRecHash'];
+const ACCT_LS=['pup','pdel','trash','fullAt','syncCur','syncAt','cntAt','cntBad','closes','clStart','qtNo','ordNew','codeHW','lastBackup','cbAt','cbDay','bkSnooze','cloudNag','stkMin','dcSeen','wcSeen','mcSeen','welcDone','shopAskAt','setH','fbUid','fbCfg','fbOn','lkOn','lkHash','lkSalt','lkBio','lkRecHash'];
 /* إعدادات المحل واللوجو وتصميم الفاتورة بتتحفظ مع الحساب (users/{uid}/settings/shop)، فكل حساب ليه محله */
 const SET_K=['shop','logo','logoOn','shopTxt','custw','docw','tpl_inv','tpl_pay','tpl_rem','tpl_rdy','invdesign','invtpls','invWm','invpal','fancyInv','paper','gnote','invNotes','pfPre'],SET_S=new Set(SET_K);
 const setGet=()=>{const o={};SET_K.forEach(k=>{const v=lsv(k,null);if(v!==null)o[k]=v});return o},setKey=o=>hs(JSON.stringify(Object.keys(o).sort().map(k=>[k,o[k]])));
 function setApply(){try{loadLogo();if(!typing($('t-st'))){loadMsgUI();shopTxtLoad();$('paperSel').value=paperKey();$('logoOn').checked=pget('logoOn',true);$('fancyInv').checked=pget('fancyInv',true)}}catch(e){}}
-let setBusy=null,setT=0;
+let setBusy=null,setT=0,setAt=0;
 /* البيانات اللي على السحابة بتكسب لو الجهاز ما اتغيرش من آخر مزامنة. لو الجهاز اتغير، هو اللي بيترفع */
 function setSync(){if(!FBDB||instOff)return Promise.resolve();if(setBusy)return setBusy;clearTimeout(setT);
+  /* من غير تغيير على الجهاز، بنقرا السحابة أول فتحة وكل 6 ساعات بس */
+  if(setAt&&Date.now()-setAt<6*36e5&&setKey(setGet())===lsv('setH',''))return Promise.resolve();
   setBusy=(async()=>{try{const ref=FBDB.collection('settings').doc('shop'),d=await tmo(ref.get(),12000),rem=d.exists?d.data():null,loc=setGet(),lk=setKey(loc),last=lsv('setH','');
     if(rem&&rem.h&&rem.v&&rem.h!==last&&(lk===last||!last)){SET_K.forEach(k=>{try{if(k in rem.v)localStorage.setItem(k,rem.v[k]);else localStorage.removeItem(k)}catch(e){}});localStorage.setItem('setH',rem.h);setApply()}
-    else if(lk!==last){await tmo(ref.set({h:lk,at:Date.now(),v:loc}),15000);localStorage.setItem('setH',lk)}}
+    else if(lk!==last){await tmo(ref.set({h:lk,at:Date.now(),v:loc}),15000);localStorage.setItem('setH',lk)}setAt=Date.now()}
     catch(e){}finally{setBusy=null}})();return setBusy}
 const setSoon=()=>{clearTimeout(setT);setT=setTimeout(setSync,2500)};
 async function wipeLocal(){clearTimeout(setT);clearTimeout(pupT);pupT=0;BIG.forEach(k=>{S[k]=[];lset(k,[])});DV++;
@@ -1278,7 +1288,7 @@ $('delGo').onclick=async()=>{const m=$('delMsg'),b=$('delGo'),u=fbUser();if(!u||
 function cloudNag(){if(fbCfg()||!S.invoices.length)return;const l=+lsv('cloudNag','0');if(Date.now()-l<3*864e5)return;svk('cloudNag',String(Date.now()));
   toast('⚠ بياناتك على الموبايل ده بس. اربطها بحسابك عشان ما تضيعش','اربط حسابك',goData)}
 addEventListener('online',()=>{if(fbCfg()&&dataReady&&!instOff)fbBoot()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){if(FBDB)setSync();return}if(FBDB&&Date.now()-lastSync>30000)syncNow()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(FBDB)setSync();return}if(FBDB&&Date.now()-lastSync>12e4)syncNow()});
 
 /* ---------- تطبيق الموبايل (PWA) ---------- */
 $('appVer').textContent='نسخة التطبيق: '+APP_VER;
