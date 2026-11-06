@@ -1,6 +1,6 @@
-﻿/* الطباخه · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
+﻿/* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='151';
+const APP_VER='152';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -97,7 +97,7 @@ function fixDupCodes(){const seen=new Set(),fix=[];
   if(!fix.length)return 0;const t=Date.now(),msg=[];
   fix.forEach(([r,k])=>{const old=+r[k];r[k]=nextCode();r.oc=(r.oc||[]).concat(old);r.u=t;noteCode(r);pushDoc('invoices',r);msg.push(old+' ← '+r[k]+' ('+r.cname+')')});
   DV++;lset('invoices',S.invoices);setTimeout(()=>{try{toast('كود اتكرر على جهازين واتصلح: '+msg.join('، '))}catch(e){}},800);return fix.length}
-function syncNames(){const l=S.invoices.filter(r=>{const c=getC(r.cid);return c&&c.name&&r.cname!==c.name});if(!l.length)return;DV++;const n=Date.now();l.forEach(r=>{r.cname=getC(r.cid).name;r.u=n;pushDoc('invoices',r)});lset('invoices',S.invoices)}
+function syncNames(){const cm=new Map(S.customers.map(c=>[c.id,c])),l=S.invoices.filter(r=>{const c=cm.get(r.cid);return c&&c.name&&r.cname!==c.name});if(!l.length)return;DV++;const n=Date.now();l.forEach(r=>{r.cname=cm.get(r.cid).name;r.u=n;pushDoc('invoices',r)});lset('invoices',S.invoices)}
 function loadFrom(get){DV++;const A=k=>{const v=get(k);return Array.isArray(v)?v:[]};S.items=A('items');S.customers=A('customers');S.invoices=A('invoices');S.cats=A('cats').filter(c=>c&&c.id&&c.name);S.quotes=A('quotes').filter(q=>q&&q.id);S.expenses=A('expenses').filter(x=>x&&x.id);S.suppliers=A('suppliers').filter(x=>x&&x.id);S.purchases=A('purchases').filter(x=>x&&x.id);S.stock=A('stock').filter(x=>x&&x.id);dataReady=true;migrate()}
 function loadLocal(){loadFrom(lget)}
 let migNote='';
@@ -146,12 +146,13 @@ async function loadCloud(){const d=FBDB;
     $('stor').textContent=pushOk?'الحفظ: تخزين سحابي.':'تنبيه: في بيانات لسه مترفعتش على السحابة، هتترفع لوحدها لما النت يتحسن.';return true}catch(e){}}
   db=null;$('stor').textContent='الحفظ: على هذا الجهاز فقط.';return false}
 /* اللي لسه مترفعش على السحابة بيفضل في قايمة لحد ما يترفع */
-let pupS=null;const pupGet=()=>pupS||(pupS=new Set(lget('pup'))),pupSave=()=>lset('pup',[...pupGet()]);
-function pupMark(k,o){if(!fbCfg())return false;const s=pupGet(),key=k+'|'+o.id;if(!s.has(key)){s.add(key);pupSave()}return true}
+/* الحفظ بيتجمع في مرة واحدة: كتابة القايمة كلها مع كل مستند كانت بتهنّج البرنامج أول مزامنة لحساب جديد فيه فواتير كتير */
+let pupS=null,pupT=0;const pupGet=()=>pupS||(pupS=new Set(lget('pup'))),pupSave=()=>{clearTimeout(pupT);pupT=0;lset('pup',[...pupGet()])},pupLater=()=>{if(!pupT)pupT=setTimeout(pupSave,400)};
+function pupMark(k,o){if(!fbCfg())return false;const s=pupGet(),key=k+'|'+o.id;if(!s.has(key)){s.add(key);pupLater()}return true}
 function pushDoc(k,o){if(!pupMark(k,o)||!db)return;const key=k+'|'+o.id,u0=o.u;
-  sf(()=>db.collection(k).doc(o.id).set(o).then(()=>{if(o.u===u0){pupGet().delete(key);pupSave()}}))}
-async function pushPending(d){const s=pupGet(),jobs=[];
-  [...s].forEach(key=>{const i=key.indexOf('|'),k=key.slice(0,i),id=key.slice(i+1),o=(S[k]||[]).find(x=>x.id===id);if(!o){s.delete(key);return}const u0=o.u;
+  sf(()=>db.collection(k).doc(o.id).set(o).then(()=>{if(o.u===u0){pupGet().delete(key);pupLater()}}))}
+async function pushPending(d){const s=pupGet(),jobs=[],ix={},byId=k=>ix[k]||(ix[k]=new Map((S[k]||[]).map(x=>[x.id,x])));
+  [...s].forEach(key=>{const i=key.indexOf('|'),k=key.slice(0,i),id=key.slice(i+1),o=byId(k).get(id);if(!o){s.delete(key);return}const u0=o.u;
     /* لو مستند واحد فيه مشكلة ميوقفش رفع الباقي */
     try{jobs.push(d.collection(k).doc(id).set(o).then(()=>{if(o.u===u0)s.delete(key)}))}catch(e){jobs.push(Promise.reject(e))}});
   pupSave();const r=await Promise.allSettled(jobs);pupSave();if(r.some(x=>x.status==='rejected'))throw new Error('push')}
@@ -177,7 +178,7 @@ function undel(k,o){lset('pdel',lget('pdel').filter(x=>!(x.k===k&&x.id===o.id)))
 let tm;const dirty=new Map();
 function touch(k,o){dirty.set(k+o.id,[k,o]);clearTimeout(tm);tm=setTimeout(flushTouch,500)}
 function flushTouch(){clearTimeout(tm);dirty.forEach(([k,o])=>put(k,o));dirty.clear()}
-addEventListener('pagehide',()=>{flushTouch();flushIDB()});document.addEventListener('visibilitychange',()=>{if(document.hidden)flushTouch()});
+addEventListener('pagehide',()=>{flushTouch();flushIDB();if(pupT)pupSave()});document.addEventListener('visibilitychange',()=>{if(document.hidden){flushTouch();if(pupT)pupSave()}});
 
 /* ---------- التبويبات (Bottom Nav) ---------- */
 let kbH=0;
@@ -287,9 +288,9 @@ function sheet(o){lastSpec=o;const D=invd();
     const T=(s,px,py,al,font,col)=>{if(/[-]/.test(s))return drawRich(x,s,px,py,al,font,col||'#000');x.font=font;x.textAlign=al;x.fillStyle=col||'#000';x.fillText(String(s),px,py)};
     let lg=false;
     if(logoOK()){const k=Math.min(IW*(TH?.6:.26)/logoImg.naturalWidth,(TH?44:52)/logoImg.naturalHeight,1),w=logoImg.naturalWidth*k,h=logoImg.naturalHeight*k;x.drawImage(logoImg,TH?(W-w)/2:W-P-w,y,w,h);
-      if(TH)y+=h+4;else{lg=true;x.direction='ltr';T(lsv('shop','ElTabakha Glass'),P,y+h/2-9,'left','bold 17px '+F,AC);x.direction='rtl';T(o.date,P,y+h/2+11,'left','13px '+F,GR);y+=h+6}}
-    if(lg){}else if(TH){x.direction='ltr';T(lsv('shop','ElTabakha Glass'),W/2,y+10,'center','bold 17px '+F,AC);x.direction='rtl';y+=22;T(o.date,W/2,y+8,'center','12px '+F);y+=20}
-    else{x.direction='ltr';T(lsv('shop','ElTabakha Glass'),W-P,y+10,'right','bold 17px '+F,AC);x.direction='rtl';T(o.date,P,y+10,'left','13px '+F,GR);y+=22}
+      if(TH)y+=h+4;else{lg=true;x.direction='ltr';T(shopN(),P,y+h/2-9,'left','bold 17px '+F,AC);x.direction='rtl';T(o.date,P,y+h/2+11,'left','13px '+F,GR);y+=h+6}}
+    if(lg){}else if(TH){x.direction='ltr';T(shopN(),W/2,y+10,'center','bold 17px '+F,AC);x.direction='rtl';y+=22;T(o.date,W/2,y+8,'center','12px '+F);y+=20}
+    else{x.direction='ltr';T(shopN(),W-P,y+10,'right','bold 17px '+F,AC);x.direction='rtl';T(o.date,P,y+10,'left','13px '+F,GR);y+=22}
     const tf=(TH?'bold 20px ':'bold 24px ')+F;
     wrap(o.title||((custW()?custW()+' / ':'')+o.name),IW,tf).forEach(s=>{T(s,W/2,y+13,'center',tf);y+=TH?26:28});
     wrap(o.sub||'',IW,'14px '+F).forEach(s=>{T(s,W/2,y+7,'center','14px '+F,GR);y+=20});
@@ -396,7 +397,7 @@ function sheet(o){lastSpec=o;const D=invd();
     if(LY)window.__LAY={items:LY,W,H:y+8};return y+8};
   const pf=o.fancy&&!TH?paintF:paint;
   const H=Math.ceil(pf(mc)),cv=document.createElement('canvas');
-  cv.width=W*2;cv.height=H*2;const x=cv.getContext('2d');x.scale(2,2);if(pf===paintF){x.fillStyle=PL.bg;x.fillRect(0,0,W,H);if(PL.mar){const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#f4f5f7');g.addColorStop(.3,'#e6e9ee');g.addColorStop(.5,'#f6f7f9');g.addColorStop(.75,'#e3e6eb');g.addColorStop(1,'#f3f4f6');x.fillStyle=g;x.fillRect(0,0,W,H);x.strokeStyle='rgba(110,120,145,.08)';x.lineWidth=1;for(let i=-H;i<W;i+=58){x.beginPath();x.moveTo(i,0);x.lineTo(i+H*.45,H);x.stroke()}x.strokeStyle='rgba(110,120,145,.05)';for(let i=0;i<W+H;i+=140){x.beginPath();x.moveTo(i,0);x.lineTo(i-H*.7,H);x.stroke()}}}else{x.fillStyle='#fff';x.fillRect(0,0,W,H)}pf(x);drawWM(x,W,H,o,TH,pf===paintF?PL.head:AC);return cv}
+  cv.width=W*2;cv.height=H*2;const x=cv.getContext('2d',{willReadFrequently:true});/* الرسم على المعالج: قراية الصورة من كارت الشاشة في الموبايل بطيئة */x.scale(2,2);if(pf===paintF){x.fillStyle=PL.bg;x.fillRect(0,0,W,H);if(PL.mar){const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#f4f5f7');g.addColorStop(.3,'#e6e9ee');g.addColorStop(.5,'#f6f7f9');g.addColorStop(.75,'#e3e6eb');g.addColorStop(1,'#f3f4f6');x.fillStyle=g;x.fillRect(0,0,W,H);x.strokeStyle='rgba(110,120,145,.08)';x.lineWidth=1;for(let i=-H;i<W;i+=58){x.beginPath();x.moveTo(i,0);x.lineTo(i+H*.45,H);x.stroke()}x.strokeStyle='rgba(110,120,145,.05)';for(let i=0;i<W+H;i+=140){x.beginPath();x.moveTo(i,0);x.lineTo(i-H*.7,H);x.stroke()}}}else{x.fillStyle='#fff';x.fillRect(0,0,W,H)}pf(x);drawWM(x,W,H,o,TH,pf===paintF?PL.head:AC);return cv}
 
 const nn=x=>x.rt?'مرتجع'+(x.src?' من فاتورة '+x.src:'')+' - '+x.n:x.n;
 function invSheet(r,paper){const TH=paper==='t80'||paper==='t58',fancy=!TH&&pget('fancyInv',true)&&!(r.rows||[]).some(x=>x.cols),lbl=x=>nn(x)+(x.q>0?(+x.w>0&&+x.h>0&&+x.w>+x.h?' ('+x.h+'/'+x.w+')':' ('+x.w+'/'+x.h+')'):'');const base={name:r.cname,date:stamp(r.ts),note:r.note,wm:1};
@@ -421,17 +422,21 @@ function invSheet(r,paper){const TH=paper==='t80'||paper==='t58',fancy=!TH&&pget
 
 /* ---------- عرض/حفظ/مشاركة الصورة ---------- */
 let curBlob=null,curName='',curPhone='',baseMsg='',curRec=null;
+const dataBlob=u=>{const b=atob(u.slice(u.indexOf(',')+1)),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return new Blob([a],{type:'image/png'})};
+/* علامة "جاري الفتح" بتظهر قبل الرسم، عشان الضغطة تبان على طول حتى على موبايل بطيء */
+const busyOn=t=>{const b=$('busy');b.textContent=t;b.classList.remove('hide');return new Promise(r=>{const z=setTimeout(r,80);requestAnimationFrame(()=>setTimeout(()=>{clearTimeout(z);r()},0))})},busyOff=()=>$('busy').classList.add('hide');
 async function dl(blob,name){
   try{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),60000);return'anchor'}catch(e){return'fail'}}
 async function downloadCur(){if(!curBlob)return;const s=await dl(curBlob,curName);
   $('resm').textContent=baseMsg+({ok:' · تم حفظ الصورة ✓',anchor:' · تم تنزيل الصورة ✓',declined:' · تم الإلغاء',fail:' · اضغط مطولاً على الصورة لحفظها'}[s]||'')}
 async function showImg(cv,name,msg,auto,phone,rec){
-  curSpec=lastSpec;paperLabels();curBlob=await new Promise(x=>cv.toBlob(x,'image/png'));curName=name;curPhone=phone||'';baseMsg=msg||'';curRec=rec||null;
+  /* toBlob بيستنى وقت فراغ المتصفح (ثانية على الكمبيوتر وثواني على الموبايل)، فبنحوّل الصورة مباشرة */
+  curSpec=lastSpec;paperLabels();const imgURL=cv.toDataURL('image/png');curBlob=dataBlob(imgURL);curName=name;curPhone=phone||'';baseMsg=msg||'';curRec=rec||null;
   $('resundo').classList.toggle('hide',!(rec&&lastSaved&&lastSaved.id===rec.id&&Date.now()-lastSaved.at<10*60e3));$('resdel').classList.toggle('hide',!rec);$('resedit').classList.toggle('hide',!(rec&&pget('editInv',true)&&!(rec.rows||[]).some(x=>x.cols)));$('resdup').classList.toggle('hide',!(rec&&rec.type==='inv'&&pget('dupInv',true)&&!(rec.rows||[]).some(x=>x.cols)));{const rc=$('rescut');if(rc)rc.classList.toggle('hide',!(rec&&rec.type==='inv'&&(rec.rows||[]).some(x=>!x.rt&&x.t!=='rd'&&+x.w>0&&+x.h>0)))}disarm($('resdel'));$('resdel').textContent='حذف';$('restx').classList.toggle('hide',!rec);$('resTxtBox').classList.toggle('hide',!rec);if(rec){$('resTxt').value=txtOf(rec);syncTx()}
   let canS=false;try{canS=!!(navigator.canShare&&navigator.canShare({files:[new File([curBlob],name,{type:'image/png'})]}))}catch(e){}
   $('ressh').classList.toggle('hide',!canS);$('reswa').classList.toggle('hide',canS);
   $('reshint').textContent=canS?'':'الصورة بتتنسخ ويتفتح شات العميل. الصقها (اضغط مطولاً ثم لصق) وأرسل.';
-  $('resimg').src=cv.toDataURL('image/png');$('resm').textContent=baseMsg;$('res').classList.remove('hide');
+  $('resimg').src=imgURL;$('resm').textContent=baseMsg;$('res').classList.remove('hide');
   $('res').scrollTop=0;ordUI();
   if(auto)await downloadCur()}
 $('resdl').onclick=downloadCur;$('resx').onclick=()=>$('res').classList.add('hide');
@@ -480,7 +485,7 @@ $('resprint').onclick=()=>{if(!curBlob)return;
   catch(e){$('resm').textContent=baseMsg+' · تعذرت الطباعة'}};
 
 const TPLD={inv:'{المحل}\n{اللقب} / {العميل}\n{الفاتورة} - {التاريخ}\nالإجمالي: {الإجمالي}\nالمدفوع: {المدفوع}\nالمتبقي: {المتبقي}',pay:'{المحل}\n{اللقب} / {العميل}\nإيصال دفعة كود {الكود}: {المبلغ}\nالحساب بعد الدفعة: {الحساب}',rem:'السلام عليكم {اللقب} {العميل}\nحسابك عندنا في {المحل}: {الحساب} جنيه.\nبرجاء السداد في أقرب وقت. شكراً لتعاملك معنا.',rdy:'السلام عليكم {اللقب} {العميل}\nطلبك (كود {الكود}) جاهز للاستلام من {المحل}.\n{الحساب}\nفي انتظارك، شكراً لتعاملك معنا.'};
-const tplOf=k=>{const v=lsv('tpl_'+k,'');return v.trim()?v:TPLD[k]},shopN=()=>lsv('shop','ElTabakha Glass'),docW=()=>lsv('docw','إذن صرف'),custW=()=>lsv('custw','الأستاذ');
+const tplOf=k=>{const v=lsv('tpl_'+k,'');return v.trim()?v:TPLD[k]},shopN=()=>lsv('shop',''),docW=()=>lsv('docw','إذن صرف'),custW=()=>lsv('custw','الأستاذ');
 function fillTpl(k,m){m['اللقب']=custW();return tplOf(k).split('\n').map(l=>{const had=/\{[^}]+\}/.test(l),o=l.replace(/\{([^}]+)\}/g,(x,key)=>key in m?m[key]:x).replace(/ {2,}/g,' ').replace(/^\s*\/\s*/,'');return{o,skip:had&&!o.trim()}}).filter(x=>x.skip===false).map(x=>x.o).join('\n')}
 function txtOf(r){const m={'المحل':shopN(),'العميل':r.cname,'التاريخ':dshort(r.ts),'الخصم':r.pfv?f(r.pfv):'','سبب_الخصم':r.pfWhy||''};
   m['الكود']=r.code?String(r.code):'';
@@ -514,7 +519,7 @@ $('reswa').onclick=e=>{const n=waNum(curPhone);if(!curBlob||!n){e.preventDefault
   try{navigator.clipboard.write([new ClipboardItem({'image/png':curBlob})]).then(()=>{$('resm').textContent=baseMsg+' · تم نسخ الصورة: الصقها في المحادثة'}).catch(()=>{})}catch(err){}};
 const sfn=t=>String(t).replace(/[\\\/:*?"<>|]+/g,'-');
 const fname=r=>'فاتورة-'+sfn(r.cname)+(r.code?'-'+r.code:(r.no?'-'+r.no:''))+'.png';
-const showRec=(r,auto,msg)=>showImg(sheet(invSheet(r)),fname(r),msg||'',auto,r.phone,r);
+const showRec=async(r,auto,msg)=>{await busyOn('جاري فتح الفاتورة…');try{await showImg(sheet(invSheet(r)),fname(r),msg||'',auto,r.phone,r)}finally{busyOff()}};
 
 /* ---------- العملاء ---------- */
 let cuEd=false,cuPm=false,cuMode='all',selC=null,per='all',pF='',pT='',editOpen=false,pMo=0,cdq='';
@@ -1089,7 +1094,7 @@ function remLink(c){return 'https://wa.me/'+waNum(c.phone)+'?text='+encodeURICom
 /* ---------- النسخة الاحتياطية ---------- */
 function bkInfo(){let t=0;try{t=Math.max(+localStorage.getItem('lastBackup')||0,+localStorage.getItem('cbAt')||0)}catch(e){}$('bkInfo').textContent=t?'آخر نسخة: '+stamp(t)+(Date.now()-t>6048e5?' ⚠ عدّى أكتر من أسبوع، احفظ نسخة جديدة':''):'⚠ لم تحفظ نسخة احتياطية بعد. البيانات على هذا الجهاز فقط.'}
 $('bkSave').onclick=async()=>{const data={app:'ElTabakha',v:1,at:Date.now(),items:S.items,customers:S.customers,invoices:S.invoices,cats:S.cats,quotes:S.quotes,expenses:S.expenses,suppliers:S.suppliers,purchases:S.purchases,stock:S.stock};
-  const r=await dl(new Blob([JSON.stringify(data)],{type:'application/json'}),'نسخة-ElTabakha-'+dshort(Date.now()).replace(/\//g,'-')+'.json');
+  const r=await dl(new Blob([JSON.stringify(data)],{type:'application/json'}),'نسخة-فواتير-'+dshort(Date.now()).replace(/\//g,'-')+'.json');
   $('bkMsg').textContent={ok:'تم حفظ النسخة ✓',anchor:'تم تنزيل النسخة ✓',declined:'تم الإلغاء',fail:'تعذر حفظ الملف'}[r]||'';
   if(r==='ok'||r==='anchor'){try{localStorage.setItem('lastBackup',Date.now())}catch(e){}bkInfo();bkBan()}};
 $('bkLoad').onclick=()=>$('bkFile').click();
@@ -1143,20 +1148,20 @@ $('cbRows').onclick=async e=>{const day=e.target.dataset.cbr;if(!day)return;cons
 const FBCFG={apiKey:'AIzaSyAofNoMj8p2Ku2QK7FI9tL6uEh3Qobq6Mg',authDomain:'tabakha-glass-5b9a4.firebaseapp.com',projectId:'tabakha-glass-5b9a4',messagingSenderId:'184894291393',appId:'1:184894291393:web:3e552df9088a21471d0340'};
 let FBDB=null,lastSync=0;
 const loadScript=src=>new Promise((res,rej)=>{const e=document.createElement('script');e.src=src;e.onload=res;e.onerror=()=>rej(new Error('load'));document.head.appendChild(e)});
-async function fbStart(cfg,email,pass,google){
-  if(!window.firebase){const b='https://www.gstatic.com/firebasejs/13.2.0/';await loadScript(b+'firebase-app-compat.js');await loadScript(b+'firebase-auth-compat.js');await loadScript(b+'firebase-firestore-compat.js')}
-  if(!firebase.apps.length)firebase.initializeApp(cfg);
-  const auth=firebase.auth();let user;
+async function fbLoad(){if(!window.firebase){const b='https://www.gstatic.com/firebasejs/13.2.0/';await loadScript(b+'firebase-app-compat.js');await loadScript(b+'firebase-auth-compat.js');await loadScript(b+'firebase-firestore-compat.js')}
+  if(!firebase.apps.length)firebase.initializeApp(FBCFG);const a=firebase.auth();a.languageCode='ar';return a}
+async function fbStart(cfg,email,pass,google,create){
+  const auth=await fbLoad();let user;
   if(google){try{user=(await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())).user}catch(e){if(e&&/popup-blocked|operation-not-supported|web-storage-unsupported/.test(e.code||'')){
       /* لازم نعلّم إن السحابة شغالة قبل التحويل، عشان لما الصفحة ترجع من جوجل fbBoot يكمّل الدخول */
       try{localStorage.setItem('fbOn','1');localStorage.removeItem('fbCfg')}catch(_){}await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());return false}throw e}}
-  else if(email&&pass)user=(await auth.signInWithEmailAndPassword(email,pass)).user;
+  else if(email&&pass)user=(await(create?auth.createUserWithEmailAndPassword(email,pass):auth.signInWithEmailAndPassword(email,pass))).user;
   else user=await new Promise(r=>{const u=auth.onAuthStateChanged(x=>{u();r(x)})});
   if(!user)throw new Error('no-user');if(!await acctGate(auth,user))return false;try{localStorage.setItem('fbUid',user.uid)}catch(e){}
   const base=firebase.firestore().collection('users').doc(user.uid);
   const FV=firebase.firestore.FieldValue,TS=firebase.firestore.Timestamp,clean=o=>{if(o)delete o.su;return o};
   const rdSn=sn=>({docs:sn.docs.map(x=>{const o=x.data(),t=o.su;delete o.su;return{data:()=>o,su:t&&t.toMillis?t.toMillis():0}})});
-  FBDB={collection:k=>({get:async since=>{let q=base.collection(k);if(since!=null)q=q.where('su','>',TS.fromMillis(since));return rdSn(await q.get())},
+  FBDB={base,collection:k=>({get:async since=>{let q=base.collection(k);if(since!=null)q=q.where('su','>',TS.fromMillis(since));return rdSn(await q.get())},
     /* Firestore بيرفض أي قيمة undefined: بننضف المستند قبل الرفع */
     doc:id=>({set:o=>base.collection(k).doc(id).set({...JSON.parse(JSON.stringify(o)),su:FV.serverTimestamp()}),delete:()=>base.collection(k).doc(id).delete(),get:async()=>{const d=await base.collection(k).doc(id).get();return{exists:d.exists,data:()=>clean(d.data())}}})})};
   return true}
@@ -1165,10 +1170,22 @@ const fbStat=t=>{$('fbStat').textContent=t};
 /* ---------- الجهاز بيشيل بيانات حساب واحد (fbUid = صاحبها): مفيش بيانات بتتنقل بين الحسابات من غير سؤال ---------- */
 /* الأصناف والفئات مش في الفحص عشان الجهاز الجديد ممكن يبدأ بأصناف جاهزة */
 const localHas=()=>['customers','invoices','quotes','expenses','suppliers','purchases','stock'].some(k=>S[k].length>0);
-const ACCT_LS=['pup','pdel','trash','fullAt','syncCur','closes','clStart','qtNo','ordNew','codeHW','lastBackup','cbAt','cbDay','bkSnooze','cloudNag','stkMin','dcSeen','wcSeen','mcSeen','welcDone','fbUid','fbCfg','fbOn','lkOn','lkHash','lkSalt','lkBio','lkRecHash'];
-async function wipeLocal(){BIG.forEach(k=>{S[k]=[];lset(k,[])});DV++;
+const ACCT_LS=['pup','pdel','trash','fullAt','syncCur','closes','clStart','qtNo','ordNew','codeHW','lastBackup','cbAt','cbDay','bkSnooze','cloudNag','stkMin','dcSeen','wcSeen','mcSeen','welcDone','shopAskAt','setH','fbUid','fbCfg','fbOn','lkOn','lkHash','lkSalt','lkBio','lkRecHash'];
+/* إعدادات المحل واللوجو وتصميم الفاتورة بتتحفظ مع الحساب (users/{uid}/settings/shop)، فكل حساب ليه محله */
+const SET_K=['shop','logo','logoOn','shopTxt','custw','docw','tpl_inv','tpl_pay','tpl_rem','tpl_rdy','invdesign','invtpls','invWm','invpal','fancyInv','paper','gnote','invNotes','pfPre'],SET_S=new Set(SET_K);
+const setGet=()=>{const o={};SET_K.forEach(k=>{const v=lsv(k,null);if(v!==null)o[k]=v});return o},setKey=o=>hs(JSON.stringify(Object.keys(o).sort().map(k=>[k,o[k]])));
+function setApply(){try{loadLogo();if(!typing($('t-st'))){loadMsgUI();shopTxtLoad();$('paperSel').value=paperKey();$('logoOn').checked=pget('logoOn',true);$('fancyInv').checked=pget('fancyInv',true)}}catch(e){}}
+let setBusy=null,setT=0;
+/* البيانات اللي على السحابة بتكسب لو الجهاز ما اتغيرش من آخر مزامنة. لو الجهاز اتغير، هو اللي بيترفع */
+function setSync(){if(!FBDB||instOff)return Promise.resolve();if(setBusy)return setBusy;clearTimeout(setT);
+  setBusy=(async()=>{try{const ref=FBDB.collection('settings').doc('shop'),d=await tmo(ref.get(),12000),rem=d.exists?d.data():null,loc=setGet(),lk=setKey(loc),last=lsv('setH','');
+    if(rem&&rem.h&&rem.v&&rem.h!==last&&(lk===last||!last)){SET_K.forEach(k=>{try{if(k in rem.v)localStorage.setItem(k,rem.v[k]);else localStorage.removeItem(k)}catch(e){}});localStorage.setItem('setH',rem.h);setApply()}
+    else if(lk!==last){await tmo(ref.set({h:lk,at:Date.now(),v:loc}),15000);localStorage.setItem('setH',lk)}}
+    catch(e){}finally{setBusy=null}})();return setBusy}
+const setSoon=()=>{clearTimeout(setT);setT=setTimeout(setSync,2500)};
+async function wipeLocal(){clearTimeout(setT);clearTimeout(pupT);pupT=0;BIG.forEach(k=>{S[k]=[];lset(k,[])});DV++;
   if(ddb){await flushIDB();await kvPut({alertNow:[]}).catch(()=>{})}
-  try{[...BIG,...ACCT_LS].forEach(k=>localStorage.removeItem(k));Object.keys(localStorage).filter(k=>k.indexOf('nfDay_')===0).forEach(k=>localStorage.removeItem(k))}catch(e){}
+  try{[...BIG,...ACCT_LS,...SET_K].forEach(k=>localStorage.removeItem(k));Object.keys(localStorage).filter(k=>k.indexOf('nfDay_')===0).forEach(k=>localStorage.removeItem(k))}catch(e){}
   try{await idbDo('readwrite',st=>st.clear())}catch(e){}
   pupS=null;instOff=true}
 /* لو البيانات هتتشال ولسه مش متأكدين إنها على السحابة: ينزل ملف نسخة منها الأول */
@@ -1178,59 +1195,90 @@ function acctAsk(prev,mail){if(acctP)return acctP;acctP=new Promise(res=>{const 
   $('acctT').textContent=prev?'البيانات دي تخص حساب تاني':'فيه بيانات على الموبايل ده';
   $('acctM').textContent=prev?'البيانات اللي على الموبايل مش بتاعة '+who+'، فمش هتتضاف عليه. لو دخلت هتتشال من الموبايل، وهينزل ملف نسخة منها الأول.':'تحب تضيفها لحساب '+who+'؟ ولو دخلت من غيرها هتتشال من الموبايل، وهينزل ملف نسخة منها الأول.';
   $('acctAdd').classList.toggle('hide',!!prev);$('acctAdd').onclick=()=>end('add');$('acctSkip').onclick=()=>end('skip');$('acctNo').onclick=()=>end('no');o.classList.remove('hide')});return acctP}
-async function acctGate(auth,user){const prev=lsv('fbUid','');if(prev===user.uid||!localHas())return true;
+async function acctGate(auth,user){const prev=lsv('fbUid','');if(prev===user.uid)return true;
+  if(!localHas()){if(prev)try{[...SET_K,'setH'].forEach(k=>localStorage.removeItem(k))}catch(e){}return true}
   const c=await acctAsk(prev,user.email);if(c==='add')return true;
   if(c==='skip'){await keepCopy();await wipeLocal();try{localStorage.setItem('fbOn','1');localStorage.setItem('fbUid',user.uid)}catch(e){}location.reload();return false}
   try{await auth.signOut()}catch(e){}try{localStorage.removeItem('fbOn');localStorage.removeItem('fbCfg')}catch(e){}throw new Error('acct-cancel')}
 async function acctLeave(){try{if(window.firebase&&firebase.auth)await firebase.auth().signOut()}catch(e){}await wipeLocal();location.reload()}
-const fbErr=e=>{const c=(e&&e.code)||'',t=c?' ('+c.replace('auth/','')+')':'';if(e&&e.message==='acct-cancel')return'اتلغى تسجيل الدخول، وبياناتك زي ما هي على الجهاز.';if(/popup-closed|cancelled-popup/.test(c))return'اتلغى تسجيل الدخول.';if(/unauthorized-domain/.test(c))return'تسجيل الدخول مش متاح من العنوان ده'+t;if(/operation-not-allowed/.test(c))return'طريقة الدخول دي مش متفعلة'+t;if(/invalid-credential|wrong-password|user-not-found|invalid-email/.test(c))return'الإيميل أو كلمة السر غلط.';if(/network/.test(c))return'مفيش إنترنت.';if(e&&e.message==='no-user')return'محتاج تسجيل دخول من جديد.';if(e&&e.message==='load')return'تعذر الاتصال بالسحابة: النت مش شغال.';return'تعذر الربط'+(t||(e&&e.message?' ('+e.message+')':''))};
+const fbErr=e=>{const c=(e&&e.code)||'',t=c?' ('+c.replace('auth/','')+')':'';if(e&&e.message==='acct-cancel')return'اتلغى تسجيل الدخول، وبياناتك زي ما هي على الجهاز.';if(/popup-closed|cancelled-popup/.test(c))return'اتلغى تسجيل الدخول.';if(/email-already-in-use/.test(c))return'الإيميل ده له حساب بالفعل. سجّل دخول، أو استخدم نسيت كلمة السر.';if(/weak-password/.test(c))return'كلمة السر ضعيفة. اكتب 6 حروف أو أرقام على الأقل.';if(/too-many-requests/.test(c))return'محاولات كتير. استنى شوية وجرّب تاني.';if(/user-mismatch/.test(c))return'الحساب اللي اخترته مش هو الحساب الداخل دلوقتي.';if(/requires-recent-login/.test(c))return'لازم تأكد دخولك تاني.';if(/unauthorized-domain/.test(c))return'تسجيل الدخول مش متاح من العنوان ده'+t;if(/operation-not-allowed/.test(c))return'طريقة الدخول دي مش متفعلة'+t;if(/invalid-credential|wrong-password|user-not-found|invalid-email/.test(c))return'الإيميل أو كلمة السر غلط.';if(/network/.test(c))return'مفيش إنترنت.';if(e&&e.message==='no-user')return'محتاج تسجيل دخول من جديد.';if(e&&e.message==='load')return'تعذر الاتصال بالسحابة: النت مش شغال.';return'تعذر الربط'+(t||(e&&e.message?' ('+e.message+')':''))};
 const typing=el=>{const a=document.activeElement;return!!(a&&el.contains(a)&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))};
 function refreshAll(){DV++;syncNames();if(!typing($('t-cu')))drawCusts();if(!typing($('t-it')))drawItems();if(!typing($('t-dash')))drawDash();if(!typing($('t-new')))custInput();autoBan();drawTrash();try{qtBtn()}catch(e){}if(stCur==='exp'&&!typing($('t-st')))drawExp();if(stCur==='sup'&&!typing($('t-st')))drawSup();if(stCur==='stk'&&!typing($('t-st')))drawStk()}
 let syncing=null,cloudOk=null;
 function syncNow(){if(!dataReady||instOff)return Promise.resolve(false);if(syncing)return syncing;
-  syncing=(async()=>{let ok=false;try{ok=await loadCloud();lastSync=Date.now();if(ok){reflowAll();refreshAll();autoBackupMaybe()}return ok}finally{syncing=null;cloudOk=ok;cloudUI()}})();cloudUI();return syncing}
+  syncing=(async()=>{let ok=false;try{ok=await loadCloud();lastSync=Date.now();if(ok){reflowAll();refreshAll();autoBackupMaybe();await setSync()}return ok}finally{syncing=null;cloudOk=ok;cloudUI()}})();cloudUI();return syncing}
 /* علامة السحابة فوق: ✓ محفوظ ومتزامن · ⏳ بيحفظ · ! مش متصل · ✗ مش مربوط بحساب (البيانات على الجهاز ده بس) */
 function cloudUI(){const b=$('cloudSt');if(!b)return;let s,t;
   if(!fbCfg()){s='off';t='بياناتك على الموبايل ده بس. اربطها بحسابك عشان ترجع لو الموبايل ضاع أو اتغيّر'}
   else if(syncing){s='busy';t='بيحفظ على السحابة…'}
   else if(FBDB&&cloudOk){s='ok';t='بياناتك محفوظة على حسابك ومتزامنة ✓'+(lastSync?' · آخر مزامنة '+hm(lastSync):'')}
   else{s='err';t='مش متصل بالسحابة دلوقتي. بياناتك محفوظة على الجهاز وهتتزامن لوحدها لما النت يرجع'}
-  b.className='hdr-cloud '+s;b.title=t;b.setAttribute('aria-label',t);b.dataset.s=s}
+  b.className='hdr-cloud '+s;b.title=t;b.setAttribute('aria-label',t);b.dataset.s=s;acctUI()}
+const fbUser=()=>{try{return window.firebase&&firebase.apps.length?firebase.auth().currentUser:null}catch(e){return null}};
+function acctUI(){const on=!!fbCfg(),u=fbUser();$('fbAuth').classList.toggle('hide',on);$('fbOff').classList.toggle('hide',!on);$('fbDel').classList.toggle('hide',!on);$('fbWho').textContent=u&&u.email?'الحساب: '+u.email:''}
 const goData=()=>{$('hdrSet').click();stGo('data');window.scrollTo(0,0)};
-$('cloudSt').onclick=()=>{const s=$('cloudSt').dataset.s;toast($('cloudSt').title,s==='off'?'اربط حسابك':s==='err'?'جرّب تاني':'الإعدادات',s==='err'?()=>fbBoot():goData)};
+$('cloudSt').onclick=()=>{const s=$('cloudSt').dataset.s;toast($('cloudSt').title,s==='off'?'اربط حسابك':s==='err'?'جرّب تاني':'الإعدادات',s==='off'?()=>authOpen():s==='err'?()=>fbBoot():goData)};
 addEventListener('offline',()=>{if(fbCfg()){cloudOk=false;cloudUI()}});
 async function fbBoot(){const cfg=fbCfg();if(!cfg){await syncNow();return}
   fbStat('جاري الاتصال بالسحابة...');
-  try{await fbStart(cfg);const ok=await syncNow();fbStat(ok?'متصل ✓ المزامنة والنسخ الاحتياطي تلقائيين.':'متصل بالحساب لكن قراءة البيانات فشلت (صلاحيات Firestore).')}
-  catch(e){fbStat(e&&e.message==='acct-cancel'?fbErr(e):e&&e.message==='no-user'?'محتاج تسجيل دخول من جديد.':'مفيش اتصال حالياً: بياناتك على الجهاز وهتتزامن لما النت يرجع.');cloudOk=false;cloudUI()}}
-async function fbLogin(email,pass,google){fbStat('جاري الربط...');
-  try{const r=await fbStart(FBCFG,email,pass,google);if(r===false)return;try{localStorage.setItem('fbOn','1');localStorage.removeItem('fbCfg')}catch(e){}$('fbPass').value='';
+  try{await fbStart(cfg);const ok=await syncNow();fbStat(ok?'متصل ✓ المزامنة والنسخ الاحتياطي تلقائيين.':'متصل بالحساب لكن قراءة البيانات فشلت (صلاحيات Firestore).');shopAsk()}
+  catch(e){fbStat(e&&e.message==='acct-cancel'?fbErr(e):e&&e.message==='no-user'?'محتاج تسجيل دخول من جديد.':'مفيش اتصال حالياً: بياناتك على الجهاز وهتتزامن لما النت يرجع.');cloudOk=false;
+    /* رجع من شاشة جوجل من غير ما يدخل وجهازه فاضي: يرجع لشاشة الدخول */
+    if(e&&e.message==='no-user'&&!localHas()){try{localStorage.removeItem('fbOn')}catch(_){}welcMaybe()}cloudUI()}}
+async function fbLogin(email,pass,google,create){fbStat('جاري الربط...');
+  try{const r=await fbStart(FBCFG,email,pass,google,create);if(r===false)return;try{localStorage.setItem('fbOn','1');localStorage.removeItem('fbCfg')}catch(e){}
     const ok=await syncNow();fbStat(ok?'متصل ✓ المزامنة والنسخ الاحتياطي تلقائيين.':'تم تسجيل الدخول لكن قراءة البيانات فشلت (صلاحيات Firestore).')}
   catch(e){fbStat(fbErr(e))}}
-$('fbGoogle').onclick=()=>fbLogin(null,null,true);
-$('fbConnect').onclick=()=>{const em=$('fbEmail').value.trim(),pw=$('fbPass').value;if(!em||!pw){fbStat('اكتب الإيميل وكلمة السر.');return}fbLogin(em,pw,false)};
-$('fbMore').onclick=e=>{e.preventDefault();$('fbMail').classList.toggle('hide')};
+$('fbAuth').onclick=()=>authOpen();
 /* الخروج: بيرفع آخر التعديلات، وبعدين بيشيل بيانات الحساب من الجهاز ويرجع لشاشة الدخول */
 $('fbOff').onclick=async e=>{const b=e.currentTarget;if(!fbCfg()){fbStat('مفيش حساب مربوط على الجهاز ده.');return}if(!ok2(b))return;
   b.disabled=true;fbStat('جاري رفع آخر التعديلات…');let safe=false;
-  try{if(FBDB){await tmo(flushDel(FBDB),20000);await tmo(pushPending(FBDB),20000);safe=+lsv('fullAt','0')>0&&!pupGet().size&&!lget('pdel').length}}catch(err){}
+  try{if(FBDB){await tmo(setSync(),15000);await tmo(flushDel(FBDB),20000);await tmo(pushPending(FBDB),20000);safe=+lsv('fullAt','0')>0&&!pupGet().size&&!lget('pdel').length}}catch(err){}
   b.disabled=false;if(safe){await acctLeave();return}
   const m='فيه تعديلات لسه ما اترفعتش على حسابك. وصّل النت وجرّب تاني، أو اخرج وهينزل ملف نسخة منها.';fbStat(m);toast(m,'اخرج برضه',async()=>{await keepCopy();await acctLeave()})};
-/* أول مرة البرنامج يتفتح على جهاز فاضي: زي الواتساب، يسألك ترجّع بياناتك من حسابك */
-function welcMaybe(){if(fbCfg()||lsv('welcDone','')==='1'||S.customers.length+S.invoices.length)return;$('welc').classList.remove('hide')}
+/* شاشة الدخول: أول ما البرنامج يفتح على جهاز فاضي، وبعد الخروج من الحساب */
+let auM='in';
+function auMode(m){auM=m;const nw=m==='new',rs=m==='reset';$('auTab').classList.toggle('hide',rs);$('auTab').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  $('auShopB').classList.toggle('hide',!nw);$('auPassB').classList.toggle('hide',rs);$('auAlt').classList.toggle('hide',rs);$('auForgot').classList.toggle('hide',nw);$('auForgot').textContent=rs?'رجوع لتسجيل الدخول':'نسيت كلمة السر؟';
+  $('auGo').textContent=rs?'ابعت رابط تغيير كلمة السر':nw?'إنشاء الحساب':'دخول';$('auSub').textContent=rs?'اكتب إيميلك وهيوصلك رابط تغيير كلمة السر.':nw?'حساب جديد لمحلك، وبياناتك هتتحفظ عليه.':'ادخل بحسابك وبياناتك هترجع لوحدها.';
+  $('auPass').setAttribute('autocomplete',nw?'new-password':'current-password');$('welcMsg').textContent=''}
+function authOpen(){auMode('in');$('auShop').value=shopN();$('welc').classList.remove('hide')}
+function welcMaybe(){if(fbCfg()||lsv('welcDone','')==='1'||S.customers.length+S.invoices.length){shopAsk();return}authOpen()}
 const welcEnd=()=>{svk('welcDone','1');$('welc').classList.add('hide')};
+const auDone=(nw,sh)=>{const m=$('welcMsg');if(!FBDB){m.textContent=$('fbStat').textContent;return}$('auPass').value='';if(nw&&sh){svk('shop',sh);loadMsgUI()}welcEnd();
+  toast(S.invoices.length+S.customers.length?'رجعت بياناتك ✓ '+S.customers.length+' عميل · '+S.invoices.length+' فاتورة':'اتربط حسابك ✓ وأي حاجة تعملها هتتحفظ عليه لوحدها');shopAsk()};
+$('auTab').onclick=e=>{const b=e.target.closest('button[data-m]');if(b)auMode(b.dataset.m)};
+$('auForgot').onclick=()=>auMode(auM==='reset'?'in':'reset');
+$('auEye').onclick=()=>{const p=$('auPass'),s=p.type==='password';p.type=s?'text':'password';$('auEye').textContent=s?'إخفاء':'إظهار'};
+$('auForm').onsubmit=async e=>{e.preventDefault();const m=$('welcMsg'),b=$('auGo'),em=$('auMail').value.trim(),pw=$('auPass').value,sh=$('auShop').value.trim(),nw=auM==='new';
+  if(!/^\S+@\S+\.\S+$/.test(em)){m.textContent='اكتب إيميل صحيح.';return}
+  if(auM==='reset'){b.disabled=true;m.textContent='جاري الإرسال…';try{const a=await fbLoad();await a.sendPasswordResetEmail(em);m.textContent='لو الإيميل ده له حساب، هيوصلك رابط تغيير كلمة السر. لو ما وصلش، بص في الرسايل المزعجة (Spam).'}catch(err){m.textContent=fbErr(err)}b.disabled=false;return}
+  if(nw&&!sh){m.textContent='اكتب اسم المحل.';return}if(!pw){m.textContent='اكتب كلمة السر.';return}if(nw&&pw.length<6){m.textContent='كلمة السر لازم تكون 6 حروف أو أرقام على الأقل.';return}
+  b.disabled=true;m.textContent=nw?'جاري إنشاء الحساب…':'جاري الدخول وتنزيل بياناتك…';await fbLogin(em,pw,false,nw);b.disabled=false;auDone(nw,sh)};
 $('welcG').onclick=async()=>{const m=$('welcMsg');
   if(location.protocol==='file:'){m.textContent='الدخول بحساب Google بيشتغل من لينك البرنامج بس، مش من الملف اللي على الكمبيوتر.';return}
-  m.textContent='جاري الدخول وتنزيل بياناتك…';await fbLogin(null,null,true);
-  if(FBDB){welcEnd();toast(S.invoices.length+S.customers.length?'رجعت بياناتك ✓ '+S.customers.length+' عميل · '+S.invoices.length+' فاتورة':'اتربط حسابك ✓ وأي حاجة تعملها هتتحفظ عليه لوحدها')}
-  else m.textContent=$('fbStat').textContent};
-$('welcMail').onclick=()=>{welcEnd();goData();$('fbMail').classList.remove('hide');$('fbEmail').focus()};
-$('welcNew').onclick=()=>{welcEnd();toast('تقدر تربط حسابك في أي وقت من علامة ☁️ فوق')};
+  m.textContent='جاري الدخول وتنزيل بياناتك…';await fbLogin(null,null,true);auDone(false,'')};
+$('welcNew').onclick=()=>{welcEnd();toast('تقدر تربط حسابك في أي وقت من علامة ☁️ فوق');shopAsk()};
+/* اسم المحل بيظهر على الفاتورة، فلو فاضي بنسأل عليه (مرة كل 3 أيام بالكتير) */
+function shopAsk(){if(shopN()||!$('welc').classList.contains('hide')||Date.now()-(+lsv('shopAskAt','0'))<3*864e5)return;svk('shopAskAt',String(Date.now()));$('shopAskIn').value='';$('shopOv').classList.remove('hide')}
+$('shopAskGo').onclick=()=>{const v=$('shopAskIn').value.trim();if(!v){$('shopAskIn').focus();return}svk('shop',v);loadMsgUI();$('shopOv').classList.add('hide');toast('تم حفظ اسم المحل ✓ واللوجو وباقي البيانات من الإعدادات','بيانات المحل',()=>{$('hdrSet').click();stGo('shop');window.scrollTo(0,0)})};
+$('shopAskNo').onclick=()=>$('shopOv').classList.add('hide');
+/* حذف الحساب: تأكيد الدخول، بعدين مسح كل بيانات users/{uid}، بعدين الحساب نفسه، وآخر حاجة الجهاز */
+const hasPw=u=>(u.providerData||[]).some(p=>p&&p.providerId==='password');
+async function acctPurge(){const fs=firebase.firestore();for(const k of[...BIG,'deleted','backups_meta','backups_data','settings']){const n=k==='backups_data'?20:300;
+    for(;;){const sn=await FBDB.base.collection(k).limit(n).get();if(sn.empty)break;const b=fs.batch();sn.docs.forEach(d=>b.delete(d.ref));await b.commit();if(sn.docs.length<n)break}}}
+const delChk=()=>{const u=fbUser();$('delGo').disabled=$('delCf').value.trim()!=='حذف'||(!!u&&hasPw(u)&&!$('delPw').value)};
+$('fbDel').onclick=()=>{const u=fbUser();if(!u||!FBDB){fbStat('لازم تكون داخل بحسابك ومتصل بالنت عشان تحذفه.');return}$('delCf').value='';$('delPw').value='';$('delMsg').textContent='';$('delPwB').classList.toggle('hide',!hasPw(u));delChk();$('delOv').classList.remove('hide')};
+$('delCf').oninput=delChk;$('delPw').oninput=delChk;$('delNo').onclick=()=>$('delOv').classList.add('hide');$('delBk').onclick=()=>keepCopy();
+$('delGo').onclick=async()=>{const m=$('delMsg'),b=$('delGo'),u=fbUser();if(!u||!FBDB)return;b.disabled=true;$('delNo').disabled=true;
+  try{m.textContent='جاري تأكيد حسابك…';if(hasPw(u))await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email,$('delPw').value));else await u.reauthenticateWithPopup(new firebase.auth.GoogleAuthProvider());
+    if(syncing)await syncing;instOff=true;db=null;clearTimeout(setT);m.textContent='جاري مسح بياناتك…';await tmo(acctPurge(),180000);await u.delete();FBDB=null;instOff=false;await wipeLocal();location.reload()}
+  catch(e){instOff=false;if(FBDB)db=FBDB;b.disabled=false;$('delNo').disabled=false;m.textContent=e&&e.message==='timeout'?'النت بطيء ومسح البيانات ما خلصش. جرّب تاني.':fbErr(e)}};
 /* تذكير كل 3 أيام لو فيه بيانات ومش مربوطة بحساب */
 function cloudNag(){if(fbCfg()||!S.invoices.length)return;const l=+lsv('cloudNag','0');if(Date.now()-l<3*864e5)return;svk('cloudNag',String(Date.now()));
   toast('⚠ بياناتك على الموبايل ده بس. اربطها بحسابك عشان ما تضيعش','اربط حسابك',goData)}
 addEventListener('online',()=>{if(fbCfg()&&dataReady&&!instOff)fbBoot()});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&FBDB&&Date.now()-lastSync>30000)syncNow()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(FBDB)setSync();return}if(FBDB&&Date.now()-lastSync>30000)syncNow()});
 
 /* ---------- تطبيق الموبايل (PWA) ---------- */
 $('appVer').textContent='نسخة التطبيق: '+APP_VER;
@@ -1289,7 +1337,7 @@ function applyFeatures(){cbStatus();$('saveImg').classList.toggle('hide',!pget('
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoBan()});
 
 /* رسائل الواتساب */
-const svk=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const svk=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}if(SET_S.has(k))setSoon()};
 function loadMsgUI(){$('shopN').value=shopN();$('custW').value=custW();$('docW').value=docW();$('tplInv').value=tplOf('inv');$('tplPay').value=tplOf('pay');$('tplRem').value=tplOf('rem');$('tplRdy').value=tplOf('rdy')}
 $('shopN').oninput=()=>svk('shop',$('shopN').value.trim());$('docW').oninput=()=>svk('docw',$('docW').value.trim());$('custW').oninput=()=>svk('custw',$('custW').value.trim());
 [['tplInv','tpl_inv'],['tplPay','tpl_pay'],['tplRem','tpl_rem'],['tplRdy','tpl_rdy']].forEach(([i,k])=>$(i).oninput=()=>svk(k,$(i).value));
@@ -1301,9 +1349,9 @@ function loadLogo(){const u=logoSrc();const hl=$('hdrLogo');if(u){hl.src=u;hl.cl
 $('logoFile').onchange=e=>{const fl=e.target.files[0];e.target.value='';if(!fl)return;const rd=new FileReader();
   rd.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,420/im.naturalWidth,200/im.naturalHeight),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.naturalWidth*k));c.height=Math.max(1,Math.round(im.naturalHeight*k));
       const x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
-      try{localStorage.setItem('logo',c.toDataURL('image/png'));$('logoMsg').textContent='تم حفظ اللوجو ✓'}catch(err){$('logoMsg').textContent='الصورة كبيرة، جرّب صورة أصغر'}loadLogo()};
+      try{localStorage.setItem('logo',c.toDataURL('image/png'));$('logoMsg').textContent='تم حفظ اللوجو ✓'}catch(err){$('logoMsg').textContent='الصورة كبيرة، جرّب صورة أصغر'}loadLogo();setSoon()};
     im.onerror=()=>{$('logoMsg').textContent='الملف مش صورة صالحة'};im.src=rd.result};rd.readAsDataURL(fl)};
-$('logoDel').onclick=e=>{if(!ok2(e.target))return;try{localStorage.removeItem('logo')}catch(e){}$('logoMsg').textContent='تم حذف اللوجو';loadLogo()};
+$('logoDel').onclick=e=>{if(!ok2(e.target))return;try{localStorage.removeItem('logo')}catch(e){}$('logoMsg').textContent='تم حذف اللوجو';loadLogo();setSoon()};
 
 /* ===== البرنامج مفتوح في مكانين على نفس الجهاز: الأحدث يشتغل، والأقدم يحفظ اللي عنده ويقف ===== */
 const INST=uid(),INST_AT=Date.now();let instBC=null;
@@ -1348,7 +1396,7 @@ function stSum(){const W_=(k,t)=>{const e=$('ss_'+k);if(e)e.textContent=t};$('ss
 $('t-st').addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){document.querySelector('#bnav button[data-t="'+g.dataset.go+'"]').click();window.scrollTo(0,0);return}const b=e.target.closest('.sti,.stile[data-sp]');if(b){stGo(b.dataset.sp);return}if(e.target.closest('[data-stback]'))stGo('')});
 /* بيانات المحل: السطور الثابتة */
 function shopTxtLoad(){const d=invd();$('stTop').value=d.topText||'';$('stHead').value=d.headText||'';$('stFoot').value=d.footText||''}
-['stTop','stHead','stFoot'].forEach(id=>$(id).oninput=()=>{try{localStorage.setItem('shopTxt',JSON.stringify({top:$('stTop').value,head:$('stHead').value,foot:$('stFoot').value}))}catch(e){}});
+['stTop','stHead','stFoot'].forEach(id=>$(id).oninput=()=>{try{localStorage.setItem('shopTxt',JSON.stringify({top:$('stTop').value,head:$('stHead').value,foot:$('stFoot').value}))}catch(e){}setSoon()});
 /* ملاحظات الفاتورة: أكتر من ملاحظة وكل واحدة بلونها (بتتحفظ مع كل فاتورة جديدة) */
 function getNotes(){let l=null;try{l=JSON.parse(localStorage.getItem('invNotes')||'null')}catch(e){}
   if(!Array.isArray(l)){l=[];const g=lsv('gnote','').trim();if(g)l.push({t:g,c:'',b:0});let st=null;try{st=JSON.parse(localStorage.getItem('invdesign')||'null')}catch(e){}
@@ -1862,7 +1910,7 @@ $('lkSave').onclick=async()=>{const a=$('lkP1').value,b=$('lkP2').value,m=$('lkM
   $('lkP1').value=$('lkP2').value='';$('lkSet').classList.add('hide');m.textContent='تم تفعيل القفل ✓';lkUI();lkRecMake()};
 $('lkBio').onchange=async()=>{const m=$('lkMsg');m.textContent='';
   if(!$('lkBio').checked){lkSet('lkBio',null);return}
-  try{const cr=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'ElTabakha Glass'},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'owner',displayName:'صاحب المحل'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000}});
+  try{const cr=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'فواتير'},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'owner',displayName:'صاحب المحل'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000}});
     lkSet('lkBio',b64(cr.rawId));m.textContent='تم تفعيل البصمة ✓'}
   catch(e){$('lkBio').checked=false;m.textContent='تعذر تفعيل البصمة على الجهاز ده'}};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)hiddenAt=Date.now();else if(lkGet('lkOn')==='1'&&hiddenAt&&Date.now()-hiddenAt>60000){lockNow();if(lkGet('lkBio')&&bioOK)tryBio()}});
@@ -1895,9 +1943,9 @@ async function drawSnaps(){const m=$('snapMsg');let l=[];try{l=(await idbDo('rea
   $('snapRows').innerHTML=l.length?l.map(x=>`<div class="hrow" style="cursor:default"><div class="hl"><b>${x.day}</b><small class="mute">${x.n} فاتورة · ${x.c} عميل</small></div><div style="display:flex;gap:6px"><button class="alt" data-sd="${x.day}">تنزيل</button><button class="alt b-red" data-sr="${x.day}">استرجاع</button></div></div>`).join(''):'<div class="info">لسه مفيش نسخ. أول نسخة هتتعمل أول ما تفتح التطبيق.</div>';m.textContent=''}
 $('snapList').onclick=drawSnaps;
 $('snapRows').onclick=async e=>{const d=e.target.dataset;if(!d.sd&&!d.sr)return;const k=d.sd||d.sr,x=await idbDo('readonly',st=>st.get(k));if(!x)return;
-  if(d.sd){await dl(new Blob([x.json],{type:'application/json'}),'نسخة-ElTabakha-'+k+'.json');return}
+  if(d.sd){await dl(new Blob([x.json],{type:'application/json'}),'نسخة-فواتير-'+k+'.json');return}
   if(!ok2(e.target))return;try{$('snapMsg').textContent=restoreData(JSON.parse(x.json))}catch(err){$('snapMsg').textContent='النسخة دي مش صالحة.'}};
-$('bkShare').onclick=async()=>{const name='نسخة-ElTabakha-'+dshort(Date.now()).replace(/\//g,'-')+'.json',blob=new Blob([JSON.stringify(bkData())],{type:'application/json'});
+$('bkShare').onclick=async()=>{const name='نسخة-فواتير-'+dshort(Date.now()).replace(/\//g,'-')+'.json',blob=new Blob([JSON.stringify(bkData())],{type:'application/json'});
   try{const file=new File([blob],name,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});try{localStorage.setItem('lastBackup',Date.now())}catch(e){}bkInfo();bkBan();$('snapMsg').textContent='تمت المشاركة ✓ (اختار درايف أو ابعتها لنفسك على واتساب)';return}}catch(e){if(e&&e.name==='AbortError')return}
   $('bkSave').click()};
 setTimeout(snapMaybe,4000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)snapMaybe()});
