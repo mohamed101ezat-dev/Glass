@@ -1,4 +1,4 @@
-/* الطباخه · الأنماط (كلها في ملف واحد)
+/* فواتير · الأنماط (كلها في ملف واحد)
    الترتيب مهم: الأساس، بعده تصحيحات، وآخر حاجة طبقة التصميم الجديد. */
 :root{--bg:#f3f6f5;--card:#fff;--ink:#111827;--mute:#4b5563;--line:#d1d5db;--acc:#0f766e;--accLight:#e2f1ef;--accInk:#fff;--accB:#0f766e;--tot:#eef3f2;--danger:#b91c1c;--drB:#fee2e2;--drI:#991b1b;--crB:#dcfce7;--crI:#166534;--shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);--shadowMd:0 4px 12px rgba(0,0,0,.1);--radius:12px;color-scheme:light}
 [data-theme="dark"]{--bg:#0f172a;--card:#1e293b;--ink:#e2e8f0;--mute:#94a3b8;--line:#334155;--acc:#14b8a6;--accLight:#134e4a;--accInk:#fff;--accB:#14b8a6;--tot:#1a2e2b;--danger:#f87171;--drB:#3b1111;--drI:#fca5a5;--crB:#0a2e1a;--crI:#86efac;--shadow:0 1px 3px rgba(0,0,0,.3);--shadowMd:0 4px 12px rgba(0,0,0,.4);color-scheme:dark}
@@ -846,3 +846,22 @@ button.b-green,a.b-green{background:#15803d;box-shadow:none}
 #toast{top:calc(var(--hh) + env(safe-area-inset-top,0px) + 6px);bottom:auto;left:8px;right:8px;max-width:560px;margin:0 auto;transform:none;z-index:110;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--card);color:var(--ink);border:1px solid color-mix(in srgb,var(--ink) 30%,transparent);box-shadow:0 6px 18px rgba(0,0,0,.18);font-size:14px;white-space:normal;cursor:pointer}
 #toast.hide{display:none}
 #toast b{flex:none;font-size:13px}
+
+/* شاشة الدخول */
+.auth{position:fixed;inset:0;z-index:80;background:var(--bg);overflow-y:auto;padding:calc(24px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.auth-in{max-width:360px;margin:0 auto;display:flex;flex-direction:column;align-items:stretch;gap:8px;text-align:center}
+.auth-ic{width:64px;height:64px;border-radius:14px;margin:0 auto}
+.auth-t{font-size:22px;color:var(--ink)}
+.auth-sub{margin-bottom:6px;line-height:1.7}
+.auth form{display:flex;flex-direction:column;gap:6px;text-align:start}
+.auth label{margin-top:4px}
+.auth input{width:100%;height:42px}
+.auth-pw{position:relative}.auth-pw input{padding-inline-end:64px}
+.auth-pw .lnk{position:absolute;inset-inline-end:8px;top:50%;transform:translateY(-50%)}
+.auth #auGo{margin-top:8px;height:42px;width:100%}
+.auth #auTab{margin-bottom:4px}
+.auth-or{display:flex;align-items:center;gap:8px;color:var(--mute);font-size:13px;margin:6px 0}
+.auth-or:before,.auth-or:after{content:"";flex:1;border-top:1px solid var(--line)}
+.auth .info{min-height:0;line-height:1.7}
+.busy{position:fixed;z-index:75;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(17,24,39,.88);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;pointer-events:none}
+.auth .lnk{background:none!important;border:0!important;box-shadow:none!important;align-self:center;padding:4px 8px;font-size:13px;width:auto;text-decoration:underline}.auth .auth-pw .lnk{padding:2px 4px}
