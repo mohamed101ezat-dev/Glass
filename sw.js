@@ -36,7 +36,7 @@ function alertsNow() {
 
 self.addEventListener('periodicsync', e => {
   if (e.tag !== 'tabakha-alerts') return;
-  e.waitUntil(alertsNow().then(l => Promise.all(l.map(a => self.registration.showNotification('الطباخه', {
+  e.waitUntil(alertsNow().then(l => Promise.all(l.map(a => self.registration.showNotification('فواتير', {
     body: a.m, icon: 'icon-192.png', badge: 'icon-192.png', tag: a.k, lang: 'ar', dir: 'rtl', data: { go: a.k }
   })))));
 });
