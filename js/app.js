@@ -1,6 +1,6 @@
 ﻿/* الطباخه · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='149';
+const APP_VER='150';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1152,7 +1152,7 @@ async function fbStart(cfg,email,pass,google){
       try{localStorage.setItem('fbOn','1');localStorage.removeItem('fbCfg')}catch(_){}await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());return false}throw e}}
   else if(email&&pass)user=(await auth.signInWithEmailAndPassword(email,pass)).user;
   else user=await new Promise(r=>{const u=auth.onAuthStateChanged(x=>{u();r(x)})});
-  if(!user)throw new Error('no-user');try{localStorage.setItem('fbUid',user.uid)}catch(e){}
+  if(!user)throw new Error('no-user');if(!await acctGate(auth,user))return false;try{localStorage.setItem('fbUid',user.uid)}catch(e){}
   const base=firebase.firestore().collection('users').doc(user.uid);
   const FV=firebase.firestore.FieldValue,TS=firebase.firestore.Timestamp,clean=o=>{if(o)delete o.su;return o};
   const rdSn=sn=>({docs:sn.docs.map(x=>{const o=x.data(),t=o.su;delete o.su;return{data:()=>o,su:t&&t.toMillis?t.toMillis():0}})});
@@ -1162,7 +1162,28 @@ async function fbStart(cfg,email,pass,google){
   return true}
 const fbCfg=()=>{try{return(localStorage.getItem('fbOn')==='1'||localStorage.getItem('fbCfg'))?FBCFG:null}catch(e){return null}};
 const fbStat=t=>{$('fbStat').textContent=t};
-const fbErr=e=>{const c=(e&&e.code)||'',t=c?' ('+c.replace('auth/','')+')':'';if(/popup-closed|cancelled-popup/.test(c))return'اتلغى تسجيل الدخول.';if(/unauthorized-domain/.test(c))return'تسجيل الدخول مش متاح من العنوان ده'+t;if(/operation-not-allowed/.test(c))return'طريقة الدخول دي مش متفعلة'+t;if(/invalid-credential|wrong-password|user-not-found|invalid-email/.test(c))return'الإيميل أو كلمة السر غلط.';if(/network/.test(c))return'مفيش إنترنت.';if(e&&e.message==='no-user')return'محتاج تسجيل دخول من جديد.';if(e&&e.message==='load')return'تعذر الاتصال بالسحابة: النت مش شغال.';return'تعذر الربط'+(t||(e&&e.message?' ('+e.message+')':''))};
+/* ---------- الجهاز بيشيل بيانات حساب واحد (fbUid = صاحبها): مفيش بيانات بتتنقل بين الحسابات من غير سؤال ---------- */
+/* الأصناف والفئات مش في الفحص عشان الجهاز الجديد ممكن يبدأ بأصناف جاهزة */
+const localHas=()=>['customers','invoices','quotes','expenses','suppliers','purchases','stock'].some(k=>S[k].length>0);
+const ACCT_LS=['pup','pdel','trash','fullAt','syncCur','closes','clStart','qtNo','ordNew','codeHW','lastBackup','cbAt','cbDay','bkSnooze','cloudNag','stkMin','dcSeen','wcSeen','mcSeen','welcDone','fbUid','fbCfg','fbOn','lkOn','lkHash','lkSalt','lkBio','lkRecHash'];
+async function wipeLocal(){BIG.forEach(k=>{S[k]=[];lset(k,[])});DV++;
+  if(ddb){await flushIDB();await kvPut({alertNow:[]}).catch(()=>{})}
+  try{[...BIG,...ACCT_LS].forEach(k=>localStorage.removeItem(k));Object.keys(localStorage).filter(k=>k.indexOf('nfDay_')===0).forEach(k=>localStorage.removeItem(k))}catch(e){}
+  try{await idbDo('readwrite',st=>st.clear())}catch(e){}
+  pupS=null;instOff=true}
+/* لو البيانات هتتشال ولسه مش متأكدين إنها على السحابة: ينزل ملف نسخة منها الأول */
+async function keepCopy(){try{await dl(new Blob([JSON.stringify(bkData())],{type:'application/json'}),'نسخة-قبل-تغيير-الحساب-'+dshort(Date.now()).replace(/\//g,'-')+'.json')}catch(e){}}
+let acctP=null;
+function acctAsk(prev,mail){if(acctP)return acctP;acctP=new Promise(res=>{const o=$('acctOv'),end=c=>{o.classList.add('hide');acctP=null;res(c)},who=mail||'الحساب ده';
+  $('acctT').textContent=prev?'البيانات دي تخص حساب تاني':'فيه بيانات على الموبايل ده';
+  $('acctM').textContent=prev?'البيانات اللي على الموبايل مش بتاعة '+who+'، فمش هتتضاف عليه. لو دخلت هتتشال من الموبايل، وهينزل ملف نسخة منها الأول.':'تحب تضيفها لحساب '+who+'؟ ولو دخلت من غيرها هتتشال من الموبايل، وهينزل ملف نسخة منها الأول.';
+  $('acctAdd').classList.toggle('hide',!!prev);$('acctAdd').onclick=()=>end('add');$('acctSkip').onclick=()=>end('skip');$('acctNo').onclick=()=>end('no');o.classList.remove('hide')});return acctP}
+async function acctGate(auth,user){const prev=lsv('fbUid','');if(prev===user.uid||!localHas())return true;
+  const c=await acctAsk(prev,user.email);if(c==='add')return true;
+  if(c==='skip'){await keepCopy();await wipeLocal();try{localStorage.setItem('fbOn','1');localStorage.setItem('fbUid',user.uid)}catch(e){}location.reload();return false}
+  try{await auth.signOut()}catch(e){}try{localStorage.removeItem('fbOn');localStorage.removeItem('fbCfg')}catch(e){}throw new Error('acct-cancel')}
+async function acctLeave(){try{if(window.firebase&&firebase.auth)await firebase.auth().signOut()}catch(e){}await wipeLocal();location.reload()}
+const fbErr=e=>{const c=(e&&e.code)||'',t=c?' ('+c.replace('auth/','')+')':'';if(e&&e.message==='acct-cancel')return'اتلغى تسجيل الدخول، وبياناتك زي ما هي على الجهاز.';if(/popup-closed|cancelled-popup/.test(c))return'اتلغى تسجيل الدخول.';if(/unauthorized-domain/.test(c))return'تسجيل الدخول مش متاح من العنوان ده'+t;if(/operation-not-allowed/.test(c))return'طريقة الدخول دي مش متفعلة'+t;if(/invalid-credential|wrong-password|user-not-found|invalid-email/.test(c))return'الإيميل أو كلمة السر غلط.';if(/network/.test(c))return'مفيش إنترنت.';if(e&&e.message==='no-user')return'محتاج تسجيل دخول من جديد.';if(e&&e.message==='load')return'تعذر الاتصال بالسحابة: النت مش شغال.';return'تعذر الربط'+(t||(e&&e.message?' ('+e.message+')':''))};
 const typing=el=>{const a=document.activeElement;return!!(a&&el.contains(a)&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))};
 function refreshAll(){DV++;syncNames();if(!typing($('t-cu')))drawCusts();if(!typing($('t-it')))drawItems();if(!typing($('t-dash')))drawDash();if(!typing($('t-new')))custInput();autoBan();drawTrash();try{qtBtn()}catch(e){}if(stCur==='exp'&&!typing($('t-st')))drawExp();if(stCur==='sup'&&!typing($('t-st')))drawSup();if(stCur==='stk'&&!typing($('t-st')))drawStk()}
 let syncing=null,cloudOk=null;
@@ -1181,7 +1202,7 @@ addEventListener('offline',()=>{if(fbCfg()){cloudOk=false;cloudUI()}});
 async function fbBoot(){const cfg=fbCfg();if(!cfg){await syncNow();return}
   fbStat('جاري الاتصال بالسحابة...');
   try{await fbStart(cfg);const ok=await syncNow();fbStat(ok?'متصل ✓ المزامنة والنسخ الاحتياطي تلقائيين.':'متصل بالحساب لكن قراءة البيانات فشلت (صلاحيات Firestore).')}
-  catch(e){fbStat(e&&e.message==='no-user'?'محتاج تسجيل دخول من جديد.':'مفيش اتصال حالياً: بياناتك على الجهاز وهتتزامن لما النت يرجع.');cloudOk=false;cloudUI()}}
+  catch(e){fbStat(e&&e.message==='acct-cancel'?fbErr(e):e&&e.message==='no-user'?'محتاج تسجيل دخول من جديد.':'مفيش اتصال حالياً: بياناتك على الجهاز وهتتزامن لما النت يرجع.');cloudOk=false;cloudUI()}}
 async function fbLogin(email,pass,google){fbStat('جاري الربط...');
   try{const r=await fbStart(FBCFG,email,pass,google);if(r===false)return;try{localStorage.setItem('fbOn','1');localStorage.removeItem('fbCfg')}catch(e){}$('fbPass').value='';
     const ok=await syncNow();fbStat(ok?'متصل ✓ المزامنة والنسخ الاحتياطي تلقائيين.':'تم تسجيل الدخول لكن قراءة البيانات فشلت (صلاحيات Firestore).')}
@@ -1189,7 +1210,12 @@ async function fbLogin(email,pass,google){fbStat('جاري الربط...');
 $('fbGoogle').onclick=()=>fbLogin(null,null,true);
 $('fbConnect').onclick=()=>{const em=$('fbEmail').value.trim(),pw=$('fbPass').value;if(!em||!pw){fbStat('اكتب الإيميل وكلمة السر.');return}fbLogin(em,pw,false)};
 $('fbMore').onclick=e=>{e.preventDefault();$('fbMail').classList.toggle('hide')};
-$('fbOff').onclick=async()=>{try{if(window.firebase&&firebase.auth)await firebase.auth().signOut()}catch(e){}try{['fbCfg','fbOn','fullAt','syncCur'].forEach(k=>localStorage.removeItem(k))}catch(e){}FBDB=null;db=null;cloudOk=null;cloudUI();fbStat('تم الفصل. بياناتك باقية على الجهاز.');$('stor').textContent='الحفظ: على هذا الجهاز فقط.'};
+/* الخروج: بيرفع آخر التعديلات، وبعدين بيشيل بيانات الحساب من الجهاز ويرجع لشاشة الدخول */
+$('fbOff').onclick=async e=>{const b=e.currentTarget;if(!fbCfg()){fbStat('مفيش حساب مربوط على الجهاز ده.');return}if(!ok2(b))return;
+  b.disabled=true;fbStat('جاري رفع آخر التعديلات…');let safe=false;
+  try{if(FBDB){await tmo(flushDel(FBDB),20000);await tmo(pushPending(FBDB),20000);safe=+lsv('fullAt','0')>0&&!pupGet().size&&!lget('pdel').length}}catch(err){}
+  b.disabled=false;if(safe){await acctLeave();return}
+  const m='فيه تعديلات لسه ما اترفعتش على حسابك. وصّل النت وجرّب تاني، أو اخرج وهينزل ملف نسخة منها.';fbStat(m);toast(m,'اخرج برضه',async()=>{await keepCopy();await acctLeave()})};
 /* أول مرة البرنامج يتفتح على جهاز فاضي: زي الواتساب، يسألك ترجّع بياناتك من حسابك */
 function welcMaybe(){if(fbCfg()||lsv('welcDone','')==='1'||S.customers.length+S.invoices.length)return;$('welc').classList.remove('hide')}
 const welcEnd=()=>{svk('welcDone','1');$('welc').classList.add('hide')};
