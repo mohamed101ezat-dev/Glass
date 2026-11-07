@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='160';
+const APP_VER='161';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -440,8 +440,10 @@ async function showImg(cv,name,msg,auto,phone,rec){
   curSpec=lastSpec;paperLabels();const imgURL=cv.toDataURL('image/png');curBlob=dataBlob(imgURL);curName=name;curPhone=phone||'';baseMsg=msg||'';curRec=rec||null;
   $('resundo').classList.toggle('hide',!(rec&&lastSaved&&lastSaved.id===rec.id&&Date.now()-lastSaved.at<10*60e3));$('resdel').classList.toggle('hide',!rec);$('resedit').classList.toggle('hide',!(rec&&pget('editInv',true)&&!(rec.rows||[]).some(x=>x.cols)));$('resdup').classList.toggle('hide',!(rec&&rec.type==='inv'&&pget('dupInv',true)&&!(rec.rows||[]).some(x=>x.cols)));{const rc=$('rescut');if(rc)rc.classList.toggle('hide',!(rec&&rec.type==='inv'&&(rec.rows||[]).some(x=>!x.rt&&x.t!=='rd'&&+x.w>0&&+x.h>0)))}disarm($('resdel'));$('resdel').textContent='🗑️ حذف';$('restx').classList.toggle('hide',!rec);$('resTxtBox').classList.toggle('hide',!rec);if(rec){$('resTxt').value=txtOf(rec);syncTx()}
   let canS=false;try{canS=!!(navigator.canShare&&navigator.canShare({files:[new File([curBlob],name,{type:'image/png'})]}))}catch(e){}
-  $('ressh').classList.toggle('hide',!canS);$('reswa').classList.toggle('hide',canS);
-  $('reshint').textContent=canS?'':'الصورة بتتنسخ ويتفتح شات العميل. الصقها (اضغط مطولاً ثم لصق) وأرسل.';
+  const hasN=!!waNum(curPhone),sh=$('ressh');
+  sh.classList.toggle('hide',!canS);$('reswa').classList.toggle('hide',canS&&!hasN);
+  sh.classList.toggle('main',!hasN);sh.classList.toggle('b-green',!hasN);sh.classList.toggle('alt',hasN);sh.textContent=hasN?'📤 مشاركة':'📤 إرسال للعميل';$('reswa').style.flex=hasN?'1 1 100%':'';if(hasN)$('resdl').before(sh);else $('reswa').before(sh);
+  $('reshint').textContent=hasN?'💬 بيفتح شات العميل والصورة متنسخة: دوس مطولاً في خانة الرسالة واختار «لصق». لو اللصق ما ظهرش، استخدم «📤 مشاركة».':canS?'لو عايز الزرار يفتح شات العميل على طول، اكتب رقمه في بياناته.':'الصورة بتتنسخ ويتفتح شات العميل. الصقها (اضغط مطولاً ثم لصق) وأرسل.';
   $('resimg').src=imgURL;$('resm').textContent=baseMsg;$('res').classList.remove('hide');
   $('res').scrollTop=0;ordUI();
   if(auto)await downloadCur()}
@@ -520,9 +522,12 @@ const curText=()=>$('resTxtBox').classList.contains('hide')?'':$('resTxt').value
 const syncTx=()=>{$('restx').href='https://wa.me/'+waNum(curPhone)+'?text='+encodeURIComponent($('resTxt').value)};
 function goTpl(){['res','rem'].forEach(i=>$(i).classList.add('hide'));$('hdrSet').click();stGo('msg')}
 $('resTxt').oninput=syncTx;$('resTpl').onclick=goTpl;
-$('reswa').onclick=e=>{const n=waNum(curPhone);if(!curBlob||!n){e.preventDefault();$('resm').textContent=baseMsg+' · اكتب رقم واتساب العميل في بياناته أولاً';return}
-  $('reswa').href='https://wa.me/'+n+(curText()?'?text='+encodeURIComponent(curText()):'');
-  try{navigator.clipboard.write([new ClipboardItem({'image/png':curBlob})]).then(()=>{$('resm').textContent=baseMsg+' · تم نسخ الصورة: الصقها في المحادثة'}).catch(()=>{})}catch(err){}};
+$('reswa').onclick=async e=>{e.preventDefault();const n=waNum(curPhone);if(!curBlob||!n){$('resm').textContent=baseMsg+' · اكتب رقم واتساب العميل في بياناته أولاً';return}
+  const url='https://wa.me/'+n+(curText()?'?text='+encodeURIComponent(curText()):'');$('reswa').href=url;let ok=false;
+  /* الصورة بتتنسخ الأول وبعدين الشات يتفتح، عشان النسخ ميتقطعش لما البرنامج يروح للخلفية */
+  try{await Promise.race([navigator.clipboard.write([new ClipboardItem({'image/png':curBlob})]),new Promise((_,j)=>setTimeout(()=>j(new Error('t')),2000))]);ok=true}catch(err){}
+  $('resm').textContent=baseMsg+(ok?' · ✅ الصورة اتنسخت: الصقها في شات العميل':' · مقدرتش أنسخ الصورة، ابعتها من «📤 مشاركة» أو «🖼️ حفظ الصورة»');
+  if(!window.open(url,'_blank'))location.href=url};
 const sfn=t=>String(t).replace(/[\\\/:*?"<>|]+/g,'-');
 const fname=r=>'فاتورة-'+sfn(r.cname)+(r.code?'-'+r.code:(r.no?'-'+r.no:''))+'.png';
 const showRec=async(r,auto,msg)=>{await busyOn('جاري فتح الفاتورة…');try{await showImg(sheet(invSheet(r)),fname(r),msg||'',auto,r.phone,r)}finally{busyOff()}};
@@ -1027,9 +1032,9 @@ async function doSave(img){const m=$('msg'),qf=qtFrom;m.textContent='';
     await showRec(r,img,hasRows?'تم حفظ الفاتورة ✓':'تم تسجيل الدفعة ✓');if(!img&&$('autoWa').checked)autoSend(r)}
   catch(e){m.textContent='حصل خطأ: '+(e&&e.message||e)}}
 async function autoSend(r){let can=false,file=null;try{file=new File([curBlob],curName,{type:'image/png'});can=!!(navigator.canShare&&navigator.canShare({files:[file]}))}catch(e){}
-  const ready=()=>{$('resm').textContent=baseMsg+' · الإرسال جاهز من زرار "إرسال للعميل"';const b=can?$('ressh'):$('reswa');b.classList.remove('pulse');void b.offsetWidth;b.classList.add('pulse')};
-  if(can){try{await navigator.share({files:[file],title:curName,text:curText()})}catch(e){if(!e||e.name!=='AbortError')ready()}return}
-  if(waNum(r.phone)){$('reswa').click();ready()}}
+  const ready=()=>{$('resm').textContent=baseMsg+' · الإرسال جاهز من زرار "إرسال للعميل"';const b=can&&!waNum(curPhone)?$('ressh'):$('reswa');b.classList.remove('pulse');void b.offsetWidth;b.classList.add('pulse')};
+  if(waNum(r.phone)){$('reswa').click();ready();return}
+  if(can){try{await navigator.share({files:[file],title:curName,text:curText()})}catch(e){if(!e||e.name!=='AbortError')ready()}}}
 $('save').onclick=()=>doSave(false);$('saveImg').onclick=()=>doSave(true);
 $('editCancel').onclick=()=>{clearInv();$('msg').textContent=''};
 function fillRows(r){(r.rows||[]).forEach(x=>{const d=addRow(x.t,x.rt,x.src),set=(k,v)=>{const i=d.querySelector(k);if(i&&v)i.value=v};if(x.i)d.dataset.iid=x.i;set('.n',x.n);set('.w',x.w);set('.h',x.h);set('.c',x.c);set('.p',x.p);if(x.b)set(x.bd==='h'?'.bh':'.bw',x.b);set('.bw',x.bw);set('.bh',x.bh);if(x.b||x.bw||x.bh)showB(d)})}
