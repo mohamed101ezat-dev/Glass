@@ -923,7 +923,7 @@ button.main,a.main,button.alt,select,input:not([type=checkbox]):not([type=radio]
 /* كل النص 3 مقاسات بس: :where عشان أي قاعدة صغير/كبير تحتها تكسب */
 :where(section:not(#t-cl),.res-ov,.bottom-nav) :where(*:not(.ic):not(.del):not(.cp):not(.bt):not(.nf-cnt)){font-size:var(--t-m)!important}
 .lnk,.ab,.seg button,.tag,.b-cu,.qs button,.spk,.nav-label,option,#hTot,.cs-d{font-size:var(--t-s)!important}
-#t-dash .stat-label::before{content:none!important}
+#t-dash .stat-label::before{display:block;font-size:var(--t-l);line-height:1.3}
 .lnk,.cb,.b-cu,.hrow,.qs button,.dbdue .ab,.abl .ab{border-radius:var(--r)!important}
 .hrow{padding:6px 8px!important;margin:0 0 4px!important;box-shadow:none!important;border:1px solid var(--line);background:var(--card)}
 .hrow .tag{padding:1px 6px}
@@ -936,3 +936,7 @@ button.main,a.main,button.alt,select,input:not([type=checkbox]):not([type=radio]
 .vh{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .logo-pick{display:flex!important;align-items:center;justify-content:center;min-height:var(--ctl);cursor:pointer;border:1px solid var(--line);border-radius:var(--r);background:var(--card);color:var(--ink);font-size:var(--t-m)!important}
 #nfOv #bkBanner .ro{gap:8px}
+/* الإيموجي بألوانه: مقاس واحد في كل الأماكن */
+.nav-icon,.sti .si,.stile .ti,.hdr-btn,.hdr-set,.hdr-cloud .cs-i{font-size:var(--t-l)!important;line-height:1.2}
+#t-dash .stat-card .stat-label{white-space:normal;overflow:visible}
+.hday{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;font-size:var(--t-s)!important}.hday span{font-size:var(--t-s)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.hday .lnk{flex:none;min-height:0}
