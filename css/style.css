@@ -865,3 +865,8 @@ button.b-green,a.b-green{background:#15803d;box-shadow:none}
 .auth .info{min-height:0;line-height:1.7}
 .busy{position:fixed;z-index:75;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(17,24,39,.88);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;pointer-events:none}
 .auth .lnk{background:none!important;border:0!important;box-shadow:none!important;align-self:center;padding:4px 8px;font-size:13px;width:auto;text-decoration:underline}.auth .auth-pw .lnk{padding:2px 4px}
+
+/* الشكل الأساسي: أبيض وأسود */
+html[data-pal="mono"]{--bg:#f6f7f7;--card:#fff;--line:#d8dee4;--acc:#1f2328;--acc2:#57606a;--h1:#1f2328;--h2:#1f2328;--accLight:#eceef0;--accInk:#fff;--accB:#1f2328;--tot:#f0f1f2;--g1:#d8dee4;--g2:#e6e8ea;--g3:#eceef0;--bgA:#f6f7f7;--bgB:#f6f7f7;--bgC:#f6f7f7;--shadow:0 1px 2px rgba(0,0,0,.06)}
+html[data-pal="mono"][data-theme="light"]{--bg:#f6f7f7;--card:#fff;--line:#d8dee4}
+html[data-pal="mono"][data-theme="dark"]{--bg:#16191d;--card:#1f2328;--line:#30363d;--ink:#e6e8ea;--mute:#a0a8b0;--acc:#e6e8ea;--acc2:#a0a8b0;--h1:#101215;--h2:#101215;--accLight:#2b3036;--accInk:#16191d;--accB:#e6e8ea;--tot:#1a1d21;--g1:#30363d;--g2:#2b3036;--g3:#22262b;--bgA:#16191d;--bgB:#16191d;--bgC:#16191d}
