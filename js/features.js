@@ -56,7 +56,7 @@
       .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   } catch (e) {}
 
-  // زرار «تقطيع» في شاشة الفاتورة المحفوظة: يفتح CutList ويعرض أصناف الفاتورة على طول
+  // زرار «📐 تقطيع» في شاشة الفاتورة المحفوظة: يفتح CutList ويعرض أصناف الفاتورة على طول
   var btn = document.getElementById('rescut');
   if (btn) btn.onclick = function () {
     var r = (typeof curRec !== 'undefined') ? curRec : null; if (!r) return;
@@ -179,7 +179,7 @@
       saveT();label();msg('اتضاف '+n+' قالب')}catch(x){msg('الملف مش قوالب فاتورة صالحة')}};rd.readAsText(f)};
   function open(){cfg=invd();cur='';loadT();const m=INV_BUILT.concat(tpls).find(t=>norm({...INV_G,...t.cfg})===norm(cfg));if(m)cur=m.name;
     root.classList.remove('hide');build();wmBuild();label();preview()}
-  /* ===== صمّم بإيدك: تعديل الفاتورة بالسحب واللمس على المعاينة ===== */
+  /* ===== ✋ صمّم بإيدك: تعديل الفاتورة بالسحب واللمس على المعاينة ===== */
   const DZ_SEL={
     shop:{n:'اسم المحل',f:['shop',8,34],c:[['shopC','اللون']]},
     title:{n:'اسم العميل',f:['title',9,36],c:[['ink','لون الكتابة (كل الفاتورة)']]},
@@ -207,10 +207,10 @@
   const dzPush=()=>{dzHist.push(JSON.stringify(cfg));if(dzHist.length>60)dzHist.shift();E('dzUndo').disabled=false};
   const dzSet=(k,v)=>{cfg[k]=v;cur='';saveC();label();dzDraw()};
   function dzMake(){dzOv=document.createElement('div');dzOv.id='dzOv';dzOv.className='dz-ov hide';
-    dzOv.innerHTML='<div class="dz-top"><button type="button" class="alt" id="dzUndo" disabled aria-label="تراجع">↩ تراجع</button><div class="dz-tt"><b>صمّم بإيدك</b><small>اسحب الخطوط المتقطعة · دوس على أي جزء عشان تكبّره أو تغيّر لونه</small></div><button type="button" class="main" id="dzX">حفظ التعديل</button></div>'+
+    dzOv.innerHTML='<div class="dz-top"><button type="button" class="alt" id="dzUndo" disabled aria-label="تراجع">↩ تراجع</button><div class="dz-tt"><b>✋ صمّم بإيدك</b><small>اسحب الخطوط المتقطعة · دوس على أي جزء عشان تكبّره أو تغيّر لونه</small></div><button type="button" class="main" id="dzX">💾 حفظ التعديل</button></div>'+
       '<div class="dz-wrap" id="dzWrap"><div class="dz-stage"><canvas id="dzCv"></canvas><canvas id="dzOl"></canvas></div><div style="height:46vh"></div></div><div class="dz-bar" id="dzBar" style="display:none"></div><div class="dz-tip" id="dzTip"></div>';
     document.body.appendChild(dzOv);
-    E('dzX').onclick=()=>{const ok=saveC(true);dzClose();toast(ok?'اتحفظ ✓ التصميم ثابت ومش هيتغيّر':'مقدرتش أحفظ التصميم على الجهاز')};E('dzUndo').onclick=()=>{const p=dzHist.pop();if(p){cfg=JSON.parse(p);cur='';saveC();label();dzDraw();dzBar()}E('dzUndo').disabled=!dzHist.length};
+    E('dzX').onclick=()=>{const ok=saveC(true);dzClose();toast(ok?'اتحفظ ✓ التصميم ثابت ومش هيتغيّر':'⚠ مقدرتش أحفظ التصميم على الجهاز')};E('dzUndo').onclick=()=>{const p=dzHist.pop();if(p){cfg=JSON.parse(p);cur='';saveC();label();dzDraw();dzBar()}E('dzUndo').disabled=!dzHist.length};
     const ol=E('dzOl');
     ol.addEventListener('touchstart',e=>{const t=e.touches[0];if(e.touches.length===1&&dzHit(dzPt(t)))e.preventDefault()},{passive:false});
     ol.addEventListener('pointerdown',dzDown);ol.addEventListener('pointermove',dzMove);ol.addEventListener('pointerup',dzUp);ol.addEventListener('pointercancel',()=>{dzDrag=null;dzOver()});
