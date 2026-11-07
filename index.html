@@ -17,7 +17,7 @@ function exportAll(){var out={app:'ElTabakha',v:1,at:Date.now(),emergency:1};
 function show(why){if(shown||window.__bootOK)return;shown=true;var go=function(){var d=document.createElement('div'),B='display:block;width:260px;margin:4px auto;padding:11px;border-radius:10px;font:600 15px Tahoma,Arial,sans-serif;cursor:pointer;border:0';
   d.setAttribute('style','position:fixed;inset:0;z-index:2147483647;background:#0f172a;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;font-family:Tahoma,Arial,sans-serif;text-align:center;direction:rtl');
   d.innerHTML='<div style="font-size:42px">⚠️</div><b style="font-size:18px">البرنامج مش قادر يفتح دلوقتي</b><div style="font-size:14px;opacity:.85;max-width:420px;line-height:1.8">بياناتك لسه محفوظة على الجهاز. نزّل نسخة منها الأول، وبعدين جرّب تفتح تاني. لو المشكلة فضلت، صوّر الشاشة دي وابعتها.</div>'+
-    '<button id="__beDl" style="'+B+';background:#16a34a;color:#fff">📥 نزّل نسخة من بياناتك</button><button id="__beRe" style="'+B+';background:#334155;color:#fff">🔄 حاول تاني</button><button id="__beGo" style="'+B+';background:none;color:#94a3b8;text-decoration:underline">كمّل على أي حال</button>'+
+    '<button id="__beDl" style="'+B+';background:#16a34a;color:#fff">نزّل نسخة من بياناتك</button><button id="__beRe" style="'+B+';background:#334155;color:#fff">حاول تاني</button><button id="__beGo" style="'+B+';background:none;color:#94a3b8;text-decoration:underline">كمّل على أي حال</button>'+
     '<div style="font-size:11px;opacity:.55;direction:ltr;max-width:90vw;word-break:break-all;margin-top:6px">'+String(why).replace(/</g,'&lt;').slice(0,300)+'</div>';
   document.body.appendChild(d);document.getElementById('__beDl').onclick=exportAll;document.getElementById('__beRe').onclick=function(){location.reload()};document.getElementById('__beGo').onclick=function(){d.remove()}};
   if(document.body)go();else addEventListener('DOMContentLoaded',go)}
@@ -35,16 +35,17 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <meta name="apple-mobile-web-app-title" content="فواتير">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="css/style.css?v=155">
+<link rel="stylesheet" href="css/style.css?v=156">
 
 
 
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-receipt" viewBox="0 0 24 24"><path d="M4 2v20l3-2 3 2 2-2 2 2 3-2 3 2V2l-3 2-3-2-2 2-2-2-3 2zM8 8h8M8 12h8M8 16h5"/></symbol><symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol><symbol id="i-grid" viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></symbol><symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></symbol><symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol><symbol id="i-set" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol><symbol id="i-cloud" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9z"/></symbol><symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a2 2 0 0 0 3.4 0"/></symbol><symbol id="i-store" viewBox="0 0 24 24"><path d="M3 9l1-5h16l1 5M4 9v11h16V9M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M10 20v-6h4v6"/></symbol><symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol><symbol id="i-note" viewBox="0 0 24 24"><path d="M4 4h16v12l-4 4H4zM16 20v-4h4"/></symbol><symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H3v-8h18v8h-3M6 14h12v7H6z"/></symbol><symbol id="i-card" viewBox="0 0 24 24"><path d="M2 5h20v14H2zM2 10h20"/></symbol><symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol><symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M12 20V4M20 20v-7"/></symbol><symbol id="i-wallet" viewBox="0 0 24 24"><path d="M20 7H5a2 2 0 0 1 0-4h13v4M3 5v14a2 2 0 0 0 2 2h15V7M16 14h.01"/></symbol><symbol id="i-phone" viewBox="0 0 24 24"><path d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2M11 18h2"/></symbol><symbol id="i-lock" viewBox="0 0 24 24"><path d="M6 11h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2M8 11V7a4 4 0 0 1 8 0v4"/></symbol><symbol id="i-db" viewBox="0 0 24 24"><path d="M4 5c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol><symbol id="i-truck" viewBox="0 0 24 24"><path d="M1 4h14v13H1zM15 9h4l4 4v4h-8zM6 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4M18 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/></symbol><symbol id="i-calc" viewBox="0 0 24 24"><path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01"/></symbol></defs></svg>
 <div class="app-header">
   <div class="hdr-logo"><img id="hdrLogo" alt="" class="hide"></div>
   <span class="app-title">فواتير</span>
-  <div class="hdr-end"><button type="button" id="cloudSt" class="hdr-cloud off" aria-label="حالة الحفظ على السحابة"><span class="cs-i">☁️</span><span class="cs-d"></span></button><button id="hdrSet" class="hdr-set" data-t="st" aria-label="إعدادات">⚙️</button></div>
+  <div class="hdr-end"><button type="button" id="nfBell" class="hdr-btn" aria-label="التنبيهات"><svg class="ic" aria-hidden="true"><use href="#i-bell"/></svg><span id="nfCnt" class="nf-cnt hide"></span></button><button type="button" id="calcFab" class="hdr-btn" aria-label="حاسبة"><svg class="ic" aria-hidden="true"><use href="#i-calc"/></svg></button><button type="button" id="cloudSt" class="hdr-cloud off" aria-label="حالة الحفظ على السحابة"><span class="cs-i"><svg class="ic" aria-hidden="true"><use href="#i-cloud"/></svg></span><span class="cs-d"></span></button><button id="hdrSet" class="hdr-set" data-t="st" aria-label="إعدادات"><svg class="ic" aria-hidden="true"><use href="#i-set"/></svg></button></div>
 </div>
 <div id="busy" class="busy hide" role="status"></div>
 <div id="welc" class="auth hide"><div class="auth-in">
@@ -64,6 +65,12 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <button type="button" class="lnk" id="welcNew">كمّل من غير حساب</button>
   <a class="lnk" href="privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a>
 </div></div>
+<div id="nfOv" class="res-ov hide" style="z-index:68"><div class="card res-in" style="max-width:460px"><div class="ro" style="color:var(--ink)"><b>التنبيهات</b><button class="del" id="nfX" aria-label="إغلاق">×</button></div><div id="nfRows"></div>
+  <div class="card hide" id="autoBan"></div>
+  <div class="card hide" id="remBan"></div>
+  <div class="card hide" id="ordBan" role="button" tabindex="0"></div>
+  <div class="card hide" id="bkBanner" ><div class="ro" style="color:var(--ink)"><span><span id="bkBTxt"></span></span><span style="display:flex;gap:6px"><button class="ab" id="bkNow">احفظ نسخة</button><button class="lnk" id="bkLater">لاحقاً</button></span></div></div>
+<p class="mute hide" id="nfNone">مفيش تنبيهات دلوقتي.</p></div></div>
 <div id="shopOv" class="res-ov hide" style="z-index:85;padding-top:14vh"><div class="card res-in" style="max-width:360px">
   <b style="font-size:18px">اسم محلك إيه؟</b>
   <div class="mute" style="margin:6px 0 10px;line-height:1.8">هيظهر فوق الفاتورة وفي رسايل الواتساب، وتقدر تغيّره في أي وقت من الإعدادات.</div>
@@ -88,23 +95,23 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <div id="instOv" class="lock"><div style="font-size:42px">📱</div><b style="font-size:18px">البرنامج اتفتح في مكان تاني</b><div class="mute" style="max-width:320px;text-align:center;line-height:1.8">عشان البيانات متتلخبطش، البرنامج بيشتغل من مكان واحد بس على نفس الجهاز. كل اللي عملته هنا اتحفظ.</div><button class="main" id="instGo" style="width:240px">استخدمه هنا</button></div>
 <div id="lock" class="lock"><div style="font-size:42px">🔒</div><b style="font-size:18px">فواتير</b><div class="mute">اكتب الرقم السري</div>
   <input id="lkIn" type="password" inputmode="numeric" maxlength="6" autocomplete="off" style="max-width:200px;text-align:center;font-size:20px;letter-spacing:6px;height:44px">
-  <div class="btns" style="width:200px"><button class="main" id="lkGo">فتح</button><button class="alt b-out hide" id="lkBioBtn">👆 بصمة</button></div><div class="info" id="lkErr" style="color:var(--danger)"></div><button class="lnk" id="lkForgot">نسيت الرقم السري؟</button>
-  <div id="lkRec" class="hide" style="width:270px;flex-direction:column;gap:6px;display:flex"><button class="alt" id="lkRecG">🔑 افتح بحساب Google المربوط</button><div id="lkRecC" class="ro" style="gap:6px"><input id="lkRecIn" inputmode="numeric" autocomplete="off" placeholder="كود الاسترجاع" style="flex:1;text-align:center;direction:ltr;letter-spacing:2px"><button class="main" id="lkRecGo" style="flex:none">فتح</button></div><div class="info" id="lkRecMsg" style="text-align:center"></div></div></div>
-<div id="remL" class="res-ov hide" style="z-index:66"><div class="card res-in"><div class="ro" style="color:var(--ink)"><b>🔔 محتاجين تذكير</b><button class="del" id="remLX" aria-label="إغلاق">×</button></div>
-  <div class="mute" style="margin:4px 0 6px">البرنامج بيجهز رسالة الواتساب وانت بتدوس إرسال. بعد التذكير العميل بيختفي من هنا لحد ما المدة تعدّي تاني.</div><div id="remLList"></div><button class="lnk" id="remLSet">⚙ مدة التنبيه من الإعدادات</button></div></div>
-<div id="bulk" class="res-ov hide"><div class="card res-in"><div class="ro" style="color:var(--ink)"><b>📨 تذكير المديونين</b><button class="del" id="bulkX" aria-label="إغلاق">×</button></div><div class="mute" id="bulkInfo" style="margin:4px 0 6px"></div><div id="bulkList"></div></div></div>
-<div id="rem" class="res-ov hide"><div class="card res-in"><div class="ro" style="color:var(--ink)"><b id="remT">📨 تذكير بالدين</b><button class="del" id="remX" aria-label="إغلاق">×</button></div>
+  <div class="btns" style="width:200px"><button class="main" id="lkGo">فتح</button><button class="alt b-out hide" id="lkBioBtn">بصمة</button></div><div class="info" id="lkErr" style="color:var(--danger)"></div><button class="lnk" id="lkForgot">نسيت الرقم السري؟</button>
+  <div id="lkRec" class="hide" style="width:270px;flex-direction:column;gap:6px;display:flex"><button class="alt" id="lkRecG">افتح بحساب Google المربوط</button><div id="lkRecC" class="ro" style="gap:6px"><input id="lkRecIn" inputmode="numeric" autocomplete="off" placeholder="كود الاسترجاع" style="flex:1;text-align:center;direction:ltr;letter-spacing:2px"><button class="main" id="lkRecGo" style="flex:none">فتح</button></div><div class="info" id="lkRecMsg" style="text-align:center"></div></div></div>
+<div id="remL" class="res-ov hide" style="z-index:66"><div class="card res-in"><div class="ro" style="color:var(--ink)"><b>محتاجين تذكير</b><button class="del" id="remLX" aria-label="إغلاق">×</button></div>
+  <div class="mute" style="margin:4px 0 6px">البرنامج بيجهز رسالة الواتساب وانت بتدوس إرسال. بعد التذكير العميل بيختفي من هنا لحد ما المدة تعدّي تاني.</div><div id="remLList"></div><button class="lnk" id="remLSet">مدة التنبيه من الإعدادات</button></div></div>
+<div id="bulk" class="res-ov hide"><div class="card res-in"><div class="ro" style="color:var(--ink)"><b>تذكير المديونين</b><button class="del" id="bulkX" aria-label="إغلاق">×</button></div><div class="mute" id="bulkInfo" style="margin:4px 0 6px"></div><div id="bulkList"></div></div></div>
+<div id="rem" class="res-ov hide"><div class="card res-in"><div class="ro" style="color:var(--ink)"><b id="remT">تذكير بالدين</b><button class="del" id="remX" aria-label="إغلاق">×</button></div>
   <label style="margin-top:6px">نص الرسالة (عدّله قبل الإرسال لو حابب)</label><textarea id="remTxt" rows="5" style="direction:rtl;text-align:right;font-size:14px;width:100%"></textarea>
   <div class="btns"><a class="main b-green" id="remGo" target="_blank" rel="noopener" href="#">إرسال واتساب</a><button class="alt" id="remCopy">نسخ النص</button></div>
-  <button class="lnk" id="remTpl">⚙ غيّر الرسالة الثابتة من الإعدادات</button><div class="info" id="remMsg"></div></div></div>
+  <button class="lnk" id="remTpl">غيّر الرسالة الثابتة من الإعدادات</button><div class="info" id="remMsg"></div></div></div>
 <div id="res" class="res-ov hide"><div class="card res-in">
   <div class="ro" style="color:var(--ink)"><b id="resm"></b><button class="del" id="resx" aria-label="إغلاق">×</button></div>
     <div class="btns rbt"><button class="main b-green" id="ressh">إرسال للعميل</button><a class="main b-green" id="reswa" target="_blank" rel="noopener" href="#">إرسال للعميل</a><button class="alt" id="resdl">حفظ الصورة</button></div>
-  <div class="btns rbt" id="pdfRow" style="margin-top:4px"><button class="alt b-out" id="respdf">📄 PDF</button><button class="alt" id="resprint">🖨 طباعة</button></div>
-  <div class="btns rlk" style="margin-top:0"><button class="lnk hide" id="resundo" style="font-weight:700">↩ تراجع عن الحفظ</button><a class="lnk hide" id="restx" target="_blank" rel="noopener" href="#">نص فقط</a><button class="lnk hide" id="resedit">✏️ تعديل</button><button class="lnk hide" id="resdup">🔁 تكرار</button><button class="lnk hide" id="rescut">📐 تقطيع</button><button class="lnk hide" id="resdel" style="color:var(--danger)">حذف</button></div>
-  <div id="resOrd" class="ordrow hide"><span class="mute">حالة الطلب</span><div class="seg s" id="resOrdSeg"><button type="button" data-os="p">⏳ تجهيز</button><button type="button" data-os="r">✅ جاهز</button><button type="button" data-os="d">📦 اتسلّم</button></div><a class="main b-green hide" id="resOrdWa" target="_blank" rel="noopener" href="#">📨 بلّغ العميل إن طلبه جاهز</a></div>
+  <div class="btns rbt" id="pdfRow" style="margin-top:4px"><button class="alt b-out" id="respdf">PDF</button><button class="alt" id="resprint">طباعة</button></div>
+  <div class="btns rlk" style="margin-top:0"><button class="lnk hide" id="resundo" style="font-weight:700">↩ تراجع عن الحفظ</button><a class="lnk hide" id="restx" target="_blank" rel="noopener" href="#">نص فقط</a><button class="lnk hide" id="resedit">تعديل</button><button class="lnk hide" id="resdup">تكرار</button><button class="lnk hide" id="rescut">تقطيع</button><button class="lnk hide" id="resdel" style="color:var(--danger)">حذف</button></div>
+  <div id="resOrd" class="ordrow hide"><span class="mute">حالة الطلب</span><div class="seg s" id="resOrdSeg"><button type="button" data-os="p">تجهيز</button><button type="button" data-os="r">جاهز</button><button type="button" data-os="d">اتسلّم</button></div><a class="main b-green hide" id="resOrdWa" target="_blank" rel="noopener" href="#">بلّغ العميل إن طلبه جاهز</a></div>
   <div class="mute" id="reshint"></div>
-  <details id="resTxtBox" class="hide" style="margin-top:6px"><summary class="mute" style="cursor:pointer">نص رسالة الواتساب</summary><textarea id="resTxt" rows="5" style="direction:rtl;text-align:right;font-size:14px;width:100%;margin-top:4px"></textarea><button class="lnk" id="resTpl">⚙ الصيغة الثابتة في الإعدادات</button></details>
+  <details id="resTxtBox" class="hide" style="margin-top:6px"><summary class="mute" style="cursor:pointer">نص رسالة الواتساب</summary><textarea id="resTxt" rows="5" style="direction:rtl;text-align:right;font-size:14px;width:100%;margin-top:4px"></textarea><button class="lnk" id="resTpl">الصيغة الثابتة في الإعدادات</button></details>
   <img id="resimg" alt="الصورة">
 </div></div>
 
@@ -113,19 +120,16 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <input id="pinIn" type="password" inputmode="numeric" maxlength="6" autocomplete="off" style="text-align:center;font-size:20px;letter-spacing:6px;height:44px;margin:8px 0">
   <div class="btns"><button class="main" id="pinOk">تأكيد</button><button class="alt" id="pinNo">إلغاء</button></div><div class="info" id="pinErr" style="color:var(--danger)"></div></div></div>
 <div id="qtOv" class="res-ov hide" style="z-index:65"><div class="card res-in">
-  <div class="ro" style="color:var(--ink)"><b>📝 عروض الأسعار</b><button class="del" id="qtX" aria-label="إغلاق">×</button></div>
+  <div class="ro" style="color:var(--ink)"><b>عروض الأسعار</b><button class="del" id="qtX" aria-label="إغلاق">×</button></div>
   <div class="mute" style="margin:4px 0 6px">عرض السعر مش بيتسجل على حساب العميل. لما يوافق اضغط (تحويل لفاتورة) واكتب المدفوع واحفظ.</div>
   <div id="qtList"></div></div></div>
 <div id="clOv" class="res-ov hide" style="z-index:65"><div class="card res-in">
-  <div class="ro" style="color:var(--ink)"><b>🗂 الإقفالات</b><button class="del" id="clX" aria-label="إغلاق">×</button></div>
+  <div class="ro" style="color:var(--ink)"><b>الإقفالات</b><button class="del" id="clX" aria-label="إغلاق">×</button></div>
   <div class="seg s" id="clTab" style="margin:4px 0 6px"><button data-k="d" class="on">يومي</button><button data-k="w">أسبوعي (جمعة ← خميس)</button></div>
   <div id="clBody"></div>
 </div></div>
 
 <section id="t-dash" class="hide">
-  <div class="card hide" id="autoBan"></div>
-  <div class="card hide" id="remBan"></div>
-  <div class="card hide" id="ordBan" role="button" tabindex="0"></div>
   <div class="stat-grid">
     <div class="stat-card" id="infoCard" role="button" tabindex="0"><div class="stat-label">فواتير اليوم ›</div><div class="stat-value num" id="d_info">0</div></div>
     <div class="stat-card good" data-sc="paid" role="button" tabindex="0"><div class="stat-label" id="l_paid">المدفوع اليوم ›</div><div class="stat-value num" id="d_todayPaid">0</div></div>
@@ -139,27 +143,27 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <div class="card">
     <input id="hq" aria-label="بحث في السجل" placeholder="ابحث بالاسم أو الكود" inputmode="search">
     <div class="seg s" id="hPer" style="margin:6px 0 4px"><button data-p="all" class="on">الكل</button><button data-p="d">اليوم</button><button data-p="w">7 أيام</button><button data-p="m">30 يوم</button></div>
-    <div class="seg s" id="hTy" style="margin:0 0 4px"><button data-y="all" class="on">الكل</button><button data-y="inv">فواتير</button><button data-y="paid">مدفوع</button><button data-y="ret">مرتجع</button><button data-y="due">متبقي</button><button data-y="ord" id="hTyOrd">📦 طلبيات</button></div>
+    <div class="seg s" id="hTy" style="margin:0 0 4px"><button data-y="all" class="on">الكل</button><button data-y="inv">فواتير</button><button data-y="paid">مدفوع</button><button data-y="ret">مرتجع</button><button data-y="due">متبقي</button><button data-y="ord" id="hTyOrd">طلبيات</button></div>
     <div class="mute hide" id="hBrk" style="font-weight:700;margin:2px 0"></div>
     <div class="ro"><span class="mute" id="hTot"></span></div>
   </div>
   <div id="hList"></div>
   </div>
   <div id="infoView" class="hide"><div class="card">
-    <div class="ro" style="color:var(--ink);margin-bottom:4px"><button class="lnk" id="infoBack">→ رجوع للسجل</button><b>📊 معلومات</b></div>
+    <div class="ro" style="color:var(--ink);margin-bottom:4px"><button class="lnk" id="infoBack">→ رجوع للسجل</button><b>معلومات</b></div>
     <div class="seg s" id="iSub" style="margin:4px 0 4px"><button data-k="p" class="on">المدفوع</button><button data-k="s">المبيعات</button><button data-k="i">الأصناف</button><button data-k="d">الديون</button><button data-k="w">طرق الدفع</button></div>
-  <div class="seg s" id="iPer" style="margin:0 0 4px"><button data-k="d">اليوم</button><button data-k="m" class="on">الشهر ده</button><button data-k="pm">الشهر الفات</button><button data-k="y">السنة</button><button data-k="c" id="iCal">📅 شهر</button></div>
+  <div class="seg s" id="iPer" style="margin:0 0 4px"><button data-k="d">اليوم</button><button data-k="m" class="on">الشهر ده</button><button data-k="pm">الشهر الفات</button><button data-k="y">السنة</button><button data-k="c" id="iCal">شهر</button></div>
   <div class="seg s" id="iCmp" style="margin:0 0 6px"><button data-k="0" class="on">بدون مقارنة</button><button data-k="prev">الفترة اللي قبلها</button><button data-k="yoy">السنة اللي فاتت</button></div>
   <input type="month" id="iMonth" aria-label="اختيار شهر" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
   <div id="infoBody"></div>
-    <div class="ro" style="justify-content:flex-start;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="ab hide" id="clBtn">🗂 الإقفالات</button><button class="ab hide" id="dayClose">🧾 إقفال</button><button class="ab hide" id="monRep">📊 تقرير</button></div>
+    <div class="ro" style="justify-content:flex-start;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="ab hide" id="clBtn">الإقفالات</button><button class="ab hide" id="dayClose">إقفال</button><button class="ab hide" id="monRep">تقرير</button></div>
   </div></div>
   <div id="dbView" class="hide">
     <div id="dbList0">
       <div class="card dbhero"><b id="dbTot"></b><button class="lnk" id="dbBack">→ رجوع</button></div>
       <div class="card">
         <input id="dbq" placeholder="ابحث باسم المديون">
-        <button class="main b-green hide" id="bulkRem" style="width:100%;margin-top:6px">📨 تذكير كل المديونين</button></div>
+        <button class="main b-green hide" id="bulkRem" style="width:100%;margin-top:6px">تذكير كل المديونين</button></div>
       <div id="dbList"></div>
     </div>
     <div id="dbDet" class="hide"></div>
@@ -167,7 +171,6 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 </section>
 
 <section id="t-new">
-  <div class="card hide" id="bkBanner" style="border-color:var(--danger)"><div class="ro" style="color:var(--ink)"><span>⚠ <span id="bkBTxt"></span></span><span style="display:flex;gap:6px"><button class="ab" id="bkNow">احفظ نسخة</button><button class="lnk" id="bkLater">لاحقاً</button></span></div></div>
   <div class="card hide" id="editBar"><div class="ro" style="color:var(--ink)"><b id="editBarT"></b><button class="lnk" id="editCancel" style="color:var(--danger)">إلغاء التعديل</button></div></div>
   <div class="card">
     <div class="ro" style="margin:0"><label style="margin:0">العميل</label><button class="lnk hide" id="qtOpen" style="padding:1px 9px;font-size:calc(var(--fs) - 1px)"></button></div>
@@ -183,21 +186,21 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <div class="card isum">
     <div id="r_sub" class="sub hide"><span><span id="subLbl">إجمالي الإذن</span><span class="num" id="tqw"></span></span><b class="num" id="sub">0</b></div>
     <div class="xg">
-      <div id="r_nylon" class="hide"><label for="nylon">🚚 نولون</label><input id="nylon" type="text" inputmode="decimal" placeholder="0"></div>
-      <div id="r_disc" class="hide"><label for="disc">🏷️ خصم</label><input id="disc" type="text" inputmode="decimal" placeholder="0"></div>
-      <div id="r_ref" class="hide"><label for="refund">💸 رد كاش</label><input id="refund" type="text" inputmode="decimal" placeholder="0"></div>
+      <div id="r_nylon" class="hide"><label for="nylon">نولون</label><input id="nylon" type="text" inputmode="decimal" placeholder="0"></div>
+      <div id="r_disc" class="hide"><label for="disc">خصم</label><input id="disc" type="text" inputmode="decimal" placeholder="0"></div>
+      <div id="r_ref" class="hide"><label for="refund">رد كاش</label><input id="refund" type="text" inputmode="decimal" placeholder="0"></div>
     </div>
     <input id="discWhy" class="hide" placeholder="سبب الخصم (يظهر في الفاتورة)">
     <div class="pgrid">
       <div class="pcol" id="payR">
-        <div class="pbar" id="payBar"><span id="pfFull"></span><span id="pfPre"></span><button type="button" class="alt" id="pfOther">✏️ أخرى</button><span class="mute num" id="pfInfo"></span></div>
+        <div class="pbar" id="payBar"><span id="pfFull"></span><span id="pfPre"></span><button type="button" class="alt" id="pfOther">أخرى</button><span class="mute num" id="pfInfo"></span></div>
         <div id="spBox" class="hide"><div id="spRows"></div><div id="spFull" class="hide"></div><div class="pbar" id="spChips"></div></div>
       </div>
       <div class="pcol" id="totL">
-        <div id="r_prev" class="hide"><label for="prev">📒 سابق</label><input id="prev" type="text" inputmode="decimal" placeholder="0"></div>
+        <div id="r_prev" class="hide"><label for="prev">سابق</label><input id="prev" type="text" inputmode="decimal" placeholder="0"></div>
         <div id="r_inv" class="hide"><label>+ الفاتورة</label><b class="num" id="invAmt">0</b></div>
         <div class="tg">
-          <div><label>المدفوع الآن</label><input id="paid" aria-label="المبلغ المدفوع الآن" type="text" inputmode="decimal" placeholder="0"></div>
+          <div><label>المدفوع</label><input id="paid" aria-label="المبلغ المدفوع" type="text" inputmode="decimal" placeholder="0"></div>
           <div class="tcell tg1"><label>الإجمالي</label><b class="num" id="grand">0</b></div>
           <div class="tcell trm"><label>المتبقي</label><b class="num" id="rest">0</b></div>
         </div>
@@ -210,16 +213,16 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <button class="lnk" id="moreBtn">+ إضافات (نولون، خصم، مرتجع، رد كاش، ملاحظة)</button>
   <input id="note" class="hide" placeholder="ملاحظة تظهر في الفاتورة">
   <button class="lnk" id="clear" style="color:var(--mute)">مسح الفاتورة</button>
-  <div id="ordPick" class="ordpick hide"><span class="mute">الطلب:</span><div class="seg s"><button type="button" data-os="d">📦 اتسلّم</button><button type="button" data-os="p">⏳ لسه هيتجهز</button></div></div>
-  <div id="saveBar" class="savebar"><div class="info" id="msg" style="color:var(--danger)"></div><button class="main" id="save">حفظ الفاتورة</button><button class="alt b-out" id="saveImg">حفظ كصورة</button><button class="alt hide" id="saveQt">📝 عرض سعر</button></div>
+  <div id="ordPick" class="ordpick hide"><span class="mute">الطلب:</span><div class="seg s"><button type="button" data-os="d">اتسلّم</button><button type="button" data-os="p">لسه هيتجهز</button></div></div>
+  <div id="saveBar" class="savebar"><div class="info" id="msg" style="color:var(--danger)"></div><button class="main" id="save">حفظ الفاتورة</button><button class="alt b-out" id="saveImg">حفظ كصورة</button><button class="alt hide" id="saveQt">عرض سعر</button></div>
 </section>
 
 <section id="t-cu" class="hide">
   <div id="cuMain">
-    <div class="rowc"><input id="cq" placeholder="🔍 ابحث باسم العميل"><button class="main" data-m="add">+ عميل</button></div>
+    <div class="rowc"><input id="cq" placeholder="ابحث باسم العميل"><button class="main" data-m="add">+ عميل</button></div>
     <div class="seg s" id="cuMode"><button data-m="all" class="on">الكل</button><button data-m="debt">عليهم فلوس</button><button data-m="credit">ليهم فلوس</button></div>
     <div id="cuAdd" class="card hide">
-      <button type="button" class="alt hide" id="pickC" style="width:100%;margin-bottom:6px">📇 اختار من جهات الاتصال</button>
+      <button type="button" class="alt hide" id="pickC" style="width:100%;margin-bottom:6px">اختار من جهات الاتصال</button>
       <div class="ro" style="gap:6px;margin:0"><input id="nc_name" placeholder="اسم العميل (مطلوب)" style="flex:1"><select id="nc_cat" class="catsel" aria-label="الفئة"></select></div>
       <div class="g2" style="margin-top:6px"><input id="nc_phone" type="tel" inputmode="tel" placeholder="واتساب (اختياري)"><input id="nc_bal" type="text" inputmode="decimal" placeholder="حساب قديم عليه"></div>
       <div class="g2"><input id="nc_addr" placeholder="العنوان (اختياري)"><input id="nc_note" placeholder="ملاحظات (اختياري)"></div>
@@ -236,7 +239,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 </section>
 
 <section id="t-it" class="hide">
-  <div class="sth"><button type="button" class="lnk" data-goset="1" aria-label="رجوع للإعدادات">→</button><b>📦 الأصناف</b></div>
+  <div class="sth"><button type="button" class="lnk" data-goset="1" aria-label="رجوع للإعدادات">→</button><b>الأصناف</b></div>
   <div class="seg s" style="max-width:220px" id="seg"><button data-it="rd">جاهز</button><button data-it="mq" class="on">مقطع</button></div>
   <div class="ro" id="catBar" style="gap:6px;margin:6px 0"><span class="mute">سعر فئة:</span><select id="icat" class="catsel" style="max-width:150px"></select><button class="lnk" id="catMgrBtn" style="flex:none">إدارة الفئات</button></div>
   <div id="catMgr" class="card hide"></div>
@@ -247,22 +250,22 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <section id="t-st" class="hide">
 <div id="stHome">
-  <div class="stiles"><button type="button" class="stile" data-go="it"><span class="ti">📦</span><b>الأصناف</b><small id="ssIt"></small></button><button type="button" class="stile" data-sp="sup"><span class="ti">🚚</span><b>الموردين</b><small id="ssSup"></small></button><button type="button" class="stile" data-sp="stk"><span class="ti">🧱</span><b>المخزون</b><small id="ssStk"></small></button></div>
+  <div class="stiles"><button type="button" class="stile" data-go="it"><span class="ti"><svg class="ic" aria-hidden="true"><use href="#i-box"/></svg></span><b>الأصناف</b><small id="ssIt"></small></button><button type="button" class="stile" data-sp="sup"><span class="ti"><svg class="ic" aria-hidden="true"><use href="#i-truck"/></svg></span><b>الموردين</b><small id="ssSup"></small></button><button type="button" class="stile" data-sp="stk"><span class="ti"><svg class="ic" aria-hidden="true"><use href="#i-grid"/></svg></span><b>المخزون</b><small id="ssStk"></small></button></div>
   <div class="sgh">الفاتورة</div>
-  <div class="sgl"><button type="button" class="sti" data-sp="shop"><span class="si">🏪</span><span class="stt"><b>بيانات المحل</b><small id="ss_shop"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="des"><span class="si">🎨</span><span class="stt"><b>تصميم الفاتورة</b><small id="ss_des"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="notes"><span class="si">📝</span><span class="stt"><b>ملاحظات الفاتورة</b><small id="ss_notes"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="inv"><span class="si">🧾</span><span class="stt"><b>خيارات الفاتورة والطباعة</b><small id="ss_inv"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="pay"><span class="si">💳</span><span class="stt"><b>طرق الدفع</b><small id="ss_pay"></small></span><span class="sa">‹</span></button></div>
+  <div class="sgl"><button type="button" class="sti" data-sp="shop"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-store"/></svg></span><span class="stt"><b>بيانات المحل</b><small id="ss_shop"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="des"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-pen"/></svg></span><span class="stt"><b>تصميم الفاتورة</b><small id="ss_des"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="notes"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-note"/></svg></span><span class="stt"><b>ملاحظات الفاتورة</b><small id="ss_notes"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="inv"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-print"/></svg></span><span class="stt"><b>خيارات الفاتورة والطباعة</b><small id="ss_inv"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="pay"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-card"/></svg></span><span class="stt"><b>طرق الدفع</b><small id="ss_pay"></small></span><span class="sa">‹</span></button></div>
   <div class="sgh">الرسائل والتقارير</div>
-  <div class="sgl"><button type="button" class="sti" data-sp="msg"><span class="si">📨</span><span class="stt"><b>رسائل الواتساب</b><small id="ss_msg"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="rem"><span class="si">🔔</span><span class="stt"><b>تذكير المديونين</b><small id="ss_rem"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="cl"><span class="si">📊</span><span class="stt"><b>الإقفال والتقارير</b><small id="ss_cl"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="exp"><span class="si">💸</span><span class="stt"><b>المصروفات</b><small id="ss_exp"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="nf"><span class="si">🔔</span><span class="stt"><b>الإشعارات</b><small id="ss_nf"></small></span><span class="sa">‹</span></button></div>
+  <div class="sgl"><button type="button" class="sti" data-sp="msg"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></span><span class="stt"><b>رسائل الواتساب</b><small id="ss_msg"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="rem"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-bell"/></svg></span><span class="stt"><b>تذكير المديونين</b><small id="ss_rem"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="cl"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-chart"/></svg></span><span class="stt"><b>الإقفال والتقارير</b><small id="ss_cl"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="exp"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-wallet"/></svg></span><span class="stt"><b>المصروفات</b><small id="ss_exp"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="nf"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-bell"/></svg></span><span class="stt"><b>الإشعارات</b><small id="ss_nf"></small></span><span class="sa">‹</span></button></div>
   <div class="sgh">البرنامج</div>
-  <div class="sgl"><button type="button" class="sti" data-sp="look"><span class="si">📱</span><span class="stt"><b>شكل البرنامج</b><small id="ss_look"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="lock"><span class="si">🔒</span><span class="stt"><b>القفل والأمان</b><small id="ss_lock"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="data"><span class="si">💾</span><span class="stt"><b>الحفظ والنسخ</b><small id="ss_data"></small></span><span class="sa">‹</span></button></div>
+  <div class="sgl"><button type="button" class="sti" data-sp="look"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg></span><span class="stt"><b>شكل البرنامج</b><small id="ss_look"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="lock"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg></span><span class="stt"><b>القفل والأمان</b><small id="ss_lock"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="data"><span class="si"><svg class="ic" aria-hidden="true"><use href="#i-db"/></svg></span><span class="stt"><b>الحفظ والنسخ</b><small id="ss_data"></small></span><span class="sa">‹</span></button></div>
   <div class="mute" id="appVer" style="text-align:center;margin:12px 0 4px"></div>
 </div>
-<div class="stp hide" data-sp="shop"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🏪 بيانات المحل</b></div>
+<div class="stp hide" data-sp="shop"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>بيانات المحل</b></div>
 <div class="card"><b>اسم المحل</b><div class="mute">بيظهر فوق الفاتورة وفي رسايل الواتساب.</div><input id="shopN" style="margin-top:6px">
   <label for="bizSel" style="margin-top:8px">طريقة البيع</label><select id="bizSel"><option value="gen">بالعدد (أي محل)</option><option value="cut">بالمقاس (زجاج، رخام، ألوميتال)</option></select>
   <div class="mute" style="margin-top:4px">البيع بالعدد بيخفي العرض والطول وCutList وحاسبة الزجاج.</div>
   <div class="g2" style="margin-top:8px;margin-bottom:0"><div><label>اللقب قبل اسم العميل</label><input id="custW" placeholder="مثال: الأستاذ"></div><div><label>اسم الفاتورة</label><input id="docW" placeholder="مثال: إذن صرف"></div></div>
   <div class="mute" style="margin-top:4px">لو سبت اللقب أو اسم الفاتورة فاضي، مش هيظهروا.</div></div>
-<div class="card"><b>اللوجو</b><div class="mute">بيظهر فوق الفاتورة وفي أعلى البرنامج. حجمه بيتظبط من تصميم الفاتورة.</div><div style="margin-top:6px"><input type="file" id="logoFile" accept="image/*">
+<div class="card"><b>اللوجو</b><div class="mute">بيظهر فوق الفاتورة وفي أعلى البرنامج. حجمه بيتظبط من تصميم الفاتورة.</div><div style="margin-top:6px"><label class="alt logo-pick" for="logoFile">اختيار صورة اللوجو</label><input type="file" id="logoFile" accept="image/*" class="vh">
     <div id="logoBox" class="hide" style="margin-top:6px"><img id="logoPrev" alt="اللوجو" style="max-height:60px;max-width:60%;display:block;margin-bottom:6px;background:#fff;border-radius:6px;padding:4px"><label class="opt"><input type="checkbox" id="logoOn"> إظهار اللوجو على الفاتورة</label><button class="alt b-red" id="logoDel" style="margin-top:6px">حذف اللوجو</button></div>
     <div class="info" id="logoMsg"></div></div></div>
 <div class="card"><b>سطور ثابتة في الفاتورة</b><div class="mute">رقم الواتساب، العنوان، حساب إنستا، أرقام التحويل… بتظهر في كل الفواتير.</div>
@@ -271,50 +274,50 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <label style="margin-top:6px">آخر الفاتورة</label><textarea id="stFoot" rows="2" placeholder="مثال: إنستا: اسم حسابك · فودافون كاش: 010..."></textarea>
   <div class="mute" style="margin-top:4px">السطور دي بتظهر مع التصميم الملون.</div></div>
 </div>
-<div class="stp hide" data-sp="des" id="invDes"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🎨 تصميم الفاتورة</b></div>
+<div class="stp hide" data-sp="des" id="invDes"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>تصميم الفاتورة</b></div>
 <div class="card"><label class="opt"><input type="checkbox" id="fancyInv"> التصميم الملون</label><div class="mute">جداول مدوّرة وألوان وملخص الأصناف. لو قفلته، الفاتورة بتطلع بشكل بسيط والإعدادات اللي تحت مش بتأثر عليها.</div></div>
-<button type="button" class="main" id="dzOpen" style="width:100%;margin:6px 0">✋ صمّم الفاتورة بإيدك (اسحب وكبّر ولوّن على الفاتورة نفسها)</button>
+<button type="button" class="main" id="dzOpen" style="width:100%;margin:6px 0">صمّم الفاتورة بإيدك (اسحب وكبّر ولوّن على الفاتورة نفسها)</button>
 <div class="idprev" id="idPrev" title="دوس عشان تصمّم بإيدك" style="cursor:pointer"></div>
-<details class="card idg" open><summary>🎨 الألوان</summary><div id="idCol"></div></details>
-<details class="card idg"><summary>📐 المقاسات واللوجو</summary><div id="idSize"></div></details>
-<details class="card idg"><summary>🔤 الخطوط</summary><div id="idFont"></div></details>
-<details class="card idg"><summary>📝 المحتوى والترتيب</summary><div id="idCont"></div></details>
-<details class="card idg"><summary>📏 أعمدة جدول البنود (العرض والمحاذاة)</summary><div id="idCols"></div></details>
-<details class="card idg"><summary>🔢 مربعات الإجمالي والمتبقي والمدفوع</summary><div id="idTot"></div></details>
-<details class="card idg"><summary>✍️ حجم ومحاذاة الملاحظات والسطور الثابتة</summary><div id="idTxt"></div></details>
-<details class="card idg wmg"><summary>💧 العلامة المائية والختم</summary><div id="idWm"></div></details>
-<details class="card idg"><summary>💾 القوالب: احفظ تصميمك أو ارجع لتصميم جاهز</summary>
+<details class="card idg" open><summary>الألوان</summary><div id="idCol"></div></details>
+<details class="card idg"><summary>المقاسات واللوجو</summary><div id="idSize"></div></details>
+<details class="card idg"><summary>الخطوط</summary><div id="idFont"></div></details>
+<details class="card idg"><summary>المحتوى والترتيب</summary><div id="idCont"></div></details>
+<details class="card idg"><summary>أعمدة جدول البنود (العرض والمحاذاة)</summary><div id="idCols"></div></details>
+<details class="card idg"><summary>مربعات الإجمالي والمتبقي والمدفوع</summary><div id="idTot"></div></details>
+<details class="card idg"><summary>حجم ومحاذاة الملاحظات والسطور الثابتة</summary><div id="idTxt"></div></details>
+<details class="card idg wmg"><summary>العلامة المائية والختم</summary><div id="idWm"></div></details>
+<details class="card idg"><summary>القوالب: احفظ تصميمك أو ارجع لتصميم جاهز</summary>
   <div class="mute" style="margin:6px 0">القالب نسخة محفوظة من الألوان والمقاسات والخطوط بس. الملاحظات والسطور الثابتة واللوجو مش بيتغيروا معاه.</div>
   <div class="qs" id="idTpls" style="margin:6px 0"></div>
   <div class="ro" style="gap:6px"><input id="idName" placeholder="اسم للتصميم الحالي" style="flex:1"><button class="main" id="idSave" style="flex:none">حفظ كقالب</button></div>
   <div class="ro" style="gap:6px;margin-top:6px"><span class="mute" id="idCur" style="flex:1"></span><button class="alt b-red" id="idReset" style="flex:none">رجّع الأصلي</button></div>
-  <div class="ro" style="gap:6px;margin-top:6px"><button class="alt" id="idExp" style="flex:1">📤 تصدير القوالب</button><button class="alt" id="idImp" style="flex:1">📥 استيراد قوالب</button><input type="file" id="idImpF" accept=".json,application/json" class="hide"></div><div class="info" id="idMsg"></div></details>
+  <div class="ro" style="gap:6px;margin-top:6px"><button class="alt" id="idExp" style="flex:1">تصدير القوالب</button><button class="alt" id="idImp" style="flex:1">استيراد قوالب</button><input type="file" id="idImpF" accept=".json,application/json" class="hide"></div><div class="info" id="idMsg"></div></details>
 </div>
-<div class="stp hide" data-sp="notes"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>📝 ملاحظات الفاتورة</b></div>
+<div class="stp hide" data-sp="notes"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>ملاحظات الفاتورة</b></div>
 <div class="card"><b>الملاحظات اللي بتظهر تحت الفاتورة</b><div class="mute">ضيف أكتر من ملاحظة، وكل واحدة بلونها. بتتحفظ مع كل فاتورة جديدة، والفواتير القديمة بتفضل زي ما هي.</div>
   <div id="ntList"></div><button type="button" class="alt" id="ntAdd" style="width:100%;margin-top:8px">+ ملاحظة جديدة</button></div>
 <div class="card"><b>شكلها في الفاتورة</b><div id="ntPrevBox" style="margin-top:6px"></div><div class="mute" style="margin-top:4px">حجم الخط والمحاذاة من: تصميم الفاتورة ← حجم ومحاذاة الملاحظات.</div></div>
 </div>
-<div class="stp hide" data-sp="inv"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🧾 خيارات الفاتورة والطباعة</b></div>
+<div class="stp hide" data-sp="inv"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>خيارات الفاتورة والطباعة</b></div>
 <div class="card"><b>بعد حفظ الفاتورة</b>
   <label class="opt"><input type="checkbox" id="rndTot"> إلغاء القروش من إجمالي الفاتورة (يتقرّب لأعلى للجنيه اللي بعده: 27.2 تبقى 28)</label>
   <label class="opt"><input type="checkbox" id="rndDn"> التقريب لأسفل بدل لأعلى (27.8 تبقى 27)</label>
-  <label class="opt"><input type="checkbox" id="ordOn"> متابعة الطلبيات (⏳ تحت التجهيز ← ✅ جاهز ← 📦 اتسلّم)</label>
+  <label class="opt"><input type="checkbox" id="ordOn"> متابعة الطلبيات (تحت التجهيز ← جاهز ← اتسلّم)</label>
   <label class="opt"><input type="checkbox" id="xAlw"> النولون والخصم ورد الكاش ظاهرين دايماً (من غير ما تدوس «+ إضافات»)</label>
   <label class="opt"><input type="checkbox" id="ceilSz"> تقريب العرض والطول لأعلى رقم صحيح عند حساب المتر (42.2 و42.5 يتحسبوا 43)</label>
   <label class="opt"><input type="checkbox" id="editInv"> تعديل الفاتورة بعد حفظها</label>
   <label class="opt"><input type="checkbox" id="dupInv"> تكرار فاتورة قديمة لنفس العميل</label>
   <label class="opt"><input type="checkbox" id="saveImgOn"> زرار «حفظ كصورة» في شريط الحفظ (بينزّل الصورة في التنزيلات)</label></div>
-<div class="card"><b>🖨 الطباعة والـ PDF</b>
+<div class="card"><b>الطباعة والـ PDF</b>
   <label class="opt"><input type="checkbox" id="pdfOn"> زرار PDF والطباعة تحت الفاتورة</label>
   <div id="paperBox"><label style="margin-top:6px">مقاس الورق</label><select id="paperSel"><option value="a4">A4 عادي</option><option value="t80">ورق حراري 80 مم</option><option value="t58">ورق حراري 58 مم</option></select></div></div>
 </div>
-<div class="stp hide" data-sp="pay"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>💳 طرق الدفع</b></div>
+<div class="stp hide" data-sp="pay"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>طرق الدفع</b></div>
 <div class="card"><b>طرق الدفع الجاهزة</b><div class="mute">بتظهر زراير في الفاتورة وفي صفحة الدفع. النسبة بتتخصم من المبلغ المدفوع (زي عمولة المحفظة)، و0 يعني من غير خصم.</div>
   <div id="pmList"></div><button type="button" class="alt" id="pmAdd" style="width:100%;margin-top:8px">+ إضافة طريقة دفع</button></div>
 <div class="card"><b>نسب العملاء المحفوظة</b><div class="mute">البرنامج بيفتكر آخر نسبة اتسجلت لكل عميل. امسح النسبة لو عايز العميل يرجع للنسبة العامة.</div><div id="pmCust"></div></div>
 </div>
-<div class="stp hide" data-sp="msg"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>📨 رسائل الواتساب</b></div>
+<div class="stp hide" data-sp="msg"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>رسائل الواتساب</b></div>
 <div class="card"><b>الإرسال</b>
   <label class="opt"><input type="checkbox" id="autoWa"> بعد حفظ الفاتورة افتح الإرسال للعميل على طول</label>
   <label class="opt"><input type="checkbox" id="bulkRemChk"> زرار تذكير كل المديونين مرة واحدة</label></div>
@@ -322,7 +325,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <div class="card"><b>رسالة الفاتورة</b><textarea id="tplInv" rows="6" style="margin-top:6px"></textarea><div class="vch" data-for="tplInv"></div><label>شكلها عند العميل</label><div class="wab" id="pvInv"></div></div><div class="card"><b>رسالة الدفعة</b><textarea id="tplPay" rows="4" style="margin-top:6px"></textarea><div class="vch" data-for="tplPay"></div><label>شكلها عند العميل</label><div class="wab" id="pvPay"></div></div><div class="card"><b>رسالة تذكير الدين</b><textarea id="tplRem" rows="4" style="margin-top:6px"></textarea><div class="vch" data-for="tplRem"></div><label>شكلها عند العميل</label><div class="wab" id="pvRem"></div></div><div class="card"><b>رسالة الطلب جاهز</b><textarea id="tplRdy" rows="4" style="margin-top:6px"></textarea><div class="vch" data-for="tplRdy"></div><label>شكلها عند العميل</label><div class="wab" id="pvRdy"></div></div>
 <button type="button" class="alt b-red" id="tplReset" style="width:100%;margin-top:4px">رجوع للرسايل الأصلية</button>
 </div>
-<div class="stp hide" data-sp="rem"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🔔 تذكير المديونين</b></div>
+<div class="stp hide" data-sp="rem"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>تذكير المديونين</b></div>
 <div class="card"><b>التنبيه</b>
   <label class="opt"><input type="checkbox" id="remOn"> نبّهني بالمديونين اللي محتاجين تذكير</label>
   <label style="margin-top:8px">يعتبر متأخر لو عدّى من غير ما يدفع</label>
@@ -330,30 +333,30 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <div class="ro" style="gap:6px;margin-top:6px;justify-content:flex-start"><span class="mute">أو اكتب عدد الأيام:</span><input id="remDaysIn" type="text" inputmode="numeric" style="width:64px;text-align:center"><span class="mute">يوم</span></div>
   <div class="ro" style="gap:6px;margin-top:10px;justify-content:flex-start"><span class="mute">متنبهنيش لو الحساب أقل من</span><input id="remMinIn" type="text" inputmode="decimal" placeholder="0" style="width:90px;text-align:center"><span class="mute">جنيه</span></div></div>
 <div class="card"><b>إزاي بيشتغل</b><div class="mute" style="line-height:1.8;margin-top:4px">
-  • العميل اللي عدّى عليه المدة دي من آخر دفعة (أو من آخر تذكير) بيظهر في السجل في سطر «🔔 محتاجين تذكير»، وأول مرة تفتح البرنامج كل يوم بيطلعلك تنبيه.<br>
+  • العميل اللي عدّى عليه المدة دي من آخر دفعة (أو من آخر تذكير) بيظهر في السجل في سطر «محتاجين تذكير»، وأول مرة تفتح البرنامج كل يوم بيطلعلك تنبيه.<br>
   • لو حددت للعميل ميعاد سداد من صفحته في المديونين، بيتنبهك يوم الميعاد نفسه. وأي دفعة بتلغي الميعاد.<br>
   • البرنامج بيجهز رسالة الواتساب وانت بتدوس إرسال بنفسك، لأن الواتساب مش بيسمح لأي برنامج يبعت لوحده.<br>
-  • بعد ما تبعت التذكير، العميل بيختفي من القايمة لحد ما المدة تعدّي تاني. وزرار «⏰ بكرة» بيأجله ليوم واحد.</div></div>
+  • بعد ما تبعت التذكير، العميل بيختفي من القايمة لحد ما المدة تعدّي تاني. وزرار «بكرة» بيأجله ليوم واحد.</div></div>
 </div>
-<div class="stp hide" data-sp="cl"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>📊 الإقفال والتقارير</b></div>
+<div class="stp hide" data-sp="cl"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>الإقفال والتقارير</b></div>
 <div class="card"><b>الإقفال التلقائي</b>
   <label class="opt"><input type="checkbox" id="dayCl"> إقفال يومي (آخر اليوم الساعة 12 بالليل)</label>
   <label class="opt"><input type="checkbox" id="weekCl"> إقفال أسبوعي (من الجمعة للخميس)</label>
-  <button type="button" class="alt" id="stClOpen" style="width:100%;margin-top:8px">🗂 عرض الإقفالات</button></div>
-<div class="card"><b>📊 تقرير الشهر</b>
+  <button type="button" class="alt" id="stClOpen" style="width:100%;margin-top:8px">عرض الإقفالات</button></div>
+<div class="card"><b>تقرير الشهر</b>
   <label class="opt"><input type="checkbox" id="monCl"> زرار التقرير + تقرير الشهر اللي فات يظهر لوحده</label></div>
 </div>
-<div class="stp hide" data-sp="exp"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>💸 المصروفات</b></div>
+<div class="stp hide" data-sp="exp"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>المصروفات</b></div>
 <div class="card"><b>مصروف جديد</b>
   <div class="g2" style="margin-top:6px"><div><label for="exAmt">المبلغ</label><input id="exAmt" inputmode="decimal" autocomplete="off"></div><div><label for="exCat">النوع</label><select id="exCat"><option>إيجار</option><option>مرتبات</option><option>كهربا ومياه</option><option>نقل</option><option>بضاعة ومشتريات</option><option>صيانة</option><option>أخرى</option></select></div></div>
   <div class="g2"><div><label for="exDate">التاريخ</label><input type="date" id="exDate"></div><div><label for="exNote">ملاحظة</label><input id="exNote" autocomplete="off"></div></div>
   <button type="button" class="main" id="exAdd" style="width:100%">حفظ المصروف</button><div class="info" id="exMsg"></div></div>
 <div class="card"><label for="exMon">الشهر</label><input type="month" id="exMon"><div id="exSum" style="margin-top:6px"></div>
   <div class="mute" style="margin-top:4px">الصافي = المبيعات ناقص المصروفات ومشتريات الموردين. الشراء من مورد سجّله في الموردين بس، عشان ما يتحسبش مرتين.</div>
-  <button type="button" class="alt hide" id="exRep" style="width:100%;margin-top:8px">📊 تقرير الشهر</button></div>
+  <button type="button" class="alt hide" id="exRep" style="width:100%;margin-top:8px">تقرير الشهر</button></div>
 <div id="exList"></div>
 </div>
-<div class="stp hide" data-sp="sup"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🚚 الموردين</b></div>
+<div class="stp hide" data-sp="sup"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>الموردين</b></div>
 <div id="supHome"><div class="card"><div class="ro" style="color:var(--ink)"><span>عليك للموردين</span><b class="num" id="supTot"></b></div>
   <div class="rowc" style="margin:6px 0 0"><input id="supName" placeholder="اسم مورد جديد" autocomplete="off"><button type="button" class="main" id="supAdd" style="flex:none">+ مورد</button></div><div class="info" id="supMsg"></div></div>
 <table class="xl" id="supList"></table></div>
@@ -365,13 +368,13 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <table class="xl" id="spList"></table>
 <button type="button" class="alt b-red" id="supDel" style="width:100%;margin-top:8px">حذف المورد</button></div>
 </div>
-<div class="stp hide" data-sp="stk"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🧱 المخزون</b></div>
+<div class="stp hide" data-sp="stk"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>المخزون</b></div>
 <div class="card"><div class="mute cut-only">بعدد الألواح. الصنف الجاهز بيتخصم لوحده مع البيع، والمقطع بتصرف منه بإيدك لما تفتح لوح.</div><div class="mute gen-only">بالعدد. الصنف بيتخصم لوحده مع البيع.</div>
   <div class="g2" style="margin:6px 0 0"><div><label for="stkQ">بحث</label><input id="stkQ" autocomplete="off"></div><div><label for="stkLim">نبّهني لما الرصيد يوصل</label><input id="stkLim" inputmode="decimal" autocomplete="off"></div></div><div class="info" id="stkMsg"></div></div>
 <table class="xl" id="stkList"></table>
 <table class="xl" id="stkLog" style="margin-top:8px"></table>
 </div>
-<div class="stp hide" data-sp="nf"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🔔 الإشعارات</b></div>
+<div class="stp hide" data-sp="nf"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>الإشعارات</b></div>
 <div class="card"><b>إشعارات الموبايل</b><div style="margin-top:4px" id="nfStat"></div>
   <div class="btns"><button type="button" class="main" id="nfBtn"></button><button type="button" class="alt hide" id="nfTest">جرّب إشعار</button></div>
   <div class="mute" style="margin-top:6px">بتوصلك من الموبايل والبرنامج في الخلفية. لو البرنامج مقفول، الموبايل هو اللي بيحدد توقيتها، ومش كل الموبايلات بتدعم ده.</div></div>
@@ -379,7 +382,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <label class="opt"><input type="checkbox" id="nfRem"> المديونين اللي محتاجين تذكير</label>
   <label class="opt"><input type="checkbox" id="nfStk"> الأصناف اللي قربت تخلص من المخزون</label></div>
 </div>
-<div class="stp hide" data-sp="look"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>📱 شكل البرنامج</b></div>
+<div class="stp hide" data-sp="look"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>شكل البرنامج</b></div>
 <div class="card"><b>الألوان</b>
   <label class="opt"><input type="checkbox" id="themeChk"> الوضع الليلي</label>
   <label style="margin-top:8px">لون البرنامج</label><div class="pals" id="pals"><button type="button" data-p="mono" aria-label="أبيض وأسود" style="background:linear-gradient(135deg,#1f2328 50%,#fff 50%)"></button><button type="button" data-p="teal" aria-label="teal" style="background:linear-gradient(135deg,#0f766e,#8fd3f4)"></button><button type="button" data-p="ocean" aria-label="ocean" style="background:linear-gradient(135deg,#1d4ed8,#7fe3f5)"></button><button type="button" data-p="violet" aria-label="violet" style="background:linear-gradient(135deg,#6d28d9,#f5a8e6)"></button><button type="button" data-p="rose" aria-label="rose" style="background:linear-gradient(135deg,#be123c,#fdba74)"></button><button type="button" data-p="sand" aria-label="sand" style="background:linear-gradient(135deg,#b45309,#fcd34d)"></button><button type="button" data-p="forest" aria-label="forest" style="background:linear-gradient(135deg,#166534,#d9f99d)"></button><button type="button" data-p="graphite" aria-label="graphite" style="background:linear-gradient(135deg,#0f1114,#9ca3af)"></button><label class="pc" id="pcLbl" title="اختار لونك"><input type="color" id="palCustom" value="#0f766e"></label></div>
@@ -388,7 +391,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <select id="fzSel" class="hide"><option value="x">x</option><option value="s">s</option><option value="m">m</option><option value="l">l</option><option value="xl">xl</option></select></div>
 <div class="card"><b>أدوات</b><label class="opt"><input type="checkbox" id="calcOn"> زرار الآلة الحاسبة</label></div>
 </div>
-<div class="stp hide" data-sp="lock"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🔒 القفل والأمان</b></div>
+<div class="stp hide" data-sp="lock"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>القفل والأمان</b></div>
 <div class="card"><b>قفل البرنامج</b>
     <label class="opt"><input type="checkbox" id="lkChk"> قفل البرنامج برقم سري</label>
     <div id="lkSet" class="hide"><div class="g2" style="margin-top:6px"><input id="lkP1" type="password" inputmode="numeric" maxlength="6" placeholder="رقم سري (4 إلى 6 أرقام)"><input id="lkP2" type="password" inputmode="numeric" maxlength="6" placeholder="اكتب الرقم تاني"></div>
@@ -401,30 +404,30 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
     <div class="info" id="editLkMsg"></div>
     <div id="lkRecSet" class="hide"><button type="button" class="alt" id="lkRecMake" style="width:100%;margin-top:10px"></button><div id="lkRecShow" class="hide" style="margin-top:6px"></div></div></div>
 </div>
-<div class="stp hide" data-sp="data"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>💾 الحفظ والنسخ</b></div>
-<div class="card"><b>📦 مساحة التخزين</b><div id="stMeter"></div></div>
-<div class="card"><b>☁️ الحفظ والمزامنة</b><div id="stor" class="stor"></div>
+<div class="stp hide" data-sp="data"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>الحفظ والنسخ</b></div>
+<div class="card"><b>مساحة التخزين</b><div id="stMeter"></div></div>
+<div class="card"><b>الحفظ والمزامنة</b><div id="stor" class="stor"></div>
     <div id="fbStat" style="margin:4px 0 8px;font-size:14px">غير مربوطة.</div>
     <div class="mute num" id="fbWho" style="margin-bottom:6px;direction:ltr;text-align:right"></div>
     <div id="fbVer" class="hide" style="margin-bottom:6px"><span class="mute">الإيميل لسه ما اتأكدش.</span> <button class="lnk" id="fbVerB">ابعت رسالة التأكيد</button><div class="info" id="fbVerM"></div></div>
     <div class="btns" style="margin:0"><button class="main" id="fbAuth">دخول أو إنشاء حساب</button><button class="alt b-red hide" id="fbOff">تسجيل خروج</button></div>
     <button class="lnk hide" id="fbDel" style="color:var(--danger);margin-top:8px">حذف الحساب</button>
     <a class="lnk" href="privacy.html" target="_blank" rel="noopener" style="display:block;margin-top:4px">سياسة الخصوصية</a></div>
-<div class="card"><b>💾 نسخة احتياطية</b><div class="mute" id="bkInfo" style="margin-top:4px"></div>
+<div class="card"><b>نسخة احتياطية</b><div class="mute" id="bkInfo" style="margin-top:4px"></div>
   <div class="btns"><button class="main" id="bkSave">حفظ نسخة</button><button class="alt" id="bkLoad">استرجاع نسخة</button><input type="file" id="bkFile" accept=".json,application/json" class="hide"></div>
-  <div class="btns"><button class="alt b-out" id="bkShare">📤 مشاركة نسخة (درايف / واتساب)</button></div><div class="info" id="bkMsg"></div>
+  <div class="btns"><button class="alt b-out" id="bkShare">مشاركة نسخة (درايف / واتساب)</button></div><div class="info" id="bkMsg"></div>
   <label class="opt"><input type="checkbox" id="bkAl"> تنبيه لو عدّى أسبوع من غير نسخة</label></div>
-<div class="card" id="xlBox"><b>📊 تصدير Excel</b><div class="mute" style="margin-top:4px">ملف بيتفتح في Excel أو Google Sheets.</div>
+<div class="card" id="xlBox"><b>تصدير Excel</b><div class="mute" style="margin-top:4px">ملف بيتفتح في Excel أو Google Sheets.</div>
   <div class="btns"><button type="button" class="alt" data-xl="inv">الفواتير</button><button type="button" class="alt" data-xl="cu">العملاء</button><button type="button" class="alt" data-xl="it">الأصناف</button></div>
   <div class="btns"><button type="button" class="alt" data-xl="ex">المصروفات</button><button type="button" class="alt" data-xl="sp">الموردين</button><button type="button" class="alt" data-xl="st">المخزون</button></div><div class="info" id="xlMsg"></div></div>
-<details class="card"><summary>🗄 نسخ تلقائية (على الجهاز والسحابة)</summary>
+<details class="card"><summary>نسخ تلقائية (على الجهاز والسحابة)</summary>
   <label class="opt"><input type="checkbox" id="snapOn"> نسخة على الجهاز كل يوم (آخر 14 يوم)</label>
   <div class="mute" style="margin:2px 0 6px">بتحميك من الحذف أو التعديل بالغلط، بس مش بتحميك لو الموبايل نفسه ضاع.</div>
   <div class="btns" style="margin-top:0"><button class="alt" id="snapList">عرض نسخ الجهاز</button></div><div id="snapRows"></div><div class="info" id="snapMsg"></div>
   <label class="opt" style="margin-top:8px"><input type="checkbox" id="autoBk"> نسخة على السحابة كل يوم</label>
   <div class="mute" id="cbStat" style="margin-top:4px"></div>
   <div class="btns"><button class="main" id="cbNow">نسخة سحابية دلوقتي</button><button class="alt" id="cbList">النسخ السحابية</button></div><div id="cbRows"></div><div class="info" id="cbMsg"></div></details>
-<details class="card" id="trD"><summary>🗑 سلة المحذوفات <span id="trCnt"></span></summary>
+<details class="card" id="trD"><summary>سلة المحذوفات <span id="trCnt"></span></summary>
   <label class="opt"><input type="checkbox" id="trashOn"> الفاتورة المحذوفة تتحفظ 30 يوم</label>
   <div class="mute" style="margin:6px 0">اضغط (استرجاع) عشان ترجع الفاتورة.</div>
   <div id="trList"></div><div class="info" id="trMsg"></div></details>
@@ -434,7 +437,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <div id="calcModal" class="calc-modal hide">
   <div class="calc-inner">
     <div class="r1" style="justify-content:space-between;margin-bottom:12px">
-      <b style="font-size:17px">🧮 حاسبة الزجاج</b>
+      <b style="font-size:17px">حاسبة الزجاج</b>
       <button class="del" id="calcClose" aria-label="إغلاق">×</button>
     </div>
     <div class="g2">
@@ -454,23 +457,22 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
     <button class="lnk" id="calcReset" style="margin-top:4px;color:var(--mute)">مسح القيم</button>
   </div>
 </div>
-<button class="calc-fab" id="calcFab" aria-label="حاسبة">🧮</button>
 
 <div id="toast" class="toast hide"></div>
 <nav class="bottom-nav" id="bnav">
-  <button data-t="new" class="on"><span class="nav-icon">🧾</span><span class="nav-label">فاتورة</span></button>
-  <button data-t="dash"><span class="nav-icon">📒</span><span class="nav-label">سجل</span></button>
-  <button data-t="cl"><span class="nav-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" style="display:block;margin:0 auto" aria-hidden="true"><rect x="3" y="3" width="8" height="7" rx="1.2"/><rect x="13" y="3" width="8" height="11" rx="1.2"/><rect x="3" y="12" width="8" height="9" rx="1.2"/><rect x="13" y="16" width="8" height="5" rx="1.2"/></svg></span><span class="nav-label">CutList</span></button>
-  <button data-t="it" class="hide"><span class="nav-icon">📦</span><span class="nav-label">الأصناف</span></button>
-  <button data-t="cu"><span class="nav-icon">👥</span><span class="nav-label">العملاء</span></button>
+  <button data-t="new" class="on"><span class="nav-icon"><svg class="ic" aria-hidden="true"><use href="#i-receipt"/></svg></span><span class="nav-label">فاتورة</span></button>
+  <button data-t="dash"><span class="nav-icon"><svg class="ic" aria-hidden="true"><use href="#i-list"/></svg></span><span class="nav-label">سجل</span></button>
+  <button data-t="cl"><span class="nav-icon"><svg class="ic" aria-hidden="true"><use href="#i-grid"/></svg></span><span class="nav-label">التقطيع</span></button>
+  <button data-t="it" class="hide"><span class="nav-icon"><svg class="ic" aria-hidden="true"><use href="#i-box"/></svg></span><span class="nav-label">الأصناف</span></button>
+  <button data-t="cu"><span class="nav-icon"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg></span><span class="nav-label">العملاء</span></button>
 </nav>
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=155"></script>
+<script src="js/app.js?v=156"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=155"></script>
-<script src="js/features.js?v=155"></script>
+<script src="js/cutlist.js?v=156"></script>
+<script src="js/features.js?v=156"></script>
 </body>
 </html>
 
