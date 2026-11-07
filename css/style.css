@@ -870,3 +870,15 @@ button.b-green,a.b-green{background:#15803d;box-shadow:none}
 html[data-pal="mono"]{--bg:#f6f7f7;--card:#fff;--line:#d8dee4;--acc:#1f2328;--acc2:#57606a;--h1:#1f2328;--h2:#1f2328;--accLight:#eceef0;--accInk:#fff;--accB:#1f2328;--tot:#f0f1f2;--g1:#d8dee4;--g2:#e6e8ea;--g3:#eceef0;--bgA:#f6f7f7;--bgB:#f6f7f7;--bgC:#f6f7f7;--shadow:0 1px 2px rgba(0,0,0,.06)}
 html[data-pal="mono"][data-theme="light"]{--bg:#f6f7f7;--card:#fff;--line:#d8dee4}
 html[data-pal="mono"][data-theme="dark"]{--bg:#16191d;--card:#1f2328;--line:#30363d;--ink:#e6e8ea;--mute:#a0a8b0;--acc:#e6e8ea;--acc2:#a0a8b0;--h1:#101215;--h2:#101215;--accLight:#2b3036;--accInk:#16191d;--accB:#e6e8ea;--tot:#1a1d21;--g1:#30363d;--g2:#2b3036;--g3:#22262b;--bgA:#16191d;--bgB:#16191d;--bgC:#16191d}
+
+/* طريقة البيع: بالعدد (لأي محل) بتخفي أدوات المقاسات */
+.gen-only{display:none}
+html.biz-gen .gen-only{display:block}
+html.biz-gen .cut-only,html.biz-gen #seg,html.biz-gen #bnav [data-t="cl"],html.biz-gen #calcFab,html.biz-gen #rescut{display:none!important}
+html.biz-gen label.opt:has(#ceilSz),html.biz-gen label.opt:has(#calcOn){display:none}
+html.biz-gen #rowsHd span:nth-child(2),html.biz-gen #rowsHd span:nth-child(3){display:none}
+html.biz-gen #rows .r1.one,html.biz-gen #rowsHd{grid-template-columns:minmax(0,2fr) repeat(2,minmax(0,1fr))}
+html.biz-gen #rows .r1.one .c{grid-area:1/2}
+html.biz-gen #rows .r1.one .p{grid-area:1/3}
+html.biz-gen #rows .r1.one::before,html.biz-gen #rows .r1.one::after{display:none}
+.auth select{width:100%;height:42px}
