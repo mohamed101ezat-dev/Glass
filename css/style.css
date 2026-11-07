@@ -942,5 +942,5 @@ body{font-size:var(--t-m)}
 .hday{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;font-size:var(--t-s)!important}.hday span{font-size:var(--t-s)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.hday .lnk{flex:none;min-height:0}
 #bnav [data-t="cl"] .nav-icon{font-size:var(--t-l)!important}
 #t-cl{font-size:var(--fs)}
-.nfr.dn{color:var(--mute)}.nfr.dn span:first-child{text-decoration:line-through}#startRows .nfr{margin-top:4px}
+.nfr.dn{color:var(--mute)}.nfr.dn span:first-child{text-decoration:none}#startRows .nfr{margin-top:4px}
 #t-new #rows input{border-radius:0!important}
