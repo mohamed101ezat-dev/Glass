@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='159';
+const APP_VER='160';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -375,8 +375,8 @@ function sheet(o){lastSpec=o;const D=invd();
       const fit=D.sumFit!==0,GAP=9,SS=D.sideSum==null?1:+D.sideSum,side=!!its&&SS!==0;let tw=fit?Math.min(lwm+vwm,IW*(side?.5:.7)):IW*Math.min(side?.5:1,Math.max(.3,(+D.sumW||40)/100)),vw=fit?Math.min(vwm,tw*.55):tw*.5,lw;
       if(+D.sumV>0){vw=IW*D.sumV/100;if(fit)tw=Math.min(IW*(side?.5:.95),Math.max(tw,vw+lwm));vw=Math.min(vw,tw-40)}lw=tw-vw;
       const sw=its?(side?Math.round(IW-tw-GAP):IW):0;let hS=0;
-      if(its){const st={th:['الصنف','العدد','الأمتار','القيمة'],w:[.33,.17,.22,.28],rows:its.map(r=>[r[0],r[1],r[2],r[4]])},h1=tbl(st,W-P,sw,{fs:D.items,rh:+D.itRow||0,hh:+D.itHead||0,lid:'items'});const it=o.itemsTot||{},cw=st.w.map(v=>v*sw),fo2='bold '+D.items+'px '+F;
-        hS=h1+rowBox(W-P-sw,y+h1,cw,['الإجمالي',String(it.c==null?'':it.c),it.q?fq(it.q):'-',it.v==null?'':f(it.v)],[HEADC,D.sumA,D.sumA,D.sumA],[PL.hfg,PL.ink,PL.ink,PL.ink],+D.itRow||D.sumH,[fo2],[0,0,R,R])}
+      if(its){const nq=its.every(r=>r[2]==='-'),st=nq?{th:['الصنف','العدد','القيمة'],w:[.44,.22,.34],rows:its.map(r=>[r[0],r[1],r[4]])}:{th:['الصنف','العدد','الأمتار','القيمة'],w:[.33,.17,.22,.28],rows:its.map(r=>[r[0],r[1],r[2],r[4]])},h1=tbl(st,W-P,sw,{fs:D.items,rh:+D.itRow||0,hh:+D.itHead||0,lid:'items'});const it=o.itemsTot||{},cw=st.w.map(v=>v*sw),fo2='bold '+D.items+'px '+F;
+        hS=h1+rowBox(W-P-sw,y+h1,cw,nq?['الإجمالي',String(it.c==null?'':it.c),it.v==null?'':f(it.v)]:['الإجمالي',String(it.c==null?'':it.c),it.q?fq(it.q):'-',it.v==null?'':f(it.v)],nq?[HEADC,D.sumA,D.sumA]:[HEADC,D.sumA,D.sumA,D.sumA],nq?[PL.hfg,PL.ink,PL.ink]:[PL.hfg,PL.ink,PL.ink,PL.ink],+D.itRow||D.sumH,[fo2],[0,0,R,R])}
       if(its&&!side){y+=hS+GP;hS=0}
       const X=side?P:(D.sumPos==='r'?W-P-tw:D.sumPos==='c'?(W-tw)/2:P);let hT=0,yy=y,nI=0,RW=[];
       let hPre=0;rows0.forEach(([a,b,bold])=>{const q=rk(a,bold),ls=wrap(a,lw-8,q.ff);hPre+=Math.max(q.rh0,ls.length*(q.fz+4)+4)});x.save();rr(X,y,tw,hPre,+D.sumR);x.clip();
@@ -389,8 +389,8 @@ function sheet(o){lastSpec=o;const D=invd();
       y+=Math.max(hS,hT)+GP};
     const secS=()=>{if(D.mob)return secSM();const its=D.sItems?o.items:null;
       if(its&&its.length){T('ملخص الأصناف',W-P,y+8,'right','bold '+(D.tt||14)+'px '+F);y+=D.tt?D.tt+6:20;
-        const FT=D.sumFit!==0,fd=FT?fitDims():null,SS=D.sideSum==null?1:+D.sideSum,fS=SS===2,tw1=FT?fd.w:tw,vw1=FT?fd.vw:vw,twS=fS&&!FT?Math.min(tw,IW*.45):tw1,vwS=fS&&!FT?Math.min(vw,twS*.5):vw1,side=SS!==0&&(fS||(its.length<=5&&(IW-tw1-12)>=IW*.35)),st={th:['الصنف','العدد','الأمتار','السعر','القيمة'],w:[.34,.1,.16,.16,.24],rows:its.map(r=>r.slice(0,5)),col:its.map(r=>r[5])};
-        const sh=tbl(st,W-P,side?IW-twS-12:IW,{fs:D.items,bold:i=>i===0||i===4,colr:i=>i===4?PL.val:null});
+        const FT=D.sumFit!==0,fd=FT?fitDims():null,SS=D.sideSum==null?1:+D.sideSum,fS=SS===2,tw1=FT?fd.w:tw,vw1=FT?fd.vw:vw,twS=fS&&!FT?Math.min(tw,IW*.45):tw1,vwS=fS&&!FT?Math.min(vw,twS*.5):vw1,side=SS!==0&&(fS||(its.length<=5&&(IW-tw1-12)>=IW*.35)),nq=its.every(r=>r[2]==='-'),st=nq?{th:['الصنف','العدد','السعر','القيمة'],w:[.4,.14,.2,.26],rows:its.map(r=>[r[0],r[1],r[3],r[4]]),col:its.map(r=>r[5])}:{th:['الصنف','العدد','الأمتار','السعر','القيمة'],w:[.34,.1,.16,.16,.24],rows:its.map(r=>r.slice(0,5)),col:its.map(r=>r[5])},lc=st.th.length-1;
+        const sh=tbl(st,W-P,side?IW-twS-12:IW,{fs:D.items,bold:i=>i===0||i===lc,colr:i=>i===lc?PL.val:null});
         if(side){const th2=totals(P,twS,vwS);y+=Math.max(sh,th2)+GP}else{y+=sh+GP;y+=totals(sX(tw1),tw1,vw1)+GP}}
       else if(o.sum&&o.sum.length){const FT=D.sumFit!==0,fd=FT?fitDims():null,w=FT?fd.w:Math.min(IW,Math.max(IW*Math.max(.5,D.sumW/100),vw+130));y+=totals(sX(w),w,FT?fd.vw:vw)+GP}};
     const secN=()=>{if(D.hNote)return;
@@ -408,7 +408,7 @@ function sheet(o){lastSpec=o;const D=invd();
 const nn=x=>x.rt?'مرتجع'+(x.src?' من فاتورة '+x.src:'')+' - '+x.n:x.n;
 function invSheet(r,paper){const TH=paper==='t80'||paper==='t58',fancy=!TH&&pget('fancyInv',true)&&!(r.rows||[]).some(x=>x.cols),lbl=x=>nn(x)+(x.q>0?(+x.w>0&&+x.h>0&&+x.w>+x.h?' ('+x.h+'/'+x.w+')':' ('+x.w+'/'+x.h+')'):'');const base={name:r.cname,date:stamp(r.ts),note:r.note,wm:1};
   const cd=(pureRet(r)?'مرتجع · ':'')+(r.code?'كود '+r.code+' · ':'')+(r.rcode?'كود المرتجع '+r.rcode+' · ':'');
-  if(r.type==='pay')return{...base,fancy,st:(+r.rest||0)<=0?'paid':'',...(Array.isArray(r.gn)?{gn:r.gn,gnote:r.gnote||''}:noteSnap()),sub:cd+'إذن دفعة'+(r.no?' رقم '+r.no:''),sum:[['الحساب قبل الدفعة',f(r.prev)],...(PY(r)?[...r.pays.map(y=>[(payTok(y.n)||y.n)+(y.p>0?' (خصم '+fq(y.p)+'%)':''),f(y.a)]),...(r.pfv?[['إجمالي خصم التحويلات',f(r.pfv)]]:[]),['صافي الدفعة',f(r.amount),1]]:r.pfv?[[payLbl('المبلغ المدفوع',r.pfWhy,r.amtRaw),f(r.amtRaw)],['خصم '+fq(r.pf)+'% من المدفوع',f(r.pfv)],['صافي الدفعة',f(r.amount),1]]:[[payLbl('المبلغ المدفوع',r.pfWhy,r.amount),f(r.amount),1]]),['الحساب بعد الدفعة',f(r.rest),1]]};
+  if(r.type==='pay')return{...base,fancy,st:(+r.rest||0)<=0?'paid':'',...(Array.isArray(r.gn)?{gn:r.gn,gnote:r.gnote||''}:noteSnap()),sub:cd+(isGen()?'إيصال دفعة':'إذن دفعة')+(r.no?' رقم '+r.no:''),sum:[['الحساب قبل الدفعة',f(r.prev)],...(PY(r)?[...r.pays.map(y=>[(payTok(y.n)||y.n)+(y.p>0?' (خصم '+fq(y.p)+'%)':''),f(y.a)]),...(r.pfv?[['إجمالي خصم التحويلات',f(r.pfv)]]:[]),['صافي الدفعة',f(r.amount),1]]:r.pfv?[[payLbl('المبلغ المدفوع',r.pfWhy,r.amtRaw),f(r.amtRaw)],['خصم '+fq(r.pf)+'% من المدفوع',f(r.pfv)],['صافي الدفعة',f(r.amount),1]]:[[payLbl('المبلغ المدفوع',r.pfWhy,r.amount),f(r.amount),1]]),['الحساب بعد الدفعة',f(r.rest),1]]};
   const RZ=/\s*(\d+(?:\.\d+)?)\s*[×x*]\s*(\d+(?:\.\d+)?)\s*$/,rdz=x=>x.t==='rd'&&!(x.q>0)&&!x.rt?String(x.n).match(RZ):null,bn=x=>rdz(x)?String(x.n).replace(RZ,''):x.n,nb=x=>{const m=rdz(x);return m?nn(x).replace(RZ,''):nn(x)};
   const pl0=r.rows.filter(x=>!x.cols),pl=(()=>{const o={};let n=0;pl0.forEach(x=>{if(!(bn(x) in o))o[bn(x)]=n++});return pl0.map((x,i)=>[x,i]).sort((a,b)=>o[bn(a[0])]-o[bn(b[0])]||a[1]-b[1]).map(a=>a[0])})(),ar=pl.some(x=>x.q>0||(!TH&&rdz(x))),tables=[];
   const cmap={};let cn=0;pl.forEach(x=>{if(!(bn(x) in cmap))cmap[bn(x)]=cn++});
@@ -557,7 +557,7 @@ function drawCusts(){
   selC=null;$('cuDet').classList.add('hide');$('cuMain').classList.remove('hide');
   const q=$('cq').value.trim();let l=S.customers.filter(c=>qm(c.name,q)&&(cuMode==='debt'?balOf(c)>0:cuMode==='credit'?balOf(c)<0:true));
   {l.sort((a,b)=>a.name.localeCompare(b.name,'ar'));$('cuTot').innerHTML='<span>👥 <b>'+l.length+'</b> عميل</span><span>📒 مديونيات <b class="num" style="color:var(--danger)">'+f(l.reduce((s,c)=>s+Math.max(0,balOf(c)),0))+'</b></span>'}
-  $('cuList').innerHTML=l.map(c=>`<div class="rec cr2" data-open="${c.id}"${agStyle(c)}>${av(c.name)}<div style="flex:1;min-width:0"><div class="cn">${esc(c.name)}</div><div class="mute">${esc(cSub(c))}</div></div><span class="cb ${bcls(c)} num">${bal(c)}</span></div>`).join('')||`<p class="mute">${'لا يوجد عملاء بعد. اضغط (+ عميل) أو احفظ فاتورة باسم جديد.'}</p>`}
+  $('cuList').innerHTML=l.map(c=>`<div class="rec cr2" data-open="${c.id}"${agStyle(c)}>${av(c.name)}<div style="flex:1;min-width:0"><div class="cn">${esc(c.name)}</div><div class="mute">${esc(cSub(c))}</div></div><span class="cb ${bcls(c)} num">${bal(c)}</span></div>`).join('')||`<p class="mute">${S.customers.length?'مفيش عملاء بالبحث أو الفلتر ده. اضغط «📋 الكل» أو امسح البحث.':'لسه مفيش عملاء. اضغط «➕ عميل» أو احفظ فاتورة باسم جديد.'}</p>`}
 
 /* كشف العميل: بحث (مبلغ / صنف / كود / مرتجع) + سطر الأصناف تحت كل فاتورة */
 function itemsTxt(r){return r.type==='pay'?(r.pfWhy||''):(r.rows||[]).map(x=>(x.rt?'↩ ':'')+String(x.n||'').trim()+(x.c?'×'+f(x.c):'')).filter(Boolean).join('، ')}
@@ -573,12 +573,12 @@ function rowMatch(x,q){q=q.trim();if(!q)return true;const r=x.r,vals=[val(r),pd(
 function tblHtml(c){const all=rowsOf(c);if(!all.length)return'<p class="mute">لا توجد فواتير في هذه الفترة.</p>';
   const l=all.filter(x=>rowMatch(x,cdq));if(!l.length)return'<p class="mute">مفيش نتائج للبحث ده في الفترة دي.</p>';
   return`<table class="st"><thead><tr><th>التاريخ</th><th>الكود</th><th>القيمة</th><th>المدفوع</th><th>الحساب</th></tr></thead><tbody>${l.map(({r,run})=>{const it=itemsTxt(r);return`<tr data-rec="${r.id}"><td class="num">${dshort(r.ts)}</td><td>${stTag(r)}</td><td class="num">${r.type==='pay'?'-':f(val(r))}</td><td class="num">${f(pd(r))}</td><td class="num">${f(run)}</td></tr>`+(it?`<tr data-rec="${r.id}"><td colspan="5" class="mute" style="font-size:11px;padding:0 2px 5px;max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:start">${esc(it)}</td></tr>`:'')}).join('')}</tbody></table>
-   <div class="mute" style="margin-top:4px">اضغط أي صف لعرض الفاتورة.${cdq.trim()?' (البحث بيصفّي الجدول بس، والملخص فوق للفترة كلها)':''}</div><div class="btns"><button class="main" data-stimg="1">حفظ الملخص كصورة</button></div>`}
+   <div class="mute" style="margin-top:4px">اضغط أي صف لعرض الفاتورة.${cdq.trim()?' (البحث بيصفّي الجدول بس، والملخص فوق للفترة كلها)':''}</div><div class="btns"><button class="main" data-stimg="1">🖼️ حفظ الملخص كصورة</button></div>`}
 function drawDet(){const c=getC(selC),l=rowsOf(c);
   $('cuDet').innerHTML=`<button class="lnk" data-back="1">→ رجوع</button>
   <div class="card"><div class="ro" style="margin-bottom:6px;gap:6px"><b style="font-size:17px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</b><span class="cb ${bcls(c)} num">${bal(c)}</span><button class="ab" data-tg="ed" aria-label="تعديل بيانات العميل">✏️ تعديل</button></div>
    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">${telNum(c.phone)?`<a class="ab" href="tel:${telNum(c.phone)}">📞 اتصال</a>`:''}${waNum(c.phone)?`<a class="ab" target="_blank" rel="noopener" href="https://wa.me/${waNum(c.phone)}">💬 واتساب</a>`:''}${balOf(c)>0?`<button class="ab b-out" data-rem="1">📨 تذكير</button>`:''}</div>
-   ${cuPm?`${pwHtml('cu',c)}<div class="btns"><button class="main b-green" data-pay="1">✓ تسجيل الدفعة</button><button class="alt" data-tg="pm" style="flex:none">إلغاء</button></div>`:`<button class="main b-green" data-tg="pm" style="width:100%">💵 تسجيل دفعة</button>`}
+   ${cuPm?`${pwHtml('cu',c)}<div class="btns"><button class="main b-green" data-pay="1">✅ تسجيل الدفعة</button><button class="alt" data-tg="pm" style="flex:none">✖️ إلغاء</button></div>`:`<button class="main b-green" data-tg="pm" style="width:100%">💵 تسجيل دفعة</button>`}
    <div class="info" id="cdMsg" style="color:var(--danger)"></div>
    <div id="cdEdit" class="${cuEd?'':'hide'}" style="border-top:1px dashed var(--line);margin-top:6px;padding-top:6px">
     <div class="ro" style="margin-bottom:6px"><input data-f="name" value="${esc(c.name)}" aria-label="اسم العميل" style="font-weight:700;flex:1;min-width:0"><select data-f="cat" class="catsel" aria-label="الفئة">${catOpts(custCat(c))}</select></div>
@@ -590,7 +590,7 @@ function drawDet(){const c=getC(selC),l=rowsOf(c);
    ${per==='c'?`<div class="g2"><div><label>من</label><input type="date" id="pf" value="${pF}"></div><div><label>إلى</label><input type="date" id="pt" value="${pT}"></div></div>`:''}
    ${(()=>{const q=sumOf(c);return`<div class="sumg"><div><label>الحساب أول الفترة</label><b class="num">${bsg(q.open)}</b></div><div><label>فواتير الفترة (${q.n})</label><b class="num">${f(q.inv)}</b></div><div><label>المدفوع في الفترة</label><b class="num">${f(q.pay)}</b></div><div><label>الحساب آخر الفترة</label><b class="num">${bsg(q.end)}</b></div></div>`})()}
    <input id="cdq" placeholder="ابحث: مبلغ تقريبي (700 · 600-800 · 7000+) أو صنف أو مرتجع" value="${esc(cdq)}" style="margin:6px 0 2px"><div id="cdTbl">${tblHtml(c)}</div></div>
-  <button class="lnk" data-delc="1" style="color:var(--danger)">حذف العميل</button><div class="info" id="dcMsg" style="color:var(--danger)"></div>`;pwMount('cu')}
+  <button class="lnk" data-delc="1" style="color:var(--danger)">🗑️ حذف العميل</button><div class="info" id="dcMsg" style="color:var(--danger)"></div>`;pwMount('cu')}
 function stmtImg(){const c=getC(selC),l=rowsOf(c),ss=sumOf(c);const lab=per==='c'?(pF||'...')+' إلى '+(pT||'...'):per==='mo'?moLab():PL[per];
   const cv=sheet({wm:1,name:c.name,sub:'كشف حساب',date:dshort(Date.now()),meta:['الفترة: '+(per==='w'||per==='m'?'آخر ':'')+lab].concat(l.some(({r})=>hasRet(r))?['↩ = الفاتورة فيها مرتجع']:[]),
     tables:[{th:['التاريخ','الكود','القيمة','المدفوع','الحساب'],w:[.2,.3,.17,.17,.16],rows:l.map(({r,run})=>[dshort(r.ts),stTag(r),r.type==='pay'?'-':f(val(r)),f(pd(r)),f(run)])}],
@@ -656,7 +656,7 @@ let itCat='d';
 function fillCatSelects(){if(!CATS().some(c=>c.id===itCat))itCat='d';
   $('icat').innerHTML=catOpts(itCat,true);const nc=$('nc_cat'),v=nc.value;nc.innerHTML=catOpts(CATS().some(c=>c.id===v)?v:'d')}
 function drawCatMgr(){$('catMgr').innerHTML=CATS().map(c=>`<div class="ro" style="gap:6px;margin-bottom:6px"><input data-cr="${c.id}" value="${esc(c.name)}" ${c.id==='rdy'?'readonly':''} style="flex:${c.id==='rdy'?'none;width:90px':'1'}">${c.id==='rdy'?'<span class="mute" style="flex:1">عملاء بيشوفوا أصناف الجاهز</span>':c.id==='d'?'<span class="mute" style="flex:none;font-size:11px">الافتراضية</span>':`<button class="ab" data-cd="${c.id}" style="flex:none">حذف</button>`}</div>`).join('')+
-  `<div class="ro" style="gap:6px;margin:0"><input id="cat_new" placeholder="فئة جديدة (نجار، حداد...)" style="flex:1"><button class="main" id="cat_add" style="flex:none">+ إضافة</button></div><div class="info">حذف الفئة بيمسح أسعارها، والعملاء اللي عليها بيرجعوا للفئة الافتراضية.</div>`}
+  `<div class="ro" style="gap:6px;margin:0"><input id="cat_new" placeholder="فئة جديدة (نجار، حداد...)" style="flex:1"><button class="main" id="cat_add" style="flex:none">➕ إضافة</button></div><div class="info">حذف الفئة بيمسح أسعارها، والعملاء اللي عليها بيرجعوا للفئة الافتراضية.</div>`}
 $('catMgrBtn').onclick=()=>{const b=$('catMgr');b.classList.toggle('hide');if(!b.classList.contains('hide'))drawCatMgr()};
 $('catMgr').addEventListener('input',e=>{const id=e.target.dataset.cr;if(!id)return;const v=e.target.value.trim();if(!v)return;let c=S.cats.find(x=>x.id===id);if(!c){if(id!=='d')return;c={id:'d',t:0,name:v};S.cats.push(c)}c.name=v;DV++;touch('cats',c);fillCatSelects()});
 $('catMgr').addEventListener('click',e=>{const t=e.target;
@@ -670,14 +670,14 @@ $('icat').onchange=()=>{itCat=$('icat').value;drawItemList()};
 
 /* ---------- الأصناف ---------- */
 const COLS={mq:[['w','العرض'],['h','الطول'],['p','السعر']],rd:[['w','العرض'],['h','الطول'],['p','السعر']]};
-let curIT='mq';
-function drawItems(){fillCatSelects();$('catBar').classList.toggle('hide',curIT!=='mq');if(curIT!=='mq')$('catMgr').classList.add('hide');const cf=COLS[curIT],g='2fr '+cf.map(()=>'1fr').join(' ')+' 34px';
+let curIT='mq';const itCols=()=>isGen()?COLS[curIT].filter(x=>x[0]==='p'):COLS[curIT];
+function drawItems(){if(isGen())curIT='rd';fillCatSelects();$('catBar').classList.toggle('hide',curIT!=='mq');if(curIT!=='mq')$('catMgr').classList.add('hide');const cf=itCols(),g='2fr '+cf.map(()=>'1fr').join(' ')+' 34px';
   $('nform').style.gridTemplateColumns=g;
-  $('nform').innerHTML='<input id="ni_name" placeholder="اسم الصنف">'+cf.map(x=>`<input data-nf="${x[0]}" type="text" inputmode="decimal" placeholder="${x[1]}">`).join('')+'<button class="main" id="addIt" aria-label="إضافة">+</button>';
+  $('nform').innerHTML='<input id="ni_name" placeholder="اسم الصنف">'+cf.map(x=>`<input data-nf="${x[0]}" type="text" inputmode="decimal" placeholder="${x[1]}">`).join('')+'<button class="main" id="addIt" aria-label="إضافة">➕</button>';
   $('ihead').innerHTML=`<div class="it" style="grid-template-columns:${g}"><span>الاسم</span>${cf.map(x=>`<span style="text-align:center">${x[1]}</span>`).join('')}<span></span></div>`;
   drawItemList()}
-function drawItemList(){const cf=COLS[curIT],g='2fr '+cf.map(()=>'1fr').join(' ')+' 34px';
-  $('items').innerHTML=itemsList().map(it=>`<div class="it" style="grid-template-columns:${g}"><input data-k="${it.id}" data-f="name" value="${esc(it.name)}">${cf.map(x=>`<input data-k="${it.id}" data-f="${x[0]}" type="text" inputmode="decimal" value="${(x[0]==='p'?priceOf(it,itCat):it[x[0]])||''}">`).join('')}<button class="del" data-d="${it.id}" aria-label="حذف">×</button></div>`).join('')||'<p class="mute">لا توجد أصناف.</p>'}
+function drawItemList(){const cf=itCols(),g='2fr '+cf.map(()=>'1fr').join(' ')+' 34px';
+  $('items').innerHTML=itemsList().map(it=>`<div class="it" style="grid-template-columns:${g}"><input data-k="${it.id}" data-f="name" value="${esc(it.name)}">${cf.map(x=>`<input data-k="${it.id}" data-f="${x[0]}" type="text" inputmode="decimal" value="${(x[0]==='p'?priceOf(it,itCat):it[x[0]])||''}">`).join('')}<button class="del" data-d="${it.id}" aria-label="حذف">×</button></div>`).join('')||'<p class="mute">'+(S.items.length?'مفيش أصناف بالبحث ده.':'لسه مفيش أصناف. اكتب اسم الصنف وسعره فوق واضغط ➕، أو استوردهم من Excel في الإعدادات ← الحفظ والنسخ.')+'</p>'}
 $('seg').onclick=e=>{const t=e.target.dataset.it;if(!t)return;curIT=t;document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b===e.target));drawItems()};
 $('nform').addEventListener('click',e=>{if(e.target.id!=='addIt')return;const name=$('ni_name').value.trim();if(!name)return;const o={id:uid(),type:curIT,name,p:0,w:0,h:0};
   document.querySelectorAll('#nform [data-nf]').forEach(i=>{if(i.dataset.nf==='p')setPrice(o,itCat,nv(i.value));else o[i.dataset.nf]=nv(i.value)});S.items.push(o);put('items',o);drawItems()});
@@ -1346,7 +1346,7 @@ $('animChk').checked=pget('anim',animDef());$('animChk').onchange=()=>{pset('ani
 /* متابعة الطلبيات: مفتوحة افتراضياً */
 $('ordOn').checked=ordOn();$('ordOn').onchange=()=>{pset('ordOn',$('ordOn').checked);drawDash();calc()};
 /* الإضافات ظاهرة دايماً: مقفولة افتراضياً لأنها مش في كل فاتورة */
-{const xa=()=>{document.documentElement.classList.toggle('xalw',$('xAlw').checked);$('moreBtn').textContent=$('xAlw').checked?'+ إضافات (مرتجع، ملاحظة)':'+ إضافات (نولون، خصم، مرتجع، رد كاش، ملاحظة)'};
+{const xa=()=>{document.documentElement.classList.toggle('xalw',$('xAlw').checked);$('moreBtn').textContent=$('xAlw').checked?'➕ إضافات (مرتجع، ملاحظة)':'➕ إضافات (نولون، خصم، مرتجع، رد كاش، ملاحظة)'};
   $('xAlw').checked=pget('xAlw',false);xa();$('xAlw').onchange=()=>{pset('xAlw',$('xAlw').checked);xa()}}
 const DEFPRE='تحويل محفظة=1\nتحويل انستا=0';
 const pfPresets=()=>lsv('pfPre',DEFPRE).split('\n').map(l=>{const i=l.lastIndexOf('=');return i<0?null:{n:l.slice(0,i).trim(),p:nv(l.slice(i+1))}}).filter(x=>x&&x.n);
@@ -1557,7 +1557,7 @@ function nfSave(){if(ddb)kvPut({alertNow:nfState()==='on'?nfList():[]}).catch(()
 function nfDaily(){const k=dkey(Date.now());nfList().filter(a=>lsv('nfDay_'+a.k,'')!==k).forEach((a,i)=>{svk('nfDay_'+a.k,k);setTimeout(()=>{if(document.hidden)nfSys(a)},i*8500)});nfSave();bellUI()}
 async function nfBg(){try{const r=await navigator.serviceWorker.ready,p=await navigator.permissions.query({name:'periodic-background-sync'});if(r.periodicSync&&p.state==='granted')await r.periodicSync.register('tabakha-alerts',{minInterval:12*36e5})}catch(e){}}
 /* بداية المستخدم الجديد: 3 خطوات فوق الفاتورة، وبتختفي لوحدها لما يخلصها أو يبدأ شغل فعلي */
-function startUI(){try{const st=[['shop','🏪','اكتب اسم محلك وحط اللوجو',!!(shopN()&&logoSrc())],['cu','👥','ضيف أول عميل، أو استورد القايمة من Excel',S.customers.length>0],['inv','🧾','اعمل أول فاتورة',S.invoices.some(r=>r.type==='inv')]],n=st.filter(x=>x[3]).length,off=lsv('startOff','')==='1'||n===3||S.invoices.length>3;
+function startUI(){try{const st=[['shop','🏪','اكتب اسم محلك (واللوجو لو عندك)',!!shopN()],['cu','👥','ضيف أول عميل، أو استورد القايمة من Excel',S.customers.length>0],['inv','🧾','اعمل أول فاتورة',S.invoices.some(r=>r.type==='inv')]],n=st.filter(x=>x[3]).length,off=lsv('startOff','')==='1'||n===3||S.invoices.length>3;
   $('startCard').classList.toggle('hide',off);if(!off)$('startRows').innerHTML=st.map(x=>`<button type="button" class="nfr${x[3]?' dn':''}" data-st="${x[0]}"><span>${x[3]?'✅':x[1]} ${x[2]}</span><span class="sa">‹</span></button>`).join('')}catch(e){}}
 $('startX').onclick=()=>{svk('startOff','1');startUI()};
 $('startRows').onclick=e=>{const b=e.target.closest('[data-st]');if(!b)return;const k=b.dataset.st;if(k==='shop'){$('hdrSet').click();stGo('shop');window.scrollTo(0,0)}else if(k==='cu'){document.querySelector('#bnav [data-t="cu"]').click();const m=document.querySelector('#t-cu [data-m="add"]');if(m)m.click()}else $('cust').focus()};
@@ -1661,7 +1661,7 @@ function drawDash(){startUI();drawHero();drawTopDebt();
     if(k!==last){last=k;h+=`<div class="hday"><span>${dayLabel(r.ts)}</span><span class="num">${pm?'':'مبيعات '+f(T[k].s)+' · '}مدفوع ${f(T[k].p)}</span>${pget('dayCl',true)?`<button class="lnk" data-dc="${r.ts}" style="padding:1px 9px;font-size:calc(var(--fs) - 1px)">🧾 إقفال</button>`:''}</div>`}
     h+=`<div class="hrow" data-h="${r.id}"><div class="hl"><b>${esc(r.cname)}${ordTag(r)}</b><span class="mute">${(r.type==='pay'?'دفعة'+(r.code?' '+r.code:''):'فاتورة '+(r.code||'#'+r.no))+(hasRet(r)&&r.rcode?' ↩'+r.rcode:'')} · ${hm(r.ts)}${pm&&r.pfWhy?' · '+esc(r.pfWhy):''}</span></div><div class="hr">${r.type==='pay'?`<b class="num">${f(r.amount)}</b><span class="tag ok">دفعة</span>`:pm?`<b class="num">${f(r.paid)}</b><span class="mute num">من ${f(val(r))}</span>`:`<b class="num">${f(val(r))}</b>${(()=>{const due=rd2(val(r)-r.paid);return due>0?`<span class="tag dr">متبقي ${f(due)}</span>`:`<span class="tag ok">مدفوعة</span>`})()}`}</div></div>`});
   if(l.length>hLim)h+=`<button class="lnk" data-more="1">عرض المزيد (${l.length-hLim})</button>`;
-  $('hList').innerHTML=h||'<p class="mute">لا توجد معاملات.</p>';drawDebt();try{remDraw()}catch(e){}}
+  $('hList').innerHTML=h||(S.invoices.length?'<p class="mute">مفيش معاملات بالفلتر ده. اختار «📋 الكل» فوق، أو امسح البحث.</p>':'<p class="mute">لسه مفيش معاملات. أول فاتورة هتظهر هنا.</p>');drawDebt();try{remDraw()}catch(e){}}
 $('hq').oninput=()=>{hLim=30;drawDash()};
 /* كارت الطلبيات المفتوحة: بيفتح السجل على الطلبيات بس (من أي تاريخ) */
 $('ordBan').onclick=$('ordBan').onkeydown=e=>{if(e.type==='keydown'&&e.key!=='Enter'&&e.key!==' ')return;hTy='ord';hP='all';hLim=30;
@@ -1723,16 +1723,16 @@ function drawDebt(){scMark();$('hMain').classList.toggle('hide',dbMode||infoMode
       <div class="mute dbsub">${esc(cSub(c)+(c.remAt?' · آخر تذكير '+agoTxt(c.remAt):''))}</div>
       ${b>0||wn?`<div class="dbact">${b>0?`<button class="ab b-out" data-drem="1">📨 تذكير</button>`:''}${wn?`<a class="ab wa" target="_blank" rel="noopener" href="https://wa.me/${wn}">💬 رسالة</a>`:''}${tn?`<a class="ab tel" href="tel:${tn}">📞 اتصال</a>`:''}</div>`:''}
       ${wn?'':'<div class="mute" style="margin-top:4px">مفيش رقم متسجل للعميل · يتضاف من صفحة العملاء</div>'}
-      ${b>0?(c.due?`<div class="dbdue${dAgo(0)>=c.due?' late':''}">📅 ميعاد السداد: <b>${dueLabel(c.due)}</b>${dAgo(0)>c.due?` <span>(عدّى من ${dz(Math.round((dAgo(0)-c.due)/864e5))})</span>`:''}<button type="button" class="lnk" data-ddx="1">إلغاء</button></div>`:`<div class="dbdue"><span>📅 ميعاد سداد:</span><button type="button" class="ab" data-dd="1">بكرة</button><button type="button" class="ab" data-dd="2">بعد يومين</button><button type="button" class="ab" data-dd="7">بعد أسبوع</button><input type="date" data-ddate="1" aria-label="اختار تاريخ"></div>`):''}
+      ${b>0?(c.due?`<div class="dbdue${dAgo(0)>=c.due?' late':''}">📅 ميعاد السداد: <b>${dueLabel(c.due)}</b>${dAgo(0)>c.due?` <span>(عدّى من ${dz(Math.round((dAgo(0)-c.due)/864e5))})</span>`:''}<button type="button" class="lnk" data-ddx="1">✖️ إلغاء</button></div>`:`<div class="dbdue"><span>📅 ميعاد سداد:</span><button type="button" class="ab" data-dd="1">بكرة</button><button type="button" class="ab" data-dd="2">بعد يومين</button><button type="button" class="ab" data-dd="7">بعد أسبوع</button><input type="date" data-ddate="1" aria-label="اختار تاريخ"></div>`):''}
       ${dbPay===c.id?`<div class="dbpay">
         ${pwHtml('db',c)}
-        <div class="btns"><button class="main b-green" data-dpgo="1">✓ تسجيل الدفعة</button><button class="alt" data-dpx="1" style="flex:none">إلغاء</button></div>
+        <div class="btns"><button class="main b-green" data-dpgo="1">✅ تسجيل الدفعة</button><button class="alt" data-dpx="1" style="flex:none">✖️ إلغاء</button></div>
         <div class="info" id="dbp_msg" style="color:var(--danger)"></div></div>`:''}</div>
       <div class="card">${rows.length?`<table class="st"><thead><tr><th>التاريخ</th><th>الكود</th><th>القيمة</th><th>المدفوع</th><th>الحساب</th></tr></thead><tbody>${rows.map(({r,run})=>`<tr data-rec="${r.id}"><td class="num">${dshort(r.ts)}</td><td>${stTag(r)}</td><td class="num">${r.type==='pay'?'-':f(val(r))}</td><td class="num">${f(pd(r))}</td><td class="num">${f(run)}</td></tr>`).join('')}</tbody></table><div class="mute" style="margin-top:4px">اضغط أي صف لعرض الفاتورة.</div>`:'<p class="mute">لا توجد فواتير.</p>'}</div>`;if(dbPay===c.id)pwMount('db');return}
   const q=$('dbq').value.trim(),l=S.customers.filter(x=>balOf(x)>0&&qm(x.name,q)).sort((a,b)=>balOf(b)-balOf(a));
   $('dbTot').innerHTML='<small>إجمالي المديونيات · '+l.length+' عميل</small><span class="num">'+f(l.reduce((a,x)=>a+balOf(x),0))+'</span>';
   $('bulkRem').classList.toggle('hide',!(pget('bulkRem',true)&&l.length));
-  $('dbList').innerHTML=l.map(x=>`<div class="rec cr2" data-dopen="${x.id}"${agStyle(x)}>${av(x.name)}<div style="flex:1;min-width:0"><div class="cn">${esc(x.name)}</div><div class="mute">${esc(cSub(x))}</div></div>${x.due?(dAgo(0)>=x.due?'<span class="tag dr">⚠ ميعاده جه</span>':`<span class="tag ok">📅 ${new Date(x.due).getDate()}/${new Date(x.due).getMonth()+1}</span>`):''}<span class="cb ${bcls(x)} num">${bal(x)}</span></div>`).join('')||'<p class="mute">لا يوجد مديونين.</p>'}
+  $('dbList').innerHTML=l.map(x=>`<div class="rec cr2" data-dopen="${x.id}"${agStyle(x)}>${av(x.name)}<div style="flex:1;min-width:0"><div class="cn">${esc(x.name)}</div><div class="mute">${esc(cSub(x))}</div></div>${x.due?(dAgo(0)>=x.due?'<span class="tag dr">⚠ ميعاده جه</span>':`<span class="tag ok">📅 ${new Date(x.due).getDate()}/${new Date(x.due).getMonth()+1}</span>`):''}<span class="cb ${bcls(x)} num">${bal(x)}</span></div>`).join('')||'<p class="mute">مفيش مديونين ✓</p>'}
 $('dbq').oninput=drawDebt;
 $('dbDet').addEventListener('change',e=>{const t=e.target;if(!t.dataset.ddate||!t.value)return;const c=getC(dbSel);if(!c)return;const[y,m,d]=t.value.split('-').map(Number);c.due=new Date(y,m-1,d).getTime();delete c.snz;put('customers',c);drawDebt();remDraw()});
 $('bnav').addEventListener('click',e=>{if(e.target.closest('button[data-t="dash"]')&&(dbMode||infoMode)){dbMode=false;infoMode=false;dbSel=null;drawDebt()}});
@@ -1930,7 +1930,7 @@ $('lkGo').onclick=tryPin;$('lkBioBtn').onclick=tryBio;
 /* نسيت الرقم السري: بحساب Google المربوط بالمزامنة، أو بكود استرجاع اتعمل وقت ضبط القفل */
 function lkRecover(){['lkOn','lkHash','lkSalt','lkBio','lkRecHash'].forEach(k=>lkSet(k,null));unlock();$('lkRec').classList.add('hide');lkUI();
   setTimeout(()=>toast('اتفتح ✓ والرقم السري اتلغى. اعمل رقم جديد من الإعدادات','الإعدادات',()=>{$('hdrSet').click();stGo('lock')}),300)}
-$('lkForgot').onclick=()=>{const g=!!fbCfg(),c=!!lkGet('lkRecHash');$('lkRec').classList.remove('hide');$('lkRecG').classList.toggle('hide',!g);$('lkRecC').classList.toggle('hide',!c);
+$('lkForgot').onclick=()=>{const g=!!fbCfg(),c=!!lkGet('lkRecHash');$('lkRec').classList.remove('hide');$('lkRecG').classList.toggle('hide',!g);$('lkRecP').classList.toggle('hide',!g);$('lkRecC').classList.toggle('hide',!c);
   $('lkRecMsg').textContent=!g&&!c?'مفيش طريقة استرجاع متفعّلة على الجهاز ده: لا حساب Google مربوط ولا كود استرجاع.':''};
 $('lkRecGo').onclick=async()=>{const v=toEn($('lkRecIn').value).replace(/\D/g,'');if(v&&await sha(lkGet('lkSalt')+'#'+v)===lkGet('lkRecHash'))lkRecover();else{$('lkRecIn').value='';$('lkRecMsg').textContent='الكود غلط'}};
 $('lkRecG').onclick=async()=>{const m=$('lkRecMsg');m.textContent='جاري الاتصال بجوجل…';let app=null;
@@ -1942,9 +1942,17 @@ $('lkRecG').onclick=async()=>{const m=$('lkRecMsg');m.textContent='جاري ال
     if(r&&r.user&&r.user.uid===prev)lkRecover();else m.textContent='ده مش الحساب المربوط بالبرنامج'}
   catch(e){const c=(e&&e.code)||'';m.textContent=/popup|operation-not-supported|web-storage/.test(c)?'جوجل مش راضي يفتح هنا. جرّب كود الاسترجاع، أو افتح البرنامج من المتصفح':/network/.test(c)?'مفيش نت':'تعذر الدخول'+(c?' ('+c.replace('auth/','')+')':'')}
   finally{if(app)try{await app.auth().signOut();await app.delete()}catch(_){}}};
+$('lkRecPwGo').onclick=async()=>{const m=$('lkRecMsg'),pw=$('lkRecPw').value;if(!pw){m.textContent='اكتب كلمة سر حسابك';return}m.textContent='جاري التأكد…';let app=null;
+  try{if(!window.firebase){const b='https://www.gstatic.com/firebasejs/13.2.0/';await loadScript(b+'firebase-app-compat.js');await loadScript(b+'firebase-auth-compat.js')}
+    if(!firebase.apps.length)firebase.initializeApp(FBCFG);const cu=await new Promise(r=>{const u=firebase.auth().onAuthStateChanged(x=>{u();r(x)})});
+    const prev=lsv('fbUid','')||(cu&&cu.uid)||'';if(!cu||!cu.email||!prev||!hasPw(cu)){m.textContent='الحساب المربوط هنا مش بإيميل وكلمة سر. جرّب Google أو كود الاسترجاع';return}
+    app=firebase.initializeApp(FBCFG,'lkpw'+Date.now());const r=await app.auth().signInWithEmailAndPassword(cu.email,pw);
+    if(r&&r.user&&r.user.uid===prev){$('lkRecPw').value='';lkRecover()}else m.textContent='ده مش الحساب المربوط بالبرنامج'}
+  catch(e){const c=(e&&e.code)||'';m.textContent=/wrong-password|invalid-credential|invalid-login/.test(c)?'كلمة السر غلط':/too-many/.test(c)?'محاولات كتير. استنى شوية وجرّب تاني':/network/.test(c)?'مفيش نت':'تعذر التأكد'+(c?' ('+c.replace('auth/','')+')':'')}
+  finally{if(app)try{await app.auth().signOut();await app.delete()}catch(_){}}};
 async function lkRecMake(){const a=new Uint32Array(1);crypto.getRandomValues(a);const code=String(a[0]%100000000).padStart(8,'0');
   lkSet('lkRecHash',await sha(lkGet('lkSalt')+'#'+code));const f=code.slice(0,4)+' '+code.slice(4);
-  $('lkRecShow').innerHTML=`<div class="reccode num">${f}</div><div class="mute" style="line-height:1.7">اكتب الكود ده في ورقة وشيله في مكان آمن. لو نسيت الرقم السري، اكتبه في شاشة القفل ← «نسيت الرقم السري؟». الكود بيظهر مرة واحدة بس.</div><button type="button" class="alt" id="lkRecCopy" style="width:100%;margin-top:6px">نسخ الكود</button>`;
+  $('lkRecShow').innerHTML=`<div class="reccode num">${f}</div><div class="mute" style="line-height:1.7">اكتب الكود ده في ورقة وشيله في مكان آمن. لو نسيت الرقم السري، اكتبه في شاشة القفل ← «نسيت الرقم السري؟». الكود بيظهر مرة واحدة بس.</div><button type="button" class="alt" id="lkRecCopy" style="width:100%;margin-top:6px">📋 نسخ الكود</button>`;
   $('lkRecShow').classList.remove('hide');$('lkRecCopy').onclick=async()=>{try{await navigator.clipboard.writeText(code);$('lkRecCopy').textContent='اتنسخ ✓'}catch(e){}};lkUI()}
 $('lkRecMake').onclick=e=>{if(lkGet('lkRecHash')&&!ok2(e.target))return;lkRecMake()};
 
