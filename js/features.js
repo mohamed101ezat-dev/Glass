@@ -78,7 +78,11 @@
   const saveT=()=>{try{localStorage.setItem('invtpls',JSON.stringify(tpls))}catch(e){}};
   const saveC=(chk)=>{try{const j=JSON.stringify(cfg);localStorage.setItem('invdesign',j);return !chk||localStorage.getItem('invdesign')===j}catch(e){return false}};
   const norm=c=>JSON.stringify(Object.keys(INV_G).sort().map(k=>c[k]===undefined?INV_G[k]:c[k]));
-  const pvSpec=()=>({fancy:true,paper:'a4',name:'محمد علي',date:'2026/10/25 3:02 م',sub:'كود 1001 · إذن صرف رقم 1',
+  const pvGen=()=>({fancy:true,paper:'a4',name:'محمد علي',date:'2026/10/25 3:02 م',sub:'كود 1001 · '+(lsv('docw','فاتورة')||'فاتورة')+' رقم 1',
+        tables:[{th:['البيان','العدد','السعر','القيمة'],w:[.46,.14,.2,.2],rows:[['صنف أول','2','150','300'],['صنف تاني','1','864','864'],['صنف تالت','3','135','405']],col:[0,1,2],red:[0,0,0]}],
+        items:[['صنف أول','2','-','150','300',0],['صنف تاني','1','-','864','864',1],['صنف تالت','3','-','135','405',2]],
+        sum:[['إجمالي الأصناف','1,569'],['رصيد سابق','0'],['الإجمالي','1,569',1],['المدفوع','1,569'],['المتبقي','0',1]],gn:(typeof liveNotes==='function'?liveNotes():[]),wm:1,st:wmPrevSt(),note:'مثال لملاحظة الفاتورة',itemsTot:{c:6,q:0,v:1569}});
+  const pvSpec=()=>isGen()?pvGen():({fancy:true,paper:'a4',name:'محمد علي',date:'2026/10/25 3:02 م',sub:'كود 1001 · إذن صرف رقم 1',
         tables:[{th:['البيان','المقاس','العدد','الكمية','السعر','القيمة'],w:[.3,.16,.1,.14,.14,.16],rows:[['زجاج سادة 6مم','100/50','2','1','300','300'],['سيكوريت 10مم','120/80','1','0.96','900','864'],['مرآة 5مم','90/60','3','1.62','250','405']],col:[0,1,2],red:[0,0,0]}],
         items:[['زجاج سادة 6مم','2','1','300','300',0],['سيكوريت 10مم','1','0.96','900','864',1],['مرآة 5مم','3','1.62','250','405',2]],
         sum:[['إجمالي الإذن (3.58 م²)','1,569'],['رصيد سابق','0'],['الإجمالي','1,569',1],['المدفوع','1,569'],['المتبقي','0',1]],gn:(typeof liveNotes==='function'?liveNotes():[]),wm:1,st:wmPrevSt(),note:'مثال لملاحظة الفاتورة',itemsTot:{c:6,q:3.58,v:1569}});
@@ -315,7 +319,7 @@
     '<div class="cp-row"><div class="cp-sw"><span id="cpOld"></span><span id="cpNew"></span></div><input id="cpHex" maxlength="7" placeholder="#RRGGBB" autocomplete="off" spellcheck="false"></div>'+
     '<div id="cpUsedW"><div class="cp-lab">ألوان التصميم الحالي</div><div class="cp-pre" id="cpUsed"></div></div>'+
     '<div class="cp-lab">ألوان جاهزة</div><div class="cp-pre" id="cpPre"></div>'+
-    '<div class="cp-btns"><button type="button" class="main" id="cpOk">تعيين</button><button type="button" class="alt" id="cpNo">إلغاء</button></div></div>';
+    '<div class="cp-btns"><button type="button" class="main" id="cpOk">تعيين</button><button type="button" class="alt" id="cpNo">✖️ إلغاء</button></div></div>';
     document.body.appendChild(ov);
     const drag=(el,fn)=>{let on=false;const mv=e=>{const r=el.getBoundingClientRect();fn(Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),Math.max(0,Math.min(1,(e.clientY-r.top)/r.height)))};
       el.addEventListener('pointerdown',e=>{on=true;try{el.setPointerCapture(e.pointerId)}catch(_){}mv(e);e.preventDefault()});
