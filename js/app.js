@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='154';
+const APP_VER='155';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -421,7 +421,7 @@ function invSheet(r,paper){const TH=paper==='t80'||paper==='t58',fancy=!TH&&pget
   if(!TH&&tables[0]&&pl.length){const gm={};let gn=0;tables[0].grp=pl.map(x=>{const k=bn(x);if(!(k in gm))gm[k]=gn++;return gm[k]})}
   if(TH&&items.length)tables.push({title:'ملخص الأصناف',th:['الصنف','العدد','القيمة'],w:[.5,.14,.36],rows:items.map(i=>[i[0],i[1],i[4]])});
   Object.values(G).forEach(g=>{const k=g[0].cols.length;tables.push({title:g[0].tn||'',th:['البيان',...g[0].cols.map(c=>c.l)],w:[.3,...g[0].cols.map(()=>.7/k)],rows:g.map(x=>[x.n,...x.cols.map(c=>c.v)])})});
-  const sum=[['إجمالي الإذن'+(r.tq>0?' ('+fq(r.tq)+' م²)':''),f(r.sub)]];(r.sums||[]).forEach(x=>sum.push(['إجمالي '+x.l,f(x.v)]));
+  const sum=[[(isGen()?'إجمالي الأصناف':'إجمالي الإذن')+(r.tq>0?' ('+fq(r.tq)+' م²)':''),f(r.sub)]];(r.sums||[]).forEach(x=>sum.push(['إجمالي '+x.l,f(x.v)]));
   if(r.nylon)sum.push(['نولون',f(r.nylon)]);if(r.disc)sum.push(['خصم'+(r.discWhy?' ('+r.discWhy+')':''),f(r.disc)]);if(r.dpv)sum.push(['خصم '+fq(r.dp)+'%',f(r.dpv)]);
   sum.push(['رصيد سابق',f(r.prev)],['الإجمالي',f(r.total),1]);if(PY(r)){r.pays.forEach(y=>sum.push([(payTok(y.n)||y.n)+(y.p>0?' (خصم '+fq(y.p)+'%)':''),f(y.a)]));if(r.pfv)sum.push(['إجمالي خصم التحويلات',f(r.pfv)]);sum.push(['صافي المدفوع',f(r.paid+(r.refund||0))])}else if(r.pfv)sum.push([payLbl('المبلغ المدفوع',r.pfWhy,r.paidRaw),f(r.paidRaw)],['خصم '+fq(r.pf)+'% من المدفوع',f(r.pfv)],['صافي المدفوع',f(r.paid+(r.refund||0))]);else sum.push([payLbl('المدفوع',r.pfWhy,r.paid+(r.refund||0)),f(r.paid+(r.refund||0))]);if(r.refund)sum.push(['رد كاش للعميل',f(-r.refund)]);sum.push(['المتبقي',f(r.rest),1]);
   return{...base,fancy,st:pureRet(r)?'ret':(+r.rest||0)<=0?'paid':'',items:fancy?items:[],itemsTot,sub:cd+((lsv('docw','إذن صرف')?lsv('docw','إذن صرف')+' ':'')+'رقم '+r.no),tables,sum,gnote:r.gnote||'',gn:Array.isArray(r.gn)?r.gn:null}}
@@ -739,7 +739,7 @@ function swipeDel(d){let x0=0,y0=0,dx=0,on=false;
   d.addEventListener('touchend',()=>{if(!on)return;on=false;if(Math.abs(dx)>110)delRow(d);else{d.style.transform='';d.style.opacity=''}})}
 /* الصف الأخير دايماً فاضي: أول ما تكتب فيه أو تختار صنف بيتبني صف جديد تحته، والفاضي مبيتحفظش */
 const rowBlank=d=>!d.dataset.rt&&['.n','.w','.h','.c','.p','.bw','.bh'].every(k=>{const i=d.querySelector(k);return !i||!i.value.trim()});
-function rowTail(){const r=$('rows');let l=r.lastElementChild;if(!l||!rowBlank(l)){addRow('mq');return}
+function rowTail(){const r=$('rows');let l=r.lastElementChild;if(!l||!rowBlank(l)){addRow(defT());return}
   while(l.previousElementSibling&&rowBlank(l.previousElementSibling)&&!l.contains(document.activeElement)){const p=l.previousElementSibling;l.remove();l=p}}
 function addRow(t,rt,src){const rd=t==='rd',one=rd,d=document.createElement('div');d.className='row';d.dataset.t=t;
   const num=(c,l)=>`<div><label>${l}</label><input class="${c}" type="text" inputmode="decimal"></div>`;
@@ -900,9 +900,9 @@ $('pfStep').onclick=e=>{const b=e.target.closest('[data-st]');if(!b)return;const
 $('pfStepIn').oninput=e=>{const v=toEn(e.target.value).replace(/[^\d.]/g,'').replace(/\.(?=.*\.)/g,'');if(v!==e.target.value)e.target.value=v;$('dp').value=v;calc()};
 ['focus','click'].forEach(k=>$('pfStepIn').addEventListener(k,e=>{setTimeout(()=>{try{e.target.select()}catch(_){}},0)}));
 $('r_dp').addEventListener('focusin',()=>{dpOpen=true});
-$('t-new').addEventListener('click',e=>{const x=e.target.dataset.x;if(x){const r=$(x);r.classList.remove('hide');const i=r.querySelector('input');if(i&&!i.readOnly)i.focus();return}const t=e.target.dataset.add;if(t){addRow(t).querySelector('.n').focus();calc()}});
+$('t-new').addEventListener('click',e=>{const x=e.target.dataset.x;if(x){const r=$(x);r.classList.remove('hide');const i=r.querySelector('input');if(i&&!i.readOnly)i.focus();return}const t=e.target.dataset.add;if(t){addRow(t==='mq'?defT():t).querySelector('.n').focus();calc()}});
 $('t-new').addEventListener('click',e=>{const t=e.target.dataset.ret;if(!t)return;
-  if(t==='free'){const d=addRow('mq',1);d.querySelector('.n').focus();calc();return}
+  if(t==='free'){const d=addRow(defT(),1);d.querySelector('.n').focus();calc();return}
   const pn=$('retPane');pn.classList.toggle('hide');if(!pn.classList.contains('hide')){$('retRes').innerHTML='';$('retNo').focus()}});
 (()=>{['cust','hq','dbq','cq','iq','retNo'].forEach(id=>{const i=$(id);if(!i)return;const w=document.createElement('span');w.className='xw';if(i.style.flex)w.style.flex=i.style.flex;i.parentNode.insertBefore(w,i);w.appendChild(i);
   const b=document.createElement('button');b.type='button';b.className='xclr';b.textContent='×';b.setAttribute('aria-label','مسح');w.appendChild(b);
@@ -1161,7 +1161,7 @@ async function fbStart(cfg,email,pass,google,create){
   if(google){try{user=(await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())).user}catch(e){if(e&&/popup-blocked|operation-not-supported|web-storage-unsupported/.test(e.code||'')){
       /* لازم نعلّم إن السحابة شغالة قبل التحويل، عشان لما الصفحة ترجع من جوجل fbBoot يكمّل الدخول */
       try{localStorage.setItem('fbOn','1');localStorage.removeItem('fbCfg')}catch(_){}await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());return false}throw e}}
-  else if(email&&pass)user=(await(create?auth.createUserWithEmailAndPassword(email,pass):auth.signInWithEmailAndPassword(email,pass))).user;
+  else if(email&&pass){user=(await(create?auth.createUserWithEmailAndPassword(email,pass):auth.signInWithEmailAndPassword(email,pass))).user;if(create)try{await user.sendEmailVerification()}catch(e){}}
   else user=await new Promise(r=>{const u=auth.onAuthStateChanged(x=>{u();r(x)})});
   if(!user)throw new Error('no-user');if(!await acctGate(auth,user))return false;try{localStorage.setItem('fbUid',user.uid)}catch(e){}
   const base=firebase.firestore().collection('users').doc(user.uid);
@@ -1180,9 +1180,14 @@ const fbStat=t=>{$('fbStat').textContent=t};
 const localHas=()=>['customers','invoices','quotes','expenses','suppliers','purchases','stock'].some(k=>S[k].length>0);
 const ACCT_LS=['pup','pdel','trash','fullAt','syncCur','syncAt','cntAt','cntBad','closes','clStart','qtNo','ordNew','codeHW','lastBackup','cbAt','cbDay','bkSnooze','cloudNag','stkMin','dcSeen','wcSeen','mcSeen','welcDone','shopAskAt','setH','fbUid','fbCfg','fbOn','lkOn','lkHash','lkSalt','lkBio','lkRecHash'];
 /* إعدادات المحل واللوجو وتصميم الفاتورة بتتحفظ مع الحساب (users/{uid}/settings/shop)، فكل حساب ليه محله */
-const SET_K=['shop','logo','logoOn','shopTxt','custw','docw','tpl_inv','tpl_pay','tpl_rem','tpl_rdy','invdesign','invtpls','invWm','invpal','fancyInv','paper','gnote','invNotes','pfPre'],SET_S=new Set(SET_K);
+/* نوع النشاط: gen = بيع بالعدد لأي محل. لو فاضي = بالمقاس (الحسابات القديمة بتفضل زي ما هي) */
+const isGen=()=>lsv('biz','')==='gen',defT=()=>isGen()?'rd':'mq';
+function applyBiz(){const g=isGen();document.documentElement.classList.toggle('biz-gen',g);curIT=g?'rd':'mq';document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.it===curIT));$('bizSel').value=g?'gen':'cut';
+  $('subLbl').textContent=g?'إجمالي الأصناف':'إجمالي الإذن';const l=$('rows').lastElementChild;if(l&&rowBlank(l)&&l.dataset.t!==defT()){l.remove();calc()}if(curTab==='cl'&&g)document.querySelector('#bnav [data-t="new"]').click();try{drawItems()}catch(e){}}
+function bizSet(v){svk('biz',v==='gen'?'gen':'cut');if(v==='gen'&&!lsv('docw',''))svk('docw','فاتورة');applyBiz();loadMsgUI()}
+const SET_K=['biz','shop','logo','logoOn','shopTxt','custw','docw','tpl_inv','tpl_pay','tpl_rem','tpl_rdy','invdesign','invtpls','invWm','invpal','fancyInv','paper','gnote','invNotes','pfPre'],SET_S=new Set(SET_K);
 const setGet=()=>{const o={};SET_K.forEach(k=>{const v=lsv(k,null);if(v!==null)o[k]=v});return o},setKey=o=>hs(JSON.stringify(Object.keys(o).sort().map(k=>[k,o[k]])));
-function setApply(){try{loadLogo();if(!typing($('t-st'))){loadMsgUI();shopTxtLoad();$('paperSel').value=paperKey();$('logoOn').checked=pget('logoOn',true);$('fancyInv').checked=pget('fancyInv',true)}}catch(e){}}
+function setApply(){try{applyBiz();loadLogo();if(!typing($('t-st'))){loadMsgUI();shopTxtLoad();$('paperSel').value=paperKey();$('logoOn').checked=pget('logoOn',true);$('fancyInv').checked=pget('fancyInv',true)}}catch(e){}}
 let setBusy=null,setT=0,setAt=0;
 /* البيانات اللي على السحابة بتكسب لو الجهاز ما اتغيرش من آخر مزامنة. لو الجهاز اتغير، هو اللي بيترفع */
 function setSync(){if(!FBDB||instOff)return Promise.resolve();if(setBusy)return setBusy;clearTimeout(setT);
@@ -1225,7 +1230,9 @@ function cloudUI(){const b=$('cloudSt');if(!b)return;let s,t;
   else{s='err';t='مش متصل بالسحابة دلوقتي. بياناتك محفوظة على الجهاز وهتتزامن لوحدها لما النت يرجع'}
   b.className='hdr-cloud '+s;b.title=t;b.setAttribute('aria-label',t);b.dataset.s=s;acctUI()}
 const fbUser=()=>{try{return window.firebase&&firebase.apps.length?firebase.auth().currentUser:null}catch(e){return null}};
-function acctUI(){const on=!!fbCfg(),u=fbUser();$('fbAuth').classList.toggle('hide',on);$('fbOff').classList.toggle('hide',!on);$('fbDel').classList.toggle('hide',!on);$('fbWho').textContent=u&&u.email?'الحساب: '+u.email:''}
+function acctUI(){const on=!!fbCfg(),u=fbUser();$('fbAuth').classList.toggle('hide',on);$('fbOff').classList.toggle('hide',!on);$('fbDel').classList.toggle('hide',!on);$('fbWho').textContent=u&&u.email?'الحساب: '+u.email:'';$('fbVer').classList.toggle('hide',!(u&&hasPw(u)&&!u.emailVerified))}
+/* الإيميل بيتأكد عشان نسيان كلمة السر يوصل لصاحبه. البرنامج شغال عادي لحد ما يتأكد */
+$('fbVerB').onclick=async()=>{const u=fbUser(),m=$('fbVerM');if(!u)return;m.textContent='جاري…';try{await u.reload();if(u.emailVerified){m.textContent='';acctUI();toast('الإيميل اتأكد ✓');return}await u.sendEmailVerification();m.textContent='بعتنا رسالة تأكيد على إيميلك. افتح الرابط اللي فيها، ولو ما وصلتش بص في الرسايل المزعجة (Spam).'}catch(e){m.textContent=fbErr(e)}};
 const goData=()=>{$('hdrSet').click();stGo('data');window.scrollTo(0,0)};
 $('cloudSt').onclick=()=>{const s=$('cloudSt').dataset.s;toast($('cloudSt').title,s==='off'?'اربط حسابك':s==='err'?'جرّب تاني':'الإعدادات',s==='off'?()=>authOpen():s==='err'?()=>fbBoot():goData)};
 addEventListener('offline',()=>{if(fbCfg()){cloudOk=false;cloudUI()}});
@@ -1255,8 +1262,8 @@ function auMode(m){auM=m;const nw=m==='new',rs=m==='reset';$('auTab').classList.
 function authOpen(){auMode('in');$('auShop').value=shopN();$('welc').classList.remove('hide')}
 function welcMaybe(){if(fbCfg()||lsv('welcDone','')==='1'||S.customers.length+S.invoices.length){shopAsk();return}authOpen()}
 const welcEnd=()=>{svk('welcDone','1');$('welc').classList.add('hide')};
-const auDone=(nw,sh)=>{const m=$('welcMsg');if(!FBDB){m.textContent=$('fbStat').textContent;return}$('auPass').value='';if(nw&&sh){svk('shop',sh);loadMsgUI()}welcEnd();
-  toast(S.invoices.length+S.customers.length?'رجعت بياناتك ✓ '+S.customers.length+' عميل · '+S.invoices.length+' فاتورة':'اتربط حسابك ✓ وأي حاجة تعملها هتتحفظ عليه لوحدها');shopAsk()};
+const auDone=(nw,sh)=>{const m=$('welcMsg');if(!FBDB){m.textContent=$('fbStat').textContent;return}$('auPass').value='';if(nw&&sh){svk('shop',sh);bizSet($('auBiz').value);loadMsgUI()}welcEnd();
+  toast(nw?'اتعمل حسابك ✓ وبعتنا رسالة تأكيد على إيميلك':S.invoices.length+S.customers.length?'رجعت بياناتك ✓ '+S.customers.length+' عميل · '+S.invoices.length+' فاتورة':'اتربط حسابك ✓ وأي حاجة تعملها هتتحفظ عليه لوحدها');shopAsk()};
 $('auTab').onclick=e=>{const b=e.target.closest('button[data-m]');if(b)auMode(b.dataset.m)};
 $('auForgot').onclick=()=>auMode(auM==='reset'?'in':'reset');
 $('auEye').onclick=()=>{const p=$('auPass'),s=p.type==='password';p.type=s?'text':'password';$('auEye').textContent=s?'إخفاء':'إظهار'};
@@ -1271,8 +1278,9 @@ $('welcG').onclick=async()=>{const m=$('welcMsg');
 $('welcNew').onclick=()=>{welcEnd();toast('تقدر تربط حسابك في أي وقت من علامة ☁️ فوق');shopAsk()};
 /* اسم المحل بيظهر على الفاتورة، فلو فاضي بنسأل عليه (مرة كل 3 أيام بالكتير) */
 function shopAsk(){if(shopN()||!$('welc').classList.contains('hide')||Date.now()-(+lsv('shopAskAt','0'))<3*864e5)return;svk('shopAskAt',String(Date.now()));$('shopAskIn').value='';$('shopOv').classList.remove('hide')}
-$('shopAskGo').onclick=()=>{const v=$('shopAskIn').value.trim();if(!v){$('shopAskIn').focus();return}svk('shop',v);loadMsgUI();$('shopOv').classList.add('hide');toast('تم حفظ اسم المحل ✓ واللوجو وباقي البيانات من الإعدادات','بيانات المحل',()=>{$('hdrSet').click();stGo('shop');window.scrollTo(0,0)})};
+$('shopAskGo').onclick=()=>{const v=$('shopAskIn').value.trim();if(!v){$('shopAskIn').focus();return}svk('shop',v);bizSet($('shopAskBiz').value);$('shopOv').classList.add('hide');toast('تم حفظ اسم المحل ✓ واللوجو وباقي البيانات من الإعدادات','بيانات المحل',()=>{$('hdrSet').click();stGo('shop');window.scrollTo(0,0)})};
 $('shopAskNo').onclick=()=>$('shopOv').classList.add('hide');
+$('bizSel').onchange=()=>bizSet($('bizSel').value);
 /* حذف الحساب: تأكيد الدخول، بعدين مسح كل بيانات users/{uid}، بعدين الحساب نفسه، وآخر حاجة الجهاز */
 const hasPw=u=>(u.providerData||[]).some(p=>p&&p.providerId==='password');
 async function acctPurge(){const fs=firebase.firestore();for(const k of[...BIG,'deleted','backups_meta','backups_data','settings']){const n=k==='backups_data'?20:300;
@@ -1424,7 +1432,7 @@ function ntDraw(){const l=getNotes(),ink=invd().ink||'#14233a';
   ntPrev()}
 let ntT=0;const ntPrevSoon=()=>{clearTimeout(ntT);ntT=setTimeout(ntPrev,300)};
 function ntPrev(){const box=$('ntPrevBox');const keep=lastSpec;try{const cv=sheet({fancy:pget('fancyInv',true),paper:'a4',name:'محمد علي',date:stamp(Date.now()),sub:'كود 1001 · '+(docW()?docW()+' ':'')+'رقم 1',
-    tables:[{th:['البيان','العدد','السعر','القيمة'],w:[.46,.14,.2,.2],rows:[['زجاج سادة 6مم','2','300','600']],col:[0],red:[0]}],sum:[['الإجمالي','600',1],['المدفوع','600'],['المتبقي','0',1]],gn:liveNotes()});
+    tables:[{th:['البيان','العدد','السعر','القيمة'],w:[.46,.14,.2,.2],rows:[['صنف تجريبي','2','300','600']],col:[0],red:[0]}],sum:[['الإجمالي','600',1],['المدفوع','600'],['المتبقي','0',1]],gn:liveNotes()});
     cv.style.cssText='width:100%;display:block;border-radius:6px';box.innerHTML='';box.appendChild(cv);box.scrollTop=box.scrollHeight}catch(e){}lastSpec=keep}
 $('ntList').addEventListener('input',e=>{const r=e.target.closest('.ntr');if(!r)return;const l=getNotes(),i=+r.dataset.i,t=e.target;if(!l[i])return;
   if(t.dataset.nt==='t')l[i].t=t.value;else if(t.dataset.nt==='c'){l[i].c=t.value;r.querySelector('textarea').style.color=t.value}else return;ntSave(l);ntPrevSoon()});
@@ -1963,7 +1971,7 @@ setTimeout(snapMaybe,4000);document.addEventListener('visibilitychange',()=>{if(
 lockInit();loadMsgUI();loadLogo();paperLabels();fixBar();document.body.classList.add('onNew');
 (async()=>{try{await instInit();await dataInit()}catch(e){if(window.__bootFail)window.__bootFail('storage: '+(e&&e.message||e));return}
   if(!fbCfg()){reflowAll();syncNames()}drawDash();drawCusts();drawItems();calc();bkInfo();applyFeatures();drawTrash();drawRecent();qtBtn();
-  window.__bootOK=true;fbBoot();cloudUI();welcMaybe();setTimeout(nfDaily,1800);nfBoot();setTimeout(storCheck,2500);setTimeout(cloudNag,6000);if(migNote)setTimeout(()=>toast(migNote),700)})();
+  window.__bootOK=true;applyBiz();fbBoot();cloudUI();welcMaybe();setTimeout(nfDaily,1800);nfBoot();setTimeout(storCheck,2500);setTimeout(cloudNag,6000);if(migNote)setTimeout(()=>toast(migNote),700)})();
 /* ---------- زرار الرجوع في الموبايل ---------- */
 const OVS=['res','rem','remL','bulk','calcModal','clOv','pinOv','qtOv','dzOv'],OVX={dzOv:'dzX',res:'resx',rem:'remX',remL:'remLX',bulk:'bulkX',calcModal:'calcClose',clOv:'clX',pinOv:'pinNo',qtOv:'qtX'};
 let NS=[],navIgnore=false,exitArm=false,exitT=0,navOK=false;
