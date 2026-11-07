@@ -28,14 +28,14 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <title>فواتير</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1f2328">
-<script>try{if(/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)){const v=document.querySelector('meta[name="viewport"]');v.content+=', maximum-scale=1'}}catch(e){}try{if(localStorage.getItem('theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}try{var _p=localStorage.getItem('pal');/* v154: الشكل الأساسي بقى أبيض وأسود. مرة واحدة، واللي اختار لون تاني بيفضل عليه */if(!localStorage.getItem('palV')){localStorage.setItem('palV','1');if(!_p||_p==='teal'){_p='mono';localStorage.setItem('pal','mono')}}if(_p)document.documentElement.setAttribute('data-pal',_p);var _a=localStorage.getItem('anim');if(_a==='0'||(_a===null&&navigator.deviceMemory&&navigator.deviceMemory<=2))document.documentElement.classList.add('noanim')}catch(e){}</script>
+<script>try{if(/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)){const v=document.querySelector('meta[name="viewport"]');v.content+=', maximum-scale=1'}}catch(e){}try{if(localStorage.getItem('theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}try{if(localStorage.getItem('biz')==='gen')document.documentElement.classList.add('biz-gen')}catch(e){}try{var _p=localStorage.getItem('pal');/* v154: الشكل الأساسي بقى أبيض وأسود. مرة واحدة، واللي اختار لون تاني بيفضل عليه */if(!localStorage.getItem('palV')){localStorage.setItem('palV','1');if(!_p||_p==='teal'){_p='mono';localStorage.setItem('pal','mono')}}if(_p)document.documentElement.setAttribute('data-pal',_p);var _a=localStorage.getItem('anim');if(_a==='0'||(_a===null&&navigator.deviceMemory&&navigator.deviceMemory<=2))document.documentElement.classList.add('noanim')}catch(e){}</script>
 <meta name="color-scheme" content="light">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="فواتير">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="css/style.css?v=154">
+<link rel="stylesheet" href="css/style.css?v=155">
 
 
 
@@ -52,7 +52,8 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <div class="mute auth-sub" id="auSub"></div>
   <div class="seg s" id="auTab"><button type="button" data-m="in" class="on">تسجيل الدخول</button><button type="button" data-m="new">حساب جديد</button></div>
   <form id="auForm" novalidate>
-    <div id="auShopB" class="hide"><label for="auShop">اسم المحل</label><input id="auShop" autocomplete="organization"></div>
+    <div id="auShopB" class="hide"><label for="auShop">اسم المحل</label><input id="auShop" autocomplete="organization">
+      <label for="auBiz">طريقة البيع</label><select id="auBiz"><option value="gen">بالعدد (أي محل)</option><option value="cut">بالمقاس (زجاج، رخام، ألوميتال)</option></select></div>
     <label for="auMail">الإيميل</label><input id="auMail" type="email" inputmode="email" autocomplete="email" dir="ltr">
     <div id="auPassB"><label for="auPass">كلمة السر</label><div class="auth-pw"><input id="auPass" type="password" autocomplete="current-password" dir="ltr"><button type="button" class="lnk" id="auEye">إظهار</button></div></div>
     <button class="main" id="auGo" type="submit">دخول</button>
@@ -67,6 +68,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <b style="font-size:18px">اسم محلك إيه؟</b>
   <div class="mute" style="margin:6px 0 10px;line-height:1.8">هيظهر فوق الفاتورة وفي رسايل الواتساب، وتقدر تغيّره في أي وقت من الإعدادات.</div>
   <input id="shopAskIn" autocomplete="organization" aria-label="اسم المحل">
+  <label for="shopAskBiz" style="margin-top:8px">طريقة البيع</label><select id="shopAskBiz"><option value="gen">بالعدد (أي محل)</option><option value="cut">بالمقاس (زجاج، رخام، ألوميتال)</option></select>
   <div class="btns"><button class="main" id="shopAskGo">حفظ</button><button class="alt" id="shopAskNo">بعدين</button></div></div></div>
 <div id="delOv" class="res-ov hide" style="z-index:92;padding-top:10vh"><div class="card res-in" style="max-width:380px">
   <b style="font-size:18px">حذف الحساب نهائيًا</b>
@@ -179,7 +181,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <div id="qwrap" class="hide"><div class="qs" id="qs"></div><button class="alt b-acc" id="qadd" data-add="mq">+ إضافة</button></div>
   <div class="addbar" id="addbar"><button class="alt b-acc" data-add="mq">+ إضافة</button></div>
   <div class="card isum">
-    <div id="r_sub" class="sub hide"><span>إجمالي الإذن<span class="num" id="tqw"></span></span><b class="num" id="sub">0</b></div>
+    <div id="r_sub" class="sub hide"><span><span id="subLbl">إجمالي الإذن</span><span class="num" id="tqw"></span></span><b class="num" id="sub">0</b></div>
     <div class="xg">
       <div id="r_nylon" class="hide"><label for="nylon">🚚 نولون</label><input id="nylon" type="text" inputmode="decimal" placeholder="0"></div>
       <div id="r_disc" class="hide"><label for="disc">🏷️ خصم</label><input id="disc" type="text" inputmode="decimal" placeholder="0"></div>
@@ -256,6 +258,8 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 </div>
 <div class="stp hide" data-sp="shop"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🏪 بيانات المحل</b></div>
 <div class="card"><b>اسم المحل</b><div class="mute">بيظهر فوق الفاتورة وفي رسايل الواتساب.</div><input id="shopN" style="margin-top:6px">
+  <label for="bizSel" style="margin-top:8px">طريقة البيع</label><select id="bizSel"><option value="gen">بالعدد (أي محل)</option><option value="cut">بالمقاس (زجاج، رخام، ألوميتال)</option></select>
+  <div class="mute" style="margin-top:4px">البيع بالعدد بيخفي العرض والطول وCutList وحاسبة الزجاج.</div>
   <div class="g2" style="margin-top:8px;margin-bottom:0"><div><label>اللقب قبل اسم العميل</label><input id="custW" placeholder="مثال: الأستاذ"></div><div><label>اسم الفاتورة</label><input id="docW" placeholder="مثال: إذن صرف"></div></div>
   <div class="mute" style="margin-top:4px">لو سبت اللقب أو اسم الفاتورة فاضي، مش هيظهروا.</div></div>
 <div class="card"><b>اللوجو</b><div class="mute">بيظهر فوق الفاتورة وفي أعلى البرنامج. حجمه بيتظبط من تصميم الفاتورة.</div><div style="margin-top:6px"><input type="file" id="logoFile" accept="image/*">
@@ -362,7 +366,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <button type="button" class="alt b-red" id="supDel" style="width:100%;margin-top:8px">حذف المورد</button></div>
 </div>
 <div class="stp hide" data-sp="stk"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🧱 المخزون</b></div>
-<div class="card"><div class="mute">بعدد الألواح. الصنف الجاهز بيتخصم لوحده مع البيع، والمقطع بتصرف منه بإيدك لما تفتح لوح.</div>
+<div class="card"><div class="mute cut-only">بعدد الألواح. الصنف الجاهز بيتخصم لوحده مع البيع، والمقطع بتصرف منه بإيدك لما تفتح لوح.</div><div class="mute gen-only">بالعدد. الصنف بيتخصم لوحده مع البيع.</div>
   <div class="g2" style="margin:6px 0 0"><div><label for="stkQ">بحث</label><input id="stkQ" autocomplete="off"></div><div><label for="stkLim">نبّهني لما الرصيد يوصل</label><input id="stkLim" inputmode="decimal" autocomplete="off"></div></div><div class="info" id="stkMsg"></div></div>
 <table class="xl" id="stkList"></table>
 <table class="xl" id="stkLog" style="margin-top:8px"></table>
@@ -402,6 +406,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <div class="card"><b>☁️ الحفظ والمزامنة</b><div id="stor" class="stor"></div>
     <div id="fbStat" style="margin:4px 0 8px;font-size:14px">غير مربوطة.</div>
     <div class="mute num" id="fbWho" style="margin-bottom:6px;direction:ltr;text-align:right"></div>
+    <div id="fbVer" class="hide" style="margin-bottom:6px"><span class="mute">الإيميل لسه ما اتأكدش.</span> <button class="lnk" id="fbVerB">ابعت رسالة التأكيد</button><div class="info" id="fbVerM"></div></div>
     <div class="btns" style="margin:0"><button class="main" id="fbAuth">دخول أو إنشاء حساب</button><button class="alt b-red hide" id="fbOff">تسجيل خروج</button></div>
     <button class="lnk hide" id="fbDel" style="color:var(--danger);margin-top:8px">حذف الحساب</button>
     <a class="lnk" href="privacy.html" target="_blank" rel="noopener" style="display:block;margin-top:4px">سياسة الخصوصية</a></div>
@@ -462,10 +467,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=154"></script>
+<script src="js/app.js?v=155"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=154"></script>
-<script src="js/features.js?v=154"></script>
+<script src="js/cutlist.js?v=155"></script>
+<script src="js/features.js?v=155"></script>
 </body>
 </html>
 
