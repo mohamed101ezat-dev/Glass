@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='158';
+const APP_VER='159';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1178,7 +1178,7 @@ const fbStat=t=>{$('fbStat').textContent=t};
 /* ---------- الجهاز بيشيل بيانات حساب واحد (fbUid = صاحبها): مفيش بيانات بتتنقل بين الحسابات من غير سؤال ---------- */
 /* الأصناف والفئات مش في الفحص عشان الجهاز الجديد ممكن يبدأ بأصناف جاهزة */
 const localHas=()=>['customers','invoices','quotes','expenses','suppliers','purchases','stock'].some(k=>S[k].length>0);
-const ACCT_LS=['pup','pdel','trash','fullAt','syncCur','syncAt','cntAt','cntBad','closes','clStart','qtNo','ordNew','codeHW','lastBackup','cbAt','cbDay','bkSnooze','cloudNag','stkMin','dcSeen','wcSeen','mcSeen','welcDone','shopAskAt','setH','fbUid','fbCfg','fbOn','lkOn','lkHash','lkSalt','lkBio','lkRecHash'];
+const ACCT_LS=['pup','pdel','trash','fullAt','syncCur','syncAt','cntAt','cntBad','closes','clStart','qtNo','ordNew','codeHW','lastBackup','cbAt','cbDay','bkSnooze','cloudNag','stkMin','dcSeen','wcSeen','mcSeen','welcDone','startOff','shopAskAt','setH','fbUid','fbCfg','fbOn','lkOn','lkHash','lkSalt','lkBio','lkRecHash'];
 /* إعدادات المحل واللوجو وتصميم الفاتورة بتتحفظ مع الحساب (users/{uid}/settings/shop)، فكل حساب ليه محله */
 /* نوع النشاط: gen = بيع بالعدد لأي محل. لو فاضي = بالمقاس (الحسابات القديمة بتفضل زي ما هي) */
 const isGen=()=>lsv('biz','')==='gen',defT=()=>isGen()?'rd':'mq';
@@ -1367,7 +1367,7 @@ function loadLogo(){const u=logoSrc();const hl=$('hdrLogo');if(u){hl.src=u;hl.cl
 $('logoFile').onchange=e=>{const fl=e.target.files[0];e.target.value='';if(!fl)return;const rd=new FileReader();
   rd.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,420/im.naturalWidth,200/im.naturalHeight),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.naturalWidth*k));c.height=Math.max(1,Math.round(im.naturalHeight*k));
       const x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
-      try{localStorage.setItem('logo',c.toDataURL('image/png'));$('logoMsg').textContent='تم حفظ اللوجو ✓'}catch(err){$('logoMsg').textContent='الصورة كبيرة، جرّب صورة أصغر'}loadLogo();setSoon()};
+      try{localStorage.setItem('logo',c.toDataURL('image/png'));$('logoMsg').textContent='تم حفظ اللوجو ✓'}catch(err){$('logoMsg').textContent='الصورة كبيرة، جرّب صورة أصغر'}loadLogo();setSoon();startUI()};
     im.onerror=()=>{$('logoMsg').textContent='الملف مش صورة صالحة'};im.src=rd.result};rd.readAsDataURL(fl)};
 $('logoDel').onclick=e=>{if(!ok2(e.target))return;try{localStorage.removeItem('logo')}catch(e){}$('logoMsg').textContent='تم حذف اللوجو';loadLogo();setSoon()};
 
@@ -1556,6 +1556,36 @@ async function nfSys(a){if(nfState()!=='on')return;try{await(await navigator.ser
 function nfSave(){if(ddb)kvPut({alertNow:nfState()==='on'?nfList():[]}).catch(()=>{})}
 function nfDaily(){const k=dkey(Date.now());nfList().filter(a=>lsv('nfDay_'+a.k,'')!==k).forEach((a,i)=>{svk('nfDay_'+a.k,k);setTimeout(()=>{if(document.hidden)nfSys(a)},i*8500)});nfSave();bellUI()}
 async function nfBg(){try{const r=await navigator.serviceWorker.ready,p=await navigator.permissions.query({name:'periodic-background-sync'});if(r.periodicSync&&p.state==='granted')await r.periodicSync.register('tabakha-alerts',{minInterval:12*36e5})}catch(e){}}
+/* بداية المستخدم الجديد: 3 خطوات فوق الفاتورة، وبتختفي لوحدها لما يخلصها أو يبدأ شغل فعلي */
+function startUI(){try{const st=[['shop','🏪','اكتب اسم محلك وحط اللوجو',!!(shopN()&&logoSrc())],['cu','👥','ضيف أول عميل، أو استورد القايمة من Excel',S.customers.length>0],['inv','🧾','اعمل أول فاتورة',S.invoices.some(r=>r.type==='inv')]],n=st.filter(x=>x[3]).length,off=lsv('startOff','')==='1'||n===3||S.invoices.length>3;
+  $('startCard').classList.toggle('hide',off);if(!off)$('startRows').innerHTML=st.map(x=>`<button type="button" class="nfr${x[3]?' dn':''}" data-st="${x[0]}"><span>${x[3]?'✅':x[1]} ${x[2]}</span><span class="sa">‹</span></button>`).join('')}catch(e){}}
+$('startX').onclick=()=>{svk('startOff','1');startUI()};
+$('startRows').onclick=e=>{const b=e.target.closest('[data-st]');if(!b)return;const k=b.dataset.st;if(k==='shop'){$('hdrSet').click();stGo('shop');window.scrollTo(0,0)}else if(k==='cu'){document.querySelector('#bnav [data-t="cu"]').click();const m=document.querySelector('#t-cu [data-m="add"]');if(m)m.click()}else $('cust').focus()};
+/* استيراد العملاء والأصناف: xlsx بيتفك هنا من غير مكتبات، وCSV بترميز UTF-8 أو ترميز Excel العربي */
+async function zipOpen(buf){const u=new Uint8Array(buf),dv=new DataView(buf);let e=u.length-22;while(e>=0&&dv.getUint32(e,true)!==0x06054b50)e--;if(e<0)throw new Error('zip');
+  const n=dv.getUint16(e+10,true),files={},td=new TextDecoder();let p=dv.getUint32(e+16,true);
+  for(let i=0;i<n;i++){const nl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true);files[td.decode(u.subarray(p+46,p+46+nl))]={m:dv.getUint16(p+10,true),cs:dv.getUint32(p+20,true),lo:dv.getUint32(p+42,true)};p+=46+nl+xl+cl}
+  const rd=async f0=>{const f=files[f0];if(!f)return'';const st=f.lo+30+dv.getUint16(f.lo+26,true)+dv.getUint16(f.lo+28,true),d=u.subarray(st,st+f.cs);return f.m===0?td.decode(d):new Response(new Blob([d]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text()};return{rd,names:Object.keys(files)}}
+async function xlsxRows(buf){const z=await zipOpen(buf),P=new DOMParser(),ss=P.parseFromString((await z.rd('xl/sharedStrings.xml'))||'<a/>','application/xml'),SS=[...ss.getElementsByTagName('si')].map(x=>[...x.getElementsByTagName('t')].map(t=>t.textContent).join(''));
+  const sh=z.names.filter(n=>/^xl\/worksheets\/sheet\d*\.xml$/.test(n)).sort((x,y)=>x.length-y.length||(x<y?-1:1))[0];if(!sh)throw new Error('sheet');const d=P.parseFromString(await z.rd(sh),'application/xml');
+  return[...d.getElementsByTagName('row')].map(r=>{const o=[];[...r.getElementsByTagName('c')].forEach(c=>{let ci=0;for(const ch of (c.getAttribute('r')||'').replace(/\d+/g,''))ci=ci*26+ch.charCodeAt(0)-64;const t=c.getAttribute('t'),v=c.getElementsByTagName('v')[0],is=c.getElementsByTagName('t')[0];o[(ci||o.length+1)-1]=t==='s'?(SS[+(v&&v.textContent)]||''):t==='inlineStr'?(is?is.textContent:''):(v?v.textContent:'')});return Array.from(o,x=>x==null?'':String(x).trim())})}
+function csvRows(t){t=t.replace(/^\uFEFF/,'');const l1=t.split(/\r?\n/)[0]||'',sep=[',',';','\t'].map(s=>[s,l1.split(s).length]).sort((x,y)=>y[1]-x[1])[0][0],rows=[];let row=[],c='',q=false;
+  for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}else if(ch==='"')q=true;else if(ch===sep){row.push(c.trim());c=''}else if(ch==='\n'){row.push(c.replace(/\r$/,'').trim());rows.push(row);row=[];c=''}else c+=ch}
+  if(c||row.length){row.push(c.trim());rows.push(row)}return rows}
+async function impRead(fl){const buf=await fl.arrayBuffer(),u=new Uint8Array(buf);if(u[0]===0x50&&u[1]===0x4b)return xlsxRows(buf);if(u[0]===0xd0&&u[1]===0xcf)throw new Error('xls');
+  let t;try{t=new TextDecoder('utf-8',{fatal:true}).decode(u)}catch(e){t=new TextDecoder('windows-1256').decode(u)}if(/^\s*<(html|table|\?xml|!doctype)/i.test(t)){const d=new DOMParser().parseFromString(t,'text/html');return[...d.querySelectorAll('tr')].map(r=>[...r.cells].map(c=>c.textContent.trim()))}return csvRows(t)}
+const IMP_H=[['phone',/موبايل|تليفون|تلفون|هاتف|واتس|جوال|phone|mobile/i],['bal',/رصيد|مديون|عليه|balance/i],['price',/سعر|price/i],['addr',/عنوان|address/i],['note',/ملاحظ|note/i],['w',/عرض|width/i],['h',/طول|height/i],['name',/اسم|العميل|الصنف|البيان|name|customer|item/i]];
+function impPrep(kind,rows){rows=rows.filter(r=>r.some(x=>x));const m={};(rows[0]||[]).forEach((t,i)=>{const f=IMP_H.find(([k,re])=>!(k in m)&&re.test(t));if(f)m[f[0]]=i});const hd='name' in m;if(!hd){m.name=0;if(kind==='customers'){m.phone=1;m.bal=2}else m.price=1}
+  const seen=new Set(S[kind].map(x=>nkey(x.name))),list=[];let dup=0,bad=0;const g=(r,k)=>k in m?String(r[m[k]]==null?'':r[m[k]]).trim():'';
+  rows.slice(hd?1:0).forEach(r=>{const name=g(r,'name'),k=nkey(name);if(!k){bad++;return}if(seen.has(k)){dup++;return}seen.add(k);if(kind==='customers'){let ph=toEn(g(r,'phone')).replace(/[^\d+]/g,'');if(/^1[0125]\d{8}$/.test(ph))ph='0'+ph;list.push({id:uid(),name,phone:ph,addr:g(r,'addr'),note:g(r,'note'),open:nv(g(r,'bal'))})}else list.push({id:uid(),u:0,type:defT(),name,p:nv(g(r,'price')),w:nv(g(r,'w')),h:nv(g(r,'h'))})});return{list,dup,bad}}
+let impK='',impL=null;
+$('impBox').addEventListener('click',e=>{const k=e.target.dataset.imp;if(!k)return;impK=k;$('impMsg').textContent='';$('impAsk').classList.add('hide');$('impFile').click()});
+$('impFile').onchange=async e=>{const fl=e.target.files[0],m=$('impMsg');e.target.value='';if(!fl)return;m.textContent='جاري قراءة الملف…';
+  try{const r=impPrep(impK,await impRead(fl));impL=r.list;m.textContent='';if(!r.list.length){m.textContent='مفيش حاجة جديدة تتضاف'+(r.dup?': كلهم موجودين ('+r.dup+')':'.');return}const w=impK==='customers'?'عميل':'صنف',ex=r.list.slice(0,3).map(x=>x.name).join('، ');
+    $('impPrev').textContent='هيتضاف '+r.list.length+' '+w+(r.dup?' · '+r.dup+' موجودين قبل كده مش هيتكرروا':'')+(r.bad?' · '+r.bad+' صف من غير اسم هيتساب':'')+'. زي: '+ex;$('impAsk').classList.remove('hide')}
+  catch(err){m.textContent=err&&err.message==='xls'?'ملف xls القديم مش مدعوم. من Excel اختار حفظ باسم، واحفظه xlsx أو CSV.':'تعذر قراءة الملف. جرّب تحفظه xlsx أو CSV.'}};
+$('impNo').onclick=()=>{impL=null;$('impAsk').classList.add('hide')};
+$('impGo').onclick=()=>{if(!impL||!impL.length)return;const n=impL.length,t=Date.now();DV++;S[impK].push(...impL);impL.forEach(o=>{o.u=t;pushDoc(impK,o)});lset(impK,S[impK]);impL=null;$('impAsk').classList.add('hide');refreshAll();$('impMsg').textContent='اتضاف '+n+(impK==='customers'?' عميل ✓':' صنف ✓')};
 /* جرس التنبيهات جنب السحابة: كل اللي مستني المستخدم في مكان واحد */
 function bellUI(){let l=[];try{l=nfList()}catch(e){}const rem=!$('remBan').classList.contains('hide');if(rem)l=l.filter(x=>x.k!=='rem');$('nfRows').innerHTML=l.map(x=>`<button type="button" class="nfr" data-nk="${x.k}"><span>${esc(x.m)}</span><span class="sa">‹</span></button>`).join('');const n=l.length+['autoBan','remBan','ordBan','bkBanner'].filter(i=>!$(i).classList.contains('hide')).length,c=$('nfCnt');c.textContent=n>9?'9+':String(n);c.classList.toggle('hide',!n);$('nfNone').classList.toggle('hide',n>0);$('nfBell').setAttribute('aria-label',n?'التنبيهات: '+n:'التنبيهات')}
 $('nfBell').onclick=()=>{bellUI();$('nfOv').classList.remove('hide')};$('nfX').onclick=()=>$('nfOv').classList.add('hide');
@@ -1602,7 +1632,7 @@ function drawTopDebt(){const box=$('topDebt');if(!box)return;const l=S.customers
 $('topDebt').onclick=e=>{const r=e.target.closest('[data-tdr]');if(r){const c=getC(r.dataset.tdr);if(c)openRem(c);return}if(e.target.closest('a'))return;
   if(e.target.closest('[data-tdall]')){infoMode=false;dbMode=true;dbSel=null;drawDebt();window.scrollTo(0,0);return}
   const o=e.target.closest('[data-tdo]');if(o){infoMode=false;dbMode=true;dbSel=o.dataset.tdo;dbPay=null;drawDebt();window.scrollTo(0,0)}};
-function drawDash(){drawHero();drawTopDebt();
+function drawDash(){startUI();drawHero();drawTopDebt();
   const t0=new Date();t0.setHours(0,0,0,0);const todayTs=t0.getTime(),weekTs=dAgo(6);
   const inv=S.invoices.filter(r=>r.type==='inv'),tInvs=inv.filter(r=>r.ts>=todayTs);
   const tPay=S.invoices.filter(r=>r.type==='pay'&&r.ts>=todayTs).reduce((a,r)=>a+r.amount,0);
@@ -1976,7 +2006,7 @@ setTimeout(snapMaybe,4000);document.addEventListener('visibilitychange',()=>{if(
 lockInit();loadMsgUI();loadLogo();paperLabels();fixBar();document.body.classList.add('onNew');
 (async()=>{try{await instInit();await dataInit()}catch(e){if(window.__bootFail)window.__bootFail('storage: '+(e&&e.message||e));return}
   if(!fbCfg()){reflowAll();syncNames()}drawDash();drawCusts();drawItems();calc();bkInfo();applyFeatures();drawTrash();drawRecent();qtBtn();
-  window.__bootOK=true;applyBiz();bellUI();fbBoot();cloudUI();welcMaybe();setTimeout(nfDaily,1800);nfBoot();setTimeout(storCheck,2500);setTimeout(cloudNag,6000);if(migNote)setTimeout(()=>toast(migNote),700)})();
+  window.__bootOK=true;applyBiz();bellUI();startUI();fbBoot();cloudUI();welcMaybe();setTimeout(nfDaily,1800);nfBoot();setTimeout(storCheck,2500);setTimeout(cloudNag,6000);if(migNote)setTimeout(()=>toast(migNote),700)})();
 /* ---------- زرار الرجوع في الموبايل ---------- */
 const OVS=['res','rem','remL','bulk','calcModal','clOv','pinOv','qtOv','dzOv'],OVX={dzOv:'dzX',res:'resx',rem:'remX',remL:'remLX',bulk:'bulkX',calcModal:'calcClose',clOv:'clX',pinOv:'pinNo',qtOv:'qtX'};
 let NS=[],navIgnore=false,exitArm=false,exitT=0,navOK=false;
