@@ -35,7 +35,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <meta name="apple-mobile-web-app-title" content="فواتير">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="css/style.css?v=158">
+<link rel="stylesheet" href="css/style.css?v=159">
 
 
 
@@ -170,6 +170,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 </section>
 
 <section id="t-new">
+  <div class="card hide" id="startCard"><div class="ro" style="color:var(--ink)"><b>🚀 ابدأ في 3 خطوات</b><button class="lnk" id="startX">إخفاء</button></div><div id="startRows"></div></div>
   <div class="card hide" id="editBar"><div class="ro" style="color:var(--ink)"><b id="editBarT"></b><button class="lnk" id="editCancel" style="color:var(--danger)">✖️ إلغاء التعديل</button></div></div>
   <div class="card">
     <div class="ro" style="margin:0"><label style="margin:0">العميل</label><button class="lnk hide" id="qtOpen" style="padding:1px 9px;font-size:calc(var(--fs) - 1px)"></button></div>
@@ -416,6 +417,9 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <div class="btns"><button class="main" id="bkSave">💾 حفظ نسخة</button><button class="alt" id="bkLoad">♻️ استرجاع نسخة</button><input type="file" id="bkFile" accept=".json,application/json" class="hide"></div>
   <div class="btns"><button class="alt b-out" id="bkShare">📤 مشاركة نسخة (درايف / واتساب)</button></div><div class="info" id="bkMsg"></div>
   <label class="opt"><input type="checkbox" id="bkAl"> تنبيه لو عدّى أسبوع من غير نسخة</label></div>
+<div class="card" id="impBox"><b>📥 استيراد من Excel</b><div class="mute" style="margin-top:4px">ملف Excel (xlsx) أو CSV. أول صف يبقى عناوين، زي: الاسم، الموبايل، الرصيد، السعر.</div>
+  <div class="btns"><button type="button" class="alt" data-imp="customers">👥 العملاء</button><button type="button" class="alt" data-imp="items">📦 الأصناف</button></div><input type="file" id="impFile" class="hide" accept=".xlsx,.csv,.txt,.xls">
+  <div id="impAsk" class="hide"><div class="mute" id="impPrev" style="margin-top:6px;line-height:1.8"></div><div class="btns"><button type="button" class="main" id="impGo">✅ ضيفهم</button><button type="button" class="alt" id="impNo">✖️ إلغاء</button></div></div><div class="info" id="impMsg"></div></div>
 <div class="card" id="xlBox"><b>📊 تصدير Excel</b><div class="mute" style="margin-top:4px">ملف بيتفتح في Excel أو Google Sheets.</div>
   <div class="btns"><button type="button" class="alt" data-xl="inv">🧾 الفواتير</button><button type="button" class="alt" data-xl="cu">👥 العملاء</button><button type="button" class="alt" data-xl="it">📦 الأصناف</button></div>
   <div class="btns"><button type="button" class="alt" data-xl="ex">💸 المصروفات</button><button type="button" class="alt" data-xl="sp">🚚 الموردين</button><button type="button" class="alt" data-xl="st">🧱 المخزون</button></div><div class="info" id="xlMsg"></div></div>
@@ -468,10 +472,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=158"></script>
+<script src="js/app.js?v=159"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=158"></script>
-<script src="js/features.js?v=158"></script>
+<script src="js/cutlist.js?v=159"></script>
+<script src="js/features.js?v=159"></script>
 </body>
 </html>
 
