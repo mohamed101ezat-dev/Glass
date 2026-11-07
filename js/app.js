@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='153';
+const APP_VER='154';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1306,7 +1306,7 @@ $('autoWa').onchange=()=>{try{localStorage.setItem('autoWa',$('autoWa').checked?
 const pget=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v==='1'}catch(e){return d}};
 const pset=(k,v)=>{try{localStorage.setItem(k,v?'1':'0')}catch(e){}};
 const getGN=()=>{try{return localStorage.getItem('gnote')||''}catch(e){return''}};
-const PALS=['teal','ocean','violet','rose','sand','forest','graphite','custom'];
+const PALS=['mono','teal','ocean','violet','rose','sand','forest','graphite','custom'];
 const CVARS=['--bg','--line','--acc','--acc2','--h1','--h2','--accB','--accLight','--tot','--g1','--g2','--g3'];
 function getCC(){try{return localStorage.getItem('cc')||'#0f766e'}catch(e){return'#0f766e'}}
 function applyCustom(){const h=document.documentElement,st=h.style;CVARS.forEach(n=>st.removeProperty(n));if(h.getAttribute('data-pal')!=='custom')return;
@@ -1315,10 +1315,10 @@ function applyCustom(){const h=document.documentElement,st=h.style;CVARS.forEach
  const L0=(mx+mn)/2,S0=d?d/(1-Math.abs(2*L0-1)):0,S=Math.max(35,Math.min(85,Math.round(S0*100))),H2=(H+35)%360,H3=(H+325)%360,dark=h.getAttribute('data-theme')==='dark',c=(a,s,l)=>'hsl('+a+' '+s+'% '+l+'%)',set=(n,v)=>st.setProperty(n,v);
  if(dark){set('--acc',c(H,S,58));set('--accB',c(H,S,58));set('--acc2',c(H2,S,42));set('--h1',c(H,S,30));set('--h2',c(H2,S,27));set('--accLight',c(H,40,24))}
  else{set('--bg',c(H,38,91));set('--line',c(H,25,80));set('--acc',c(H,S,32));set('--accB',c(H,S,32));set('--acc2',c(H2,S,40));set('--h1',c(H,S,32));set('--h2',c(H2,S,40));set('--accLight',c(H,42,87));set('--tot',c(H,32,89));set('--g1',c(H,80,78));set('--g2',c(H2,80,78));set('--g3',c(H3,70,80))}}
-function metaTheme(){try{document.querySelector('meta[name="theme-color"]').content=getComputedStyle(document.documentElement).getPropertyValue('--h1').trim()||'#0f766e'}catch(e){}}
+function metaTheme(){try{document.querySelector('meta[name="theme-color"]').content=getComputedStyle(document.documentElement).getPropertyValue('--h1').trim()||'#1f2328'}catch(e){}}
 function swFade(){const h=document.documentElement;h.classList.add('tsw');clearTimeout(swFade.t);swFade.t=setTimeout(()=>h.classList.remove('tsw'),600)}
 function setTheme(dark){swFade();document.documentElement.setAttribute('data-theme',dark?'dark':'light');try{localStorage.setItem('theme',dark?'dark':'light')}catch(e){}applyCustom();metaTheme()}
-function setPal(p){if(!PALS.includes(p))p='teal';swFade();document.documentElement.setAttribute('data-pal',p);try{localStorage.setItem('pal',p)}catch(e){}applyCustom();document.querySelectorAll('#pals button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));$('pcLbl').classList.toggle('on',p==='custom');metaTheme()}
+function setPal(p){if(!PALS.includes(p))p='mono';swFade();document.documentElement.setAttribute('data-pal',p);try{localStorage.setItem('pal',p)}catch(e){}applyCustom();document.querySelectorAll('#pals button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));$('pcLbl').classList.toggle('on',p==='custom');metaTheme()}
 const animDef=()=>!(navigator.deviceMemory&&navigator.deviceMemory<=2);
 function applyAnim(){const on=pget('anim',animDef());document.documentElement.classList.toggle('noanim',!on)}
 /* لو الموبايل بيهنّج فعلاً مع الحركة (فريمات بتتأخر) ومحدش اختار يدوي: نوقفها مرة واحدة ونقول. وضع توفير البطارية (30 فريم ثابت) مش بيتحسب تهنيج */
@@ -1331,7 +1331,7 @@ function applyCalc(){const on=pget('calcOn',true);$('calcFab').classList.toggle(
 $('calcOn').checked=pget('calcOn',true);$('calcOn').onchange=()=>{pset('calcOn',$('calcOn').checked);applyCalc()};applyCalc();
 try{if(localStorage.getItem('theme')==='dark'){$('themeChk').checked=true;setTheme(true)}}catch(e){}
 $('themeChk').onchange=()=>setTheme($('themeChk').checked);
-(function(){let p='teal';try{p=localStorage.getItem('pal')||'teal'}catch(e){}setPal(p);
+(function(){let p='mono';try{p=localStorage.getItem('pal')||'mono'}catch(e){}setPal(p);
 document.querySelectorAll('#pals button').forEach(b=>b.onclick=()=>setPal(b.dataset.p));$('palCustom').value=getCC();$('palCustom').oninput=()=>{try{localStorage.setItem('cc',$('palCustom').value)}catch(e){}setPal('custom')};
 $('animChk').checked=pget('anim',animDef());$('animChk').onchange=()=>{pset('anim',$('animChk').checked);applyAnim()};applyAnim();perfWatch()})();
 [['editInv','editInv'],['dupInv','dupInv'],['dayCl','dayCl'],['weekCl','weekCl'],['monCl','monCl'],['bulkRemChk','bulkRem'],['trashOn','trashOn'],['bkAl','bkAl'],['snapOn','snapOn'],['autoBk','autoBk'],['logoOn','logoOn'],['fancyInv','fancyInv'],['pdfOn','pdfOn'],['ceilSz','ceilSz'],['rndTot','rndTot'],['rndDn','rndDn'],['nfRem','nfRem'],['nfStk','nfStk']].forEach(([id,k])=>{$(id).checked=pget(k,true);$(id).onchange=()=>{pset(k,$(id).checked);applyFeatures();drawCusts();if(k==='ceilSz'||k==='rndTot'||k==='rndDn')calc()}});
