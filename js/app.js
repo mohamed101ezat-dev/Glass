@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='167';
+const APP_VER='168';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1557,14 +1557,22 @@ function stkAll(){const m=new Map();S.stock.forEach(x=>{if(!S.items.some(i=>i.id
 function stkMin(){return Math.max(0,nv(lsv('stkMin','3')))}
 function stkLow(m){const n=stkMin();return[...m.values()].filter(o=>o.bal<=n).length}
 function stkOpen(){$('stkLim').value=lsv('stkMin','3');$('stkMsg').textContent='';drawStk()}
-function drawStk(){const m=stkAll(),mn=stkMin(),l=S.items.filter(i=>qm(i.name,$('stkQ').value)).sort((a,b)=>a.name.localeCompare(b.name,'ar'));
-  $('stkList').innerHTML=l.length?'<tr><th>الصنف</th><th>الرصيد</th><th>العدد</th><th>وارد</th><th>صرف</th></tr>'+l.map(i=>{const o=m.get(i.id);return`<tr data-it="${esc(i.id)}"><td class="tn">${esc(i.name)}${szOf(i)?' <small class="num">'+esc(szOf(i))+'</small>':''}</td><td class="num">${o?`<b${o.bal<=mn?' class="low"':''}>${f(o.bal)}</b>`:'-'}</td><td class="tq"><input class="sq" inputmode="decimal" value="1" aria-label="العدد"></td><td class="tb"><button type="button" class="xb" data-sd="1" aria-label="وارد">+</button></td><td class="tb"><button type="button" class="xb" data-sd="-1" aria-label="صرف">−</button></td></tr>`}).join(''):'<tr><td class="tn mute">مفيش أصناف. ضيف الأصناف الأول من شاشة الأصناف.</td></tr>';
-  const g=S.stock.filter(x=>m.has(x.iid)).sort((a,b)=>b.ts-a.ts).slice(0,20);
-  $('stkLog').innerHTML=g.length?'<tr><th>التاريخ</th><th>الصنف</th><th>وارد</th><th>صرف</th><th></th></tr>'+g.map(x=>`<tr><td class="num">${dshort(x.ts).slice(5)}</td><td class="tn">${esc((S.items.find(i=>i.id===x.iid)||{}).name||'')}</td><td class="num">${x.q>0?f(x.q):''}</td><td class="num">${x.q<0?f(-x.q):''}</td><td><button type="button" class="xd" data-skd="${esc(x.id)}" aria-label="حذف">×</button></td></tr>`).join(''):''}
+/* شاشة المخزون: لكل صنف «عندك كام» وزرارين دخل/طلع بالكلام، وتحت آخر الحركات ومعاها البيع من الفواتير */
+const stkUnit=i=>i.type==='rd'?'':' لوح';
+function stkSales(m){const rd=new Set(S.items.filter(i=>i.type==='rd').map(i=>i.id)),o=[];
+  S.invoices.forEach(r=>{if(r.type==='pay')return;(r.rows||[]).forEach(x=>{const t=rd.has(x.i)&&m.get(x.i);if(t&&r.ts>=t.from&&+x.c)o.push({inv:1,iid:x.i,ts:r.ts,q:(x.rt?1:-1)*(+x.c),code:r.code||('#'+r.no)})})});return o}
+function drawStk(){const m=stkAll(),mn=stkMin(),q=$('stkQ').value,l=S.items.filter(i=>qm(i.name,q)).sort((a,b)=>(m.has(b.id)-m.has(a.id))||a.name.localeCompare(b.name,'ar'));
+  $('stkList').innerHTML=l.length?'<tr><th>الصنف</th><th>عندك</th><th>الكمية</th><th></th><th></th></tr>'+l.map(i=>{const o=m.get(i.id),low=o&&o.bal<=mn;
+    return`<tr data-it="${esc(i.id)}"${low?' class="stk-low"':''}><td class="tn">${esc(i.name)}${szOf(i)?' <small class="num">'+esc(szOf(i))+'</small>':''}${low?'<br><small class="stk-warn">⚠️ قرب يخلص</small>':''}</td><td class="num">${o?`<b>${f(o.bal)}</b><small class="mute">${stkUnit(i)}</small>`:'<small class="mute">لسه</small>'}</td><td class="tq"><input class="sq" inputmode="decimal" placeholder="1" aria-label="الكمية"></td><td class="tb"><button type="button" class="stk-b in" data-sd="1">➕ دخل</button></td><td class="tb"><button type="button" class="stk-b out" data-sd="-1">➖ طلع</button></td></tr>`}).join(''):'<tr><td class="tn mute">'+(q?'مفيش صنف بالاسم ده.':'مفيش أصناف لسه. ضيفها الأول من: الإعدادات ← الأصناف.')+'</td></tr>';
+  const nm=id=>(S.items.find(i=>i.id===id)||{}).name||'';
+  const g=S.stock.filter(x=>m.has(x.iid)).concat(stkSales(m)).sort((a,b)=>b.ts-a.ts).slice(0,25);
+  $('stkLogH').classList.toggle('hide',!g.length);
+  $('stkLog').innerHTML=g.length?'<tr><th>اليوم</th><th>الصنف</th><th>الحركة</th><th></th></tr>'+g.map(x=>`<tr><td class="num">${dshort(x.ts).slice(5)}</td><td class="tn">${esc(nm(x.iid))}</td><td>${x.inv?(x.q<0?'🧾 اتباع ':'↩️ مرتجع ')+'<b class="num">'+f(Math.abs(x.q))+'</b> <small class="mute">'+esc(x.code)+'</small>':x.q>0?'➕ دخل <b class="num">'+f(x.q)+'</b>':'➖ طلع <b class="num">'+f(-x.q)+'</b>'}</td><td>${x.inv?'':`<button type="button" class="xd" data-skd="${esc(x.id)}" aria-label="حذف الحركة">×</button>`}</td></tr>`).join(''):''}
 $('stkQ').oninput=drawStk;
 $('stkLim').onchange=e=>{svk('stkMin',String(Math.max(0,nv(e.target.value))));drawStk()};
-$('stkList').onclick=e=>{const b=e.target.closest('[data-sd]');if(!b)return;const tr=b.closest('tr'),q=rd2(nv(tr.querySelector('.sq').value)),m=$('stkMsg');if(!(q>0)){m.textContent='اكتب العدد';return}
-  const o={id:uid(),iid:tr.dataset.it,ts:Date.now(),q:q*+b.dataset.sd};S.stock.push(o);put('stock',o);m.textContent='';drawStk()};
+$('stkList').onclick=e=>{const b=e.target.closest('[data-sd]');if(!b)return;const tr=b.closest('tr'),v=tr.querySelector('.sq').value.trim(),q=v?rd2(nv(v)):1,m=$('stkMsg');if(!(q>0)){m.textContent='اكتب الكمية صح';return}
+  const it=S.items.find(i=>i.id===tr.dataset.it)||{},o={id:uid(),iid:tr.dataset.it,ts:Date.now(),q:q*+b.dataset.sd};S.stock.push(o);put('stock',o);drawStk();
+  const bal=(stkAll().get(o.iid)||{}).bal;m.textContent=(o.q>0?'✅ دخل ':'✅ طلع ')+f(q)+' '+(it.name||'')+' · بقى عندك '+f(bal)+stkUnit(it)};
 $('stkLog').onclick=e=>{const b=e.target.closest('[data-skd]');if(!b||!ok2(b))return;del('stock',b.dataset.skd);drawStk()};
 
 /* الإشعارات: رسالة فوق لو البرنامج قدامك، وإشعار من الموبايل لو في الخلفية، والضغط عليهم بيفتح الحاجة نفسها.
