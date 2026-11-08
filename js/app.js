@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='164';
+const APP_VER='165';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -10,7 +10,11 @@ const toEn0=s=>String(s==null?'':s).replace(/[٠-٩]/g,d=>d.charCodeAt(0)-1632).
 const toEn=s=>toEn0(s).replace(/,/g,'');
 const nv=x=>parseFloat(toEn(x))||0;
 const rd2=x=>Math.round(x*100)/100;
-const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc=s=>String(s==null?'':s).replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));
+/* الأخطاء بتتسجل عندنا بس (آخر 30 في errLog)، والمستخدم بيشوف رسالة بسيطة */
+const logErr=(e,w)=>{try{console.error('[فواتير]',w||'',e);const l=JSON.parse(localStorage.getItem('errLog')||'[]');l.push({at:Date.now(),w:w||'',m:String(e&&(e.code||e.message)||e).slice(0,300)});localStorage.setItem('errLog',JSON.stringify(l.slice(-30)))}catch(_){}};
+window.addEventListener('error',e=>logErr(e.error||e.message,'win'));window.addEventListener('unhandledrejection',e=>logErr(e.reason,'promise'));
+window.addEventListener('securitypolicyviolation',e=>logErr(e.blockedURI+' '+e.violatedDirective,'csp'));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const two=n=>String(n).padStart(2,'0');
 const dAgo=n=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-n);return d.getTime()};
@@ -1034,7 +1038,7 @@ async function doSave(img){const m=$('msg'),qf=qtFrom;m.textContent='';
     ensureRc(r);S.invoices.push(r);put('invoices',r);const dueBak=payDone(c,r);if(qf&&hasRows)qtDel(qf);
     lastSaved={id:r.id,at:Date.now(),snap,ncid,qt:hasRows?qo:null,dueBak};clearInv();drawCusts();drawDash();
     await showRec(r,img,hasRows?'تم حفظ الفاتورة ✓':'تم تسجيل الدفعة ✓');if(!img&&$('autoWa').checked)autoSend(r)}
-  catch(e){m.textContent='حصل خطأ: '+(e&&e.message||e)}}
+  catch(e){logErr(e,'save');m.textContent='حصل خطأ ومقدرتش أحفظ. جرّب تاني.'}}
 async function autoSend(r){let can=false,file=null;try{file=new File([curBlob],curName,{type:'image/png'});can=!!(navigator.canShare&&navigator.canShare({files:[file]}))}catch(e){}
   const ready=()=>{$('resm').textContent=baseMsg+' · الإرسال جاهز من زرار "إرسال للعميل"';const b=can&&!waNum(curPhone)?$('ressh'):$('reswa');b.classList.remove('pulse');void b.offsetWidth;b.classList.add('pulse')};
   if(waNum(r.phone)){$('reswa').click();ready();return}
@@ -1225,7 +1229,7 @@ async function acctGate(auth,user){const prev=lsv('fbUid','');if(prev===user.uid
   if(c==='skip'){await keepCopy();await wipeLocal();try{localStorage.setItem('fbOn','1');localStorage.setItem('fbUid',user.uid)}catch(e){}location.reload();return false}
   try{await auth.signOut()}catch(e){}try{localStorage.removeItem('fbOn');localStorage.removeItem('fbCfg')}catch(e){}throw new Error('acct-cancel')}
 async function acctLeave(){try{if(window.firebase&&firebase.auth)await firebase.auth().signOut()}catch(e){}await wipeLocal();location.reload()}
-const fbErr=e=>{const c=(e&&e.code)||'',t=c?' ('+c.replace('auth/','')+')':'';if(e&&e.message==='acct-cancel')return'اتلغى تسجيل الدخول، وبياناتك زي ما هي على الجهاز.';if(/popup-closed|cancelled-popup/.test(c))return'اتلغى تسجيل الدخول.';if(/email-already-in-use/.test(c))return'الإيميل ده له حساب بالفعل. سجّل دخول، أو استخدم نسيت كلمة السر.';if(/weak-password/.test(c))return'كلمة السر ضعيفة. اكتب 6 حروف أو أرقام على الأقل.';if(/too-many-requests/.test(c))return'محاولات كتير. استنى شوية وجرّب تاني.';if(/user-mismatch/.test(c))return'الحساب اللي اخترته مش هو الحساب الداخل دلوقتي.';if(/requires-recent-login/.test(c))return'لازم تأكد دخولك تاني.';if(/unauthorized-domain/.test(c))return'تسجيل الدخول مش متاح من العنوان ده'+t;if(/operation-not-allowed/.test(c))return'طريقة الدخول دي مش متفعلة'+t;if(/invalid-credential|wrong-password|user-not-found|invalid-email/.test(c))return'الإيميل أو كلمة السر غلط.';if(/network/.test(c))return'مفيش إنترنت.';if(e&&e.message==='no-user')return'محتاج تسجيل دخول من جديد.';if(e&&e.message==='load')return'تعذر الاتصال بالسحابة: النت مش شغال.';return'تعذر الربط'+(t||(e&&e.message?' ('+e.message+')':''))};
+const fbErr=e=>{const c=(e&&e.code)||'',t=c?' ('+c.replace('auth/','')+')':'';if(e&&e.message==='acct-cancel')return'اتلغى تسجيل الدخول، وبياناتك زي ما هي على الجهاز.';if(/popup-closed|cancelled-popup/.test(c))return'اتلغى تسجيل الدخول.';if(/email-already-in-use/.test(c))return'الإيميل ده له حساب بالفعل. سجّل دخول، أو استخدم نسيت كلمة السر.';if(/weak-password|password-does-not-meet/.test(c))return'كلمة السر ضعيفة. اكتب 8 على الأقل، حروف وأرقام مع بعض.';if(/too-many-requests/.test(c))return'محاولات كتير. استنى شوية وجرّب تاني.';if(/user-mismatch/.test(c))return'الحساب اللي اخترته مش هو الحساب الداخل دلوقتي.';if(/requires-recent-login/.test(c))return'لازم تأكد دخولك تاني.';if(/unauthorized-domain/.test(c))return'تسجيل الدخول مش متاح من العنوان ده'+t;if(/operation-not-allowed/.test(c))return'طريقة الدخول دي مش متفعلة'+t;if(/invalid-credential|wrong-password|user-not-found|invalid-email/.test(c))return'الإيميل أو كلمة السر غلط.';if(/network/.test(c))return'مفيش إنترنت.';if(e&&e.message==='no-user')return'محتاج تسجيل دخول من جديد.';if(e&&e.message==='load')return'تعذر الاتصال بالسحابة: النت مش شغال.';logErr(e,'auth');return'تعذر الربط. جرّب تاني بعد شوية.'+t};
 const typing=el=>{const a=document.activeElement;return!!(a&&el.contains(a)&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))};
 function refreshAll(){DV++;syncNames();if(!typing($('t-cu')))drawCusts();if(!typing($('t-it')))drawItems();if(!typing($('t-dash')))drawDash();if(!typing($('t-new')))custInput();autoBan();drawTrash();try{qtBtn()}catch(e){}if(stCur==='exp'&&!typing($('t-st')))drawExp();if(stCur==='sup'&&!typing($('t-st')))drawSup();if(stCur==='stk'&&!typing($('t-st')))drawStk()}
 let syncing=null,cloudOk=null;
@@ -1254,7 +1258,7 @@ async function fbBoot(){const cfg=fbCfg();if(!cfg){await syncNow();return}
 async function fbLogin(email,pass,google,create){fbStat('جاري الربط...');
   try{const r=await fbStart(FBCFG,email,pass,google,create);if(r===false)return;try{localStorage.setItem('fbOn','1');localStorage.removeItem('fbCfg')}catch(e){}
     const ok=await syncNow();fbStat(ok?'متصل ✓ المزامنة والنسخ الاحتياطي تلقائيين.':'تم تسجيل الدخول لكن قراءة البيانات فشلت (صلاحيات Firestore).')}
-  catch(e){fbStat(fbErr(e))}}
+  catch(e){fbStat(fbErr(e));return e}}
 $('fbAuth').onclick=()=>authOpen();
 /* الخروج: بيرفع آخر التعديلات، وبعدين بيشيل بيانات الحساب من الجهاز ويرجع لشاشة الدخول */
 $('fbOff').onclick=async e=>{const b=e.currentTarget;if(!fbCfg()){fbStat('مفيش حساب مربوط على الجهاز ده.');return}if(!ok2(b))return;
@@ -1267,7 +1271,7 @@ let auM='in';
 function auMode(m){auM=m;const nw=m==='new',rs=m==='reset';$('auTab').classList.toggle('hide',rs);$('auTab').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
   $('auShopB').classList.toggle('hide',!nw);$('auPassB').classList.toggle('hide',rs);$('auAlt').classList.toggle('hide',rs);$('auForgot').classList.toggle('hide',nw);$('auForgot').textContent=rs?'↩️ رجوع لتسجيل الدخول':'❓ نسيت كلمة السر؟';
   $('auGo').textContent=rs?'✉️ ابعت رابط تغيير كلمة السر':nw?'✨ إنشاء الحساب':'🔑 دخول';$('auSub').textContent=rs?'اكتب إيميلك وهيوصلك رابط تغيير كلمة السر.':nw?'حساب جديد لمحلك، وبياناتك هتتحفظ عليه.':'ادخل بحسابك وبياناتك هترجع لوحدها.';
-  $('auPass').setAttribute('autocomplete',nw?'new-password':'current-password');$('welcMsg').textContent=''}
+  $('auPwHint').textContent=nw?'8 حروف وأرقام على الأقل':'';$('auPass').setAttribute('autocomplete',nw?'new-password':'current-password');$('welcMsg').textContent=''}
 function authOpen(){auMode('in');$('auShop').value=shopN();$('welc').classList.remove('hide')}
 function welcMaybe(){if(fbCfg()||lsv('welcDone','')==='1'||S.customers.length+S.invoices.length){shopAsk();return}authOpen()}
 const welcEnd=()=>{svk('welcDone','1');$('welc').classList.add('hide')};
@@ -1276,11 +1280,19 @@ const auDone=(nw,sh)=>{const m=$('welcMsg');if(!FBDB){m.textContent=$('fbStat').
 $('auTab').onclick=e=>{const b=e.target.closest('button[data-m]');if(b)auMode(b.dataset.m)};
 $('auForgot').onclick=()=>auMode(auM==='reset'?'in':'reset');
 $('auEye').onclick=()=>{const p=$('auPass'),s=p.type==='password';p.type=s?'text':'password';$('auEye').textContent=s?'إخفاء':'إظهار'};
+/* كلمة السر: 8 على الأقل، حروف وأرقام، ومش سهلة التخمين */
+const pwWeak=(p,em)=>{const u=String(em||'').split('@')[0].toLowerCase();return p.length<8?'كلمة السر لازم تكون 8 حروف أو أرقام على الأقل.':!/[A-Za-z\u0600-\u06FF]/.test(p)||!/[0-9\u0660-\u0669]/.test(p)?'خلّي كلمة السر فيها حروف وأرقام مع بعض.':/^(.)\1+$/.test(p)||/^(0?123456789?|12345678|password|qwerty|abcd1234|a1b2c3d4)/i.test(p)||(u.length>=4&&p.toLowerCase().includes(u))?'كلمة السر دي سهلة التخمين. اختار حاجة تانية.':''};
+$('auPass').addEventListener('input',()=>{const x=$('auPwHint');if(auM!=='new'){x.textContent='';return}const p=$('auPass').value,w=p?pwWeak(p,$('auMail').value):'';x.textContent=!p?'8 حروف وأرقام على الأقل':w?'⚠️ '+w:'✅ كلمة سر قوية'});
+/* بعد 5 محاولات غلط ورا بعض: استنى 30 ثانية، والمدة بتتضاعف لحد 15 دقيقة */
+const auWaitLeft=()=>Math.max(0,Math.ceil(((+lsv('auWait','0'))-Date.now())/1000));
+function auFail(){const n=(+lsv('auFn','0'))+1;svk('auFn',String(n));if(n>=5)svk('auWait',String(Date.now()+Math.min(900,30*2**(n-5))*1000))}
 $('auForm').onsubmit=async e=>{e.preventDefault();const m=$('welcMsg'),b=$('auGo'),em=$('auMail').value.trim(),pw=$('auPass').value,sh=$('auShop').value.trim(),nw=auM==='new';
   if(!/^\S+@\S+\.\S+$/.test(em)){m.textContent='اكتب إيميل صحيح.';return}
+  const wl=auWaitLeft();if(wl&&auM==='in'){m.textContent='محاولات غلط كتير. استنى '+(wl>90?Math.ceil(wl/60)+' دقيقة':wl+' ثانية')+' وجرّب تاني، أو استخدم «نسيت كلمة السر».';return}
+  if(auM==='reset'){const rl=60-Math.floor((Date.now()-(+lsv('auRst','0')))/1000);if(rl>0){m.textContent='الرابط اتبعت من شوية. استنى '+rl+' ثانية قبل ما تطلبه تاني.';return}svk('auRst',String(Date.now()))}
   if(auM==='reset'){b.disabled=true;m.textContent='جاري الإرسال…';try{const a=await fbLoad();await a.sendPasswordResetEmail(em);m.textContent='لو الإيميل ده له حساب، هيوصلك رابط تغيير كلمة السر. لو ما وصلش، بص في الرسايل المزعجة (Spam).'}catch(err){m.textContent=fbErr(err)}b.disabled=false;return}
-  if(nw&&!sh){m.textContent='اكتب اسم المحل.';return}if(!pw){m.textContent='اكتب كلمة السر.';return}if(nw&&pw.length<6){m.textContent='كلمة السر لازم تكون 6 حروف أو أرقام على الأقل.';return}
-  b.disabled=true;m.textContent=nw?'جاري إنشاء الحساب…':'جاري الدخول وتنزيل بياناتك…';await fbLogin(em,pw,false,nw);b.disabled=false;auDone(nw,sh)};
+  if(nw&&!sh){m.textContent='اكتب اسم المحل.';return}if(!pw){m.textContent='اكتب كلمة السر.';return}if(nw){const pe=pwWeak(pw,em);if(pe){m.textContent=pe;return}}
+  b.disabled=true;m.textContent=nw?'جاري إنشاء الحساب…':'جاري الدخول وتنزيل بياناتك…';const er=await fbLogin(em,pw,false,nw);b.disabled=false;if(er){if(/invalid-credential|wrong-password|user-not-found|invalid-login/.test(er.code||''))auFail()}else{svk('auFn','0');svk('auWait','0')}auDone(nw,sh)};
 $('welcG').onclick=async()=>{const m=$('welcMsg');
   if(location.protocol==='file:'){m.textContent='الدخول بحساب Google بيشتغل من لينك البرنامج بس، مش من الملف اللي على الكمبيوتر.';return}
   m.textContent='جاري الدخول وتنزيل بياناتك…';await fbLogin(null,null,true);auDone(false,'')};
@@ -1931,9 +1943,10 @@ async function bioAvail(){try{return!!(window.PublicKeyCredential&&await PublicK
 function lkUI(){const on=lkGet('lkOn')==='1';$('lkRecSet').classList.toggle('hide',!on);$('lkRecMake').textContent=lkGet('lkRecHash')?'🔑 اعمل كود استرجاع جديد (القديم هيبطل)':'🔑 اعمل كود استرجاع (لو نسيت الرقم السري)';if(!on)$('lkRecShow').classList.add('hide');$('lkChk').checked=on||!$('lkSet').classList.contains('hide');$('lkBioBox').classList.toggle('hide',!(on&&bioOK));$('lkBio').checked=!!lkGet('lkBio')}
 function lockNow(){document.documentElement.classList.add('locked');$('lkIn').value='';$('lkErr').textContent='';$('lkBioBtn').classList.toggle('hide',!(lkGet('lkBio')&&bioOK))}
 function unlock(){document.documentElement.classList.remove('locked');lkFails=0}
-async function tryPin(){if(Date.now()<lkWait){$('lkErr').textContent='استنى شوية وحاول تاني';return}
+const lkW=()=>Math.max(lkWait,+lkGet('lkW')||0);
+async function tryPin(){if(Date.now()<lkW()){$('lkErr').textContent='استنى شوية وحاول تاني';return}
   if(await sha(lkGet('lkSalt')+$('lkIn').value)===lkGet('lkHash')){unlock();return}
-  $('lkIn').value='';if(++lkFails>=5){lkWait=Date.now()+30000;lkFails=0;$('lkErr').textContent='محاولات كتير، استنى 30 ثانية'}else $('lkErr').textContent='الرقم غلط'}
+  $('lkIn').value='';if(++lkFails>=5){lkWait=Date.now()+30000;lkSet('lkW',String(lkWait));lkFails=0;$('lkErr').textContent='محاولات كتير، استنى 30 ثانية'}else $('lkErr').textContent='الرقم غلط'}
 async function tryBio(){try{await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:unb64(lkGet('lkBio')),transports:['internal']}],userVerification:'required',timeout:60000}});unlock()}catch(e){$('lkErr').textContent='اكتب الرقم السري'}}
 $('lkGo').onclick=tryPin;$('lkBioBtn').onclick=tryBio;
 /* نسيت الرقم السري: بحساب Google المربوط بالمزامنة، أو بكود استرجاع اتعمل وقت ضبط القفل */
@@ -1941,7 +1954,7 @@ function lkRecover(){['lkOn','lkHash','lkSalt','lkBio','lkRecHash'].forEach(k=>l
   setTimeout(()=>toast('اتفتح ✓ والرقم السري اتلغى. اعمل رقم جديد من الإعدادات','الإعدادات',()=>{$('hdrSet').click();stGo('lock')}),300)}
 $('lkForgot').onclick=()=>{const g=!!fbCfg(),c=!!lkGet('lkRecHash');$('lkRec').classList.remove('hide');$('lkRecG').classList.toggle('hide',!g);$('lkRecP').classList.toggle('hide',!g);$('lkRecC').classList.toggle('hide',!c);
   $('lkRecMsg').textContent=!g&&!c?'مفيش طريقة استرجاع متفعّلة على الجهاز ده: لا حساب Google مربوط ولا كود استرجاع.':''};
-$('lkRecGo').onclick=async()=>{const v=toEn($('lkRecIn').value).replace(/\D/g,'');if(v&&await sha(lkGet('lkSalt')+'#'+v)===lkGet('lkRecHash'))lkRecover();else{$('lkRecIn').value='';$('lkRecMsg').textContent='الكود غلط'}};
+$('lkRecGo').onclick=async()=>{if(Date.now()<lkW()){$('lkRecMsg').textContent='محاولات كتير، استنى شوية وحاول تاني';return}const v=toEn($('lkRecIn').value).replace(/\D/g,'');if(v&&await sha(lkGet('lkSalt')+'#'+v)===lkGet('lkRecHash'))lkRecover();else{$('lkRecIn').value='';if(++lkFails>=5){lkWait=Date.now()+60000;lkSet('lkW',String(lkWait));lkFails=0;$('lkRecMsg').textContent='محاولات كتير، استنى دقيقة'}else $('lkRecMsg').textContent='الكود غلط'}};
 $('lkRecG').onclick=async()=>{const m=$('lkRecMsg');m.textContent='جاري الاتصال بجوجل…';let app=null;
   try{if(!window.firebase){const b='https://www.gstatic.com/firebasejs/13.2.0/';await loadScript(b+'firebase-app-compat.js');await loadScript(b+'firebase-auth-compat.js')}
     let prev=lsv('fbUid','');if(!prev){if(!firebase.apps.length)firebase.initializeApp(FBCFG);prev=await new Promise(r=>{const u=firebase.auth().onAuthStateChanged(x=>{u();r(x?x.uid:'')})})}
