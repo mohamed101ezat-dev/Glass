@@ -1051,3 +1051,14 @@ html[data-theme]:is([data-pal="sage"],[data-pal="dusk"],[data-pal="latte"],[data
 /* v167: رقم القيمة في الجدول أخف وأصغر شوية */
 #t-new #rows .vc{font-weight:500!important;font-size:var(--t-s)!important}
 #t-new #rows .vc .val{font-weight:500!important;font-size:var(--t-s)!important}
+
+/* v168: شاشة المخزون بكلام واضح */
+.stk-how .stk-st{display:flex;gap:8px;align-items:flex-start;margin-top:6px;line-height:1.6}
+.stk-how .stk-st>span{flex:1}
+#stkList .tq input{width:52px;text-align:center}
+#stkList .stk-b{white-space:nowrap;border-radius:8px;padding:4px 8px;font:inherit;font-size:var(--t-s)!important;cursor:pointer;border:1px solid transparent}
+#stkList .stk-b.in{background:var(--okS,#dcfce7);color:var(--okI,#166534);border-color:color-mix(in srgb,var(--ok,#16a34a) 30%,transparent)}
+#stkList .stk-b.out{background:var(--dngS,#fee2e2);color:var(--dngI,#991b1b);border-color:color-mix(in srgb,var(--dng,#b91c1c) 30%,transparent)}
+#stkList .stk-warn{color:var(--dngI,#b91c1c)}
+#stkList tr.stk-low td{background:color-mix(in srgb,var(--dng,#b91c1c) 7%,transparent)}
+#stkList td.num small{margin-inline-start:2px}
