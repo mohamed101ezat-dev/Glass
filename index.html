@@ -37,7 +37,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <meta name="apple-mobile-web-app-title" content="فواتير">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="css/style.css?v=167">
+<link rel="stylesheet" href="css/style.css?v=168">
 
 
 
@@ -371,10 +371,14 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <button type="button" class="alt b-red" id="supDel" style="width:100%;margin-top:8px">🗑️ حذف المورد</button></div>
 </div>
 <div class="stp hide" data-sp="stk"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🧱 المخزون</b></div>
-<div class="card"><div class="mute cut-only">بعدد الألواح. الصنف الجاهز بيتخصم لوحده مع البيع، والمقطع بتصرف منه بإيدك لما تفتح لوح.</div><div class="mute gen-only">بالعدد. الصنف بيتخصم لوحده مع البيع.</div>
-  <div class="g2" style="margin:6px 0 0"><div><label for="stkQ">بحث</label><input id="stkQ" autocomplete="off"></div><div><label for="stkLim">نبّهني لما الرصيد يوصل</label><input id="stkLim" inputmode="decimal" autocomplete="off"></div></div><div class="info" id="stkMsg"></div></div>
+<div class="card stk-how"><b>💡 بيشتغل إزاي؟</b>
+  <div class="stk-st">➕ <span>بضاعة جت لك؟ اكتب الكمية جنب الصنف واضغط <b>دخل</b>.</span></div>
+  <div class="stk-st">🧾 <span>لما تبيع الصنف في فاتورة، بينقص من المخزون لوحده.</span></div>
+  <div class="stk-st">➖ <span class="cut-only">فتحت لوح عشان تقطّع منه، أو حاجة باظت؟ اضغط <b>طلع</b>. (الأصناف المقطّعة بتتعد بالألواح، فمش بتنقص لوحدها من الفاتورة)</span><span class="gen-only">حاجة باظت أو أخدتها من غير فاتورة؟ اضغط <b>طلع</b>.</span></div>
+  <div class="g2" style="margin:8px 0 0"><div><label for="stkQ">🔍 دوّر على صنف</label><input id="stkQ" autocomplete="off" placeholder="اسم الصنف"></div><div><label for="stkLim">⚠️ نبّهني لما يفضل</label><input id="stkLim" inputmode="decimal" autocomplete="off"></div></div><div class="info" id="stkMsg" aria-live="polite"></div></div>
 <table class="xl" id="stkList"></table>
-<table class="xl" id="stkLog" style="margin-top:8px"></table>
+<div class="sgh" id="stkLogH" style="margin-top:10px">🕘 آخر الحركات</div>
+<table class="xl" id="stkLog"></table>
 </div>
 <div class="stp hide" data-sp="nf"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🔔 الإشعارات</b></div>
 <div class="card"><b>📱 إشعارات الموبايل</b><div style="margin-top:4px" id="nfStat"></div>
@@ -474,10 +478,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=167"></script>
+<script src="js/app.js?v=168"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=167"></script>
-<script src="js/features.js?v=167"></script>
+<script src="js/cutlist.js?v=168"></script>
+<script src="js/features.js?v=168"></script>
 </body>
 </html>
 
