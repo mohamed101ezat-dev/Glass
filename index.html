@@ -2,6 +2,8 @@
 <html lang="ar" dir="rtl" data-theme="light" data-pal="sage">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' data: blob: https://*.googleapis.com https://*.firebaseio.com https://www.gstatic.com https://apis.google.com; frame-src https://tabakha-glass-5b9a4.firebaseapp.com https://accounts.google.com https://apis.google.com; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <script>try{if(localStorage.getItem('lkOn')==='1')document.documentElement.classList.add('locked')}catch(e){}try{var z=localStorage.getItem('fz');if(z==='x'||z==='s'||z==='l'||z==='xl')document.documentElement.classList.add('fz-'+z)}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>
@@ -35,7 +37,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <meta name="apple-mobile-web-app-title" content="فواتير">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="css/style.css?v=164">
+<link rel="stylesheet" href="css/style.css?v=165">
 
 
 
@@ -55,7 +57,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
     <div id="auShopB" class="hide"><label for="auShop">اسم المحل</label><input id="auShop" autocomplete="organization">
       <label for="auBiz">طريقة البيع</label><select id="auBiz"><option value="gen">بالعدد (أي محل)</option><option value="cut">بالمقاس (زجاج، رخام، ألوميتال)</option></select></div>
     <label for="auMail">الإيميل</label><input id="auMail" type="email" inputmode="email" autocomplete="email" dir="ltr">
-    <div id="auPassB"><label for="auPass">كلمة السر</label><div class="auth-pw"><input id="auPass" type="password" autocomplete="current-password" dir="ltr"><button type="button" class="lnk" id="auEye">إظهار</button></div></div>
+    <div id="auPassB"><label for="auPass">كلمة السر</label><div class="auth-pw"><input id="auPass" type="password" autocomplete="current-password" dir="ltr"><button type="button" class="lnk" id="auEye">إظهار</button></div><small class="mute" id="auPwHint"></small></div>
     <button class="main" id="auGo" type="submit">🔑 دخول</button>
   </form>
   <button type="button" class="lnk" id="auForgot">❓ نسيت كلمة السر؟</button>
@@ -472,10 +474,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=164"></script>
+<script src="js/app.js?v=165"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=164"></script>
-<script src="js/features.js?v=164"></script>
+<script src="js/cutlist.js?v=165"></script>
+<script src="js/features.js?v=165"></script>
 </body>
 </html>
 
