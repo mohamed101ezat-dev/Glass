@@ -1047,3 +1047,7 @@ html[data-theme]:is([data-pal="sage"],[data-pal="dusk"],[data-pal="latte"],[data
 html[data-theme]:is([data-pal="sage"],[data-pal="dusk"],[data-pal="latte"],[data-pal="lav"]) #rowsHd span,html[data-theme]:is([data-pal="sage"],[data-pal="dusk"],[data-pal="latte"],[data-pal="lav"]) #rowsHd::before{border-color:rgba(255,255,255,.22)!important}
 html[data-theme="dark"]:is([data-pal="sage"],[data-pal="dusk"],[data-pal="latte"],[data-pal="lav"]) #rowsHd,html[data-theme="dark"]:is([data-pal="sage"],[data-pal="dusk"],[data-pal="latte"],[data-pal="lav"]) #rowsHd::before{background:color-mix(in srgb,var(--acc) 30%,var(--card))!important;color:var(--ink)!important}
 html[data-theme]:is([data-pal="sage"],[data-pal="dusk"],[data-pal="latte"],[data-pal="lav"]) #rowsHd::before{background:transparent!important}
+
+/* v167: رقم القيمة في الجدول أخف وأصغر شوية */
+#t-new #rows .vc{font-weight:500!important;font-size:var(--t-s)!important}
+#t-new #rows .vc .val{font-weight:500!important;font-size:var(--t-s)!important}
