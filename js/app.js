@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='170';
+const APP_VER='171';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1620,6 +1620,11 @@ $('impNo').onclick=()=>{impL=null;$('impAsk').classList.add('hide')};
 $('impGo').onclick=()=>{if(!impL||!impL.length)return;const n=impL.length,t=Date.now();DV++;S[impK].push(...impL);impL.forEach(o=>{o.u=t;pushDoc(impK,o)});lset(impK,S[impK]);impL=null;$('impAsk').classList.add('hide');refreshAll();$('impMsg').textContent='اتضاف '+n+(impK==='customers'?' عميل ✓':' صنف ✓')};
 /* جرس التنبيهات جنب السحابة: كل اللي مستني المستخدم في مكان واحد */
 function bellUI(){let l=[];try{l=nfList()}catch(e){}const rem=!$('remBan').classList.contains('hide');if(rem)l=l.filter(x=>x.k!=='rem');$('nfRows').innerHTML=l.map(x=>`<button type="button" class="nfr" data-nk="${x.k}"><span>${esc(x.m)}</span><span class="sa">‹</span></button>`).join('');const n=l.length+['autoBan','remBan','ordBan','bkBanner'].filter(i=>!$(i).classList.contains('hide')).length,c=$('nfCnt');c.textContent=n>9?'9+':String(n);c.classList.toggle('hide',!n);$('nfNone').classList.toggle('hide',n>0);$('nfBell').setAttribute('aria-label',n?'التنبيهات: '+n:'التنبيهات')}
+/* عمود القيمة: تدوس على عنوانه يصغر لشريط رفيع والجدول يوسع، وتدوس تاني يرجع. الاختيار بيتحفظ */
+function vTogUI(){const off=lsv('vHide','')==='1',t=$('vTog');$('rowsW').classList.toggle('v-off',off);if(t){t.setAttribute('aria-label',off?'إظهار عمود القيمة':'إخفاء عمود القيمة');t.title=off?'إظهار القيمة':'إخفاء القيمة'}}
+$('vTog').onclick=()=>{svk('vHide',lsv('vHide','')==='1'?'':'1');vTogUI()};
+$('vTog').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('vTog').click()}};
+vTogUI();
 /* شاشة واحدة بس مفتوحة: الجرس بيقفل قايمة «محتاجين تذكير» لو كانت مفتوحة، والعكس */
 $('nfBell').onclick=()=>{$('remL').classList.add('hide');bellUI();$('nfOv').classList.remove('hide')};$('nfX').onclick=()=>$('nfOv').classList.add('hide');
 $('nfOv').addEventListener('click',e=>{if(e.target===$('nfOv')){$('nfOv').classList.add('hide');return}const r=e.target.closest('[data-nk]');if(r){$('nfOv').classList.add('hide');nfGo(r.dataset.nk);return}if(e.target.closest('#autoBan button,#remBan button,#ordBan,#bkBanner button')&&e.target.id!=='nfX')setTimeout(()=>{$('nfOv').classList.add('hide');bellUI()},0)});
