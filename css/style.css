@@ -1072,3 +1072,10 @@ html[data-theme]:is([data-pal="sage"],[data-pal="dusk"],[data-pal="latte"],[data
 #rowsW.v-off #rowsHd .hv .hv-a{transform:scaleX(-1)}
 #rowsW.v-off #rows .vc>.val{visibility:hidden}
 #rowsW.v-off #rows .row.act:not(.blank) .vc{padding:0}
+
+/* v173: الصنف الجاهز ملوش زرار 📐، فمنحجزش له مكان في خانة الاسم */
+#rows .row.act:not(.blank) .r1.one .n{padding-inline-end:6px}
+#rows .n:not(:focus){text-overflow:ellipsis}
+/* الصنف الجاهز ملوش عرض وطول: اسمه ياخد خانتهم كمان عشان يبان كامل */
+html:not(.biz-gen) #rows .r1.one .n{grid-area:1/1/2/4}
+html:not(.biz-gen) #rows .r1.one::before,html:not(.biz-gen) #rows .r1.one::after{display:none}
