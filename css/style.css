@@ -1062,3 +1062,14 @@ html[data-theme]:is([data-pal="sage"],[data-pal="dusk"],[data-pal="latte"],[data
 #stkList .stk-warn{color:var(--dngI,#b91c1c)}
 #stkList tr.stk-low td{background:color-mix(in srgb,var(--dng,#b91c1c) 7%,transparent)}
 #stkList td.num small{margin-inline-start:2px}
+
+/* v171: إظهار/إخفاء عمود القيمة */
+#rowsHd .hv{cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;user-select:none}
+#rowsHd .hv .hv-t{font-weight:inherit}
+#rowsHd .hv .hv-a{font-style:normal;font-size:15px;line-height:1;opacity:.85}
+#rowsW.v-off{--vw:22px}
+#rowsW.v-off #rowsHd .hv .hv-t{display:none}
+#rowsW.v-off #rowsHd .hv .hv-a{transform:scaleX(-1)}
+#rowsW.v-off #rows .vc{font-size:0!important;color:transparent}
+#rowsW.v-off #rows .vc *{display:none}
+#rowsW.v-off #rows .row.act:not(.blank) .vc{padding:0}
