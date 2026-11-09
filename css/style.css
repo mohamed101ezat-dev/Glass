@@ -1082,3 +1082,10 @@ html:not(.biz-gen) #rows .r1.one::before,html:not(.biz-gen) #rows .r1.one::after
 
 /* v174: العدد الفاضي = 1، بيبان «1» باهت لحد ما تكتب رقم */
 html #rows .row input.c.c1::placeholder{color:var(--ink)!important;opacity:.45!important;font-size:inherit!important}
+
+/* v175: بيانات العميل جنب كلمة «العميل» بخط صغير باهت */
+.cu-ro{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+.cu-ro>label{flex:none}
+.cu-ro #qtOpen{flex:none;margin-inline-start:auto}
+#cinfo,#cinfo:not(:empty){display:block;flex:1 1 auto;min-width:0;margin:0;padding:0;background:none!important;border:0;border-radius:0;color:var(--mute)!important;font-weight:400!important;font-size:11px!important;line-height:1.35;opacity:.9}
+#cinfo:empty{display:none}
