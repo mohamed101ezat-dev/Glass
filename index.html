@@ -37,7 +37,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <meta name="apple-mobile-web-app-title" content="فواتير">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="css/style.css?v=168">
+<link rel="stylesheet" href="css/style.css?v=169">
 
 
 
@@ -46,7 +46,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <div class="app-header">
   <div class="hdr-logo"><img id="hdrLogo" alt="" class="hide"></div>
   <span class="app-title">فواتير</span>
-  <div class="hdr-end"><button type="button" id="nfBell" class="hdr-btn" aria-label="التنبيهات">🔔<span id="nfCnt" class="nf-cnt hide"></span></button><button type="button" id="calcFab" class="hdr-btn" aria-label="حاسبة">🧮</button><button type="button" id="cloudSt" class="hdr-cloud off" aria-label="حالة الحفظ على السحابة"><span class="cs-i">☁️</span><span class="cs-d"></span></button><button id="hdrSet" class="hdr-set" data-t="st" aria-label="إعدادات">⚙️</button></div>
+  <div class="hdr-end"><button type="button" id="nfBell" class="hdr-btn" aria-label="التنبيهات">🔔<span id="nfCnt" class="nf-cnt hide"></span></button><button type="button" id="calcFab" class="hdr-btn" aria-label="حاسبة">🧮</button><button type="button" id="cloudSt" class="hdr-cloud" aria-label="حالة الحفظ على السحابة"><span class="cs-i">☁️</span><span class="cs-d"></span></button><script>(function(){try{var b=document.getElementById('cloudSt'),on=localStorage.getItem('fbOn')==='1'||localStorage.getItem('fbCfg'),l=localStorage.getItem('cloudLast');var s=!on?'off':(l==='ok'&&navigator.onLine!==false)?'ok':'busy';b.className='hdr-cloud '+s;b.dataset.s=s}catch(e){}})()</script><button id="hdrSet" class="hdr-set" data-t="st" aria-label="إعدادات">⚙️</button></div>
 </div>
 <div id="busy" class="busy hide" role="status"></div>
 <div id="welc" class="auth hide"><div class="auth-in">
@@ -478,10 +478,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=168"></script>
+<script src="js/app.js?v=169"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=168"></script>
-<script src="js/features.js?v=168"></script>
+<script src="js/cutlist.js?v=169"></script>
+<script src="js/features.js?v=169"></script>
 </body>
 </html>
 
