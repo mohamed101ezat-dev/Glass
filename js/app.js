@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='168';
+const APP_VER='169';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1238,9 +1238,12 @@ function syncNow(){if(!dataReady||instOff)return Promise.resolve(false);if(synci
 /* علامة السحابة فوق: ✓ محفوظ ومتزامن · ⏳ بيحفظ · ! مش متصل · ✗ مش مربوط بحساب (البيانات على الجهاز ده بس) */
 function cloudUI(){const b=$('cloudSt');if(!b)return;let s,t;
   if(!fbCfg()){s='off';t='بياناتك على الموبايل ده بس. اربطها بحسابك عشان ترجع لو الموبايل ضاع أو اتغيّر'}
-  else if(syncing){s='busy';t='بيحفظ على السحابة…'}
-  else if(FBDB&&cloudOk){s='ok';t='بياناتك محفوظة على حسابك ومتزامنة ✓'+(lastSync?' · آخر مزامنة '+hm(lastSync):'')}
-  else{s='err';t='مش متصل بالسحابة دلوقتي. بياناتك محفوظة على الجهاز وهتتزامن لوحدها لما النت يرجع'}
+  else{/* ثابتة: بتفضل على آخر حالة معروفة ومش بترمش وهي بتتصل أو بتزامن في الخلفية. «!» بس لو الاتصال فشل فعلاً */
+    const last=lsv('cloudLast',''),okNow=cloudOk===true||(cloudOk===null&&last==='ok'&&navigator.onLine!==false);
+    if(okNow){s='ok';t='بياناتك محفوظة على حسابك ومتزامنة ✓'+(lastSync?' · آخر مزامنة '+hm(lastSync):'')}
+    else if(syncing||cloudOk===null){s='busy';t='بيتصل بالسحابة…'}
+    else{s='err';t='مش متصل بالسحابة دلوقتي. بياناتك محفوظة على الجهاز وهتتزامن لوحدها لما النت يرجع'}
+    if(cloudOk!==null&&!syncing)try{localStorage.setItem('cloudLast',cloudOk?'ok':'err')}catch(e){}}
   b.className='hdr-cloud '+s;b.title=t;b.setAttribute('aria-label',t);b.dataset.s=s;acctUI()}
 const fbUser=()=>{try{return window.firebase&&firebase.apps.length?firebase.auth().currentUser:null}catch(e){return null}};
 function acctUI(){const on=!!fbCfg(),u=fbUser();$('fbAuth').classList.toggle('hide',on);$('fbOff').classList.toggle('hide',!on);$('fbDel').classList.toggle('hide',!on);$('fbWho').textContent=u&&u.email?'الحساب: '+u.email:'';$('fbVer').classList.toggle('hide',!(u&&hasPw(u)&&!u.emailVerified))}
