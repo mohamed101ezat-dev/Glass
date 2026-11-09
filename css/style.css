@@ -1079,3 +1079,6 @@ html[data-theme]:is([data-pal="sage"],[data-pal="dusk"],[data-pal="latte"],[data
 /* الصنف الجاهز ملوش عرض وطول: اسمه ياخد خانتهم كمان عشان يبان كامل */
 html:not(.biz-gen) #rows .r1.one .n{grid-area:1/1/2/4}
 html:not(.biz-gen) #rows .r1.one::before,html:not(.biz-gen) #rows .r1.one::after{display:none}
+
+/* v174: العدد الفاضي = 1، بيبان «1» باهت لحد ما تكتب رقم */
+html #rows .row input.c.c1::placeholder{color:var(--ink)!important;opacity:.45!important;font-size:inherit!important}
