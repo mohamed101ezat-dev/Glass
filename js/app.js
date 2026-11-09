@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='174';
+const APP_VER='175';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -997,7 +997,7 @@ function custInput(){drawRecent();xSync();const name=$('cust').value.trim(),c=fi
   /* آخر فاتورة للعميل + آخر سعر اتباع بيه لكل صنف */
   {const iv=c?S.invoices.filter(r=>r.cid===c.id&&r.type==='inv').sort((a,b)=>b.ts-a.ts):[];repR=iv[0]||null;lpMap=new Map();iv.slice().reverse().forEach(r=>(r.rows||[]).forEach(x=>{if(!x.rt&&x.n&&+x.p>0)lpMap.set(nkey(x.n),+x.p)}))}
   $('phoneBox').classList.toggle('hide',!!c||!name);$('prev').readOnly=!!c;if((c&&balOf(c)!==0)||(!c&&name))$('r_prev').classList.remove('hide');else if(!nv($('prev').value))$('r_prev').classList.add('hide');
-  drawQS();$('cinfo').textContent=c?(c.name!==name?'هيتسجل على: '+c.name+' · ':'')+`كود ${nextCode()} · إذن رقم ${nextNo(c)} · الفئة: ${catName(invCat)} · الحساب: ${bal(c)}`:name?'عميل جديد: لو عليه حساب قديم يتكتب في (رصيد سابق)':'';calc()}
+  drawQS();$('cinfo').textContent=c?(c.name!==name?'هيتسجل على: '+c.name+' · ':'')+`كود ${nextCode()} · إذن ${nextNo(c)} · ${catName(invCat)} · حسابه ${bal(c)}`:name?'عميل جديد: لو عليه حساب قديم يتكتب في (رصيد سابق)':'';calc()}
 $('cust').addEventListener('input',custInput);
 /* إضافة عميل: جهات الاتصال (لو المتصفح بيدعمها) + تنبيه لو الاسم موجود */
 if('contacts' in navigator&&'ContactsManager' in window)$('pickC').classList.remove('hide');
@@ -1083,7 +1083,7 @@ function qtSheet(q){const o=invSheet({...q,type:'inv',prev:0,paid:0,paidRaw:0,re
 const showQt=(q,msg)=>showImg(sheet(qtSheet(q)),'عرض-سعر-'+q.no+'-'+sfn(q.cname)+'.png',msg||'',false,q.phone,null);
 $('saveQt').onclick=()=>{const m=$('msg');m.textContent='';if(editId)return;calc();
   const name=$('cust').value.trim().replace(/\s+/g,' ');if(!name){m.textContent='اكتب اسم العميل أولاً.';return}
-  const bad=[...document.querySelectorAll('#rows .row')].some(d=>{const g=c=>nv((d.querySelector(c)||{}).value);return g('.c')<=0&&(g('.p')>0||((d.querySelector('.n')||{}).value||'').trim())});
+  const bad=[...document.querySelectorAll('#rows .row')].some(d=>{const g=c=>nv((d.querySelector(c)||{}).value),emp=String((d.querySelector('.c')||{}).value||'').trim()==='',eff=g('.c')>0||(emp&&(g('.p')>0||(g('.w')>0&&g('.h')>0)));return !eff&&(g('.p')>0||((d.querySelector('.n')||{}).value||'').trim())});
   if(bad){m.textContent='في بند من غير عدد: اكتب العدد أو احذف البند.';return}
   if(!TOT.rows.length){m.textContent='أضف بنداً واكتب العدد.';return}
   const c=findCust(name),nyl=nv($('nylon').value),dsc=nv($('disc').value),no=Math.max(+lsv('qtNo','0')||0,...S.quotes.map(x=>x.no||0))+1;svk('qtNo',String(no));
