@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='171';
+const APP_VER='172';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1621,7 +1621,8 @@ $('impGo').onclick=()=>{if(!impL||!impL.length)return;const n=impL.length,t=Date
 /* جرس التنبيهات جنب السحابة: كل اللي مستني المستخدم في مكان واحد */
 function bellUI(){let l=[];try{l=nfList()}catch(e){}const rem=!$('remBan').classList.contains('hide');if(rem)l=l.filter(x=>x.k!=='rem');$('nfRows').innerHTML=l.map(x=>`<button type="button" class="nfr" data-nk="${x.k}"><span>${esc(x.m)}</span><span class="sa">‹</span></button>`).join('');const n=l.length+['autoBan','remBan','ordBan','bkBanner'].filter(i=>!$(i).classList.contains('hide')).length,c=$('nfCnt');c.textContent=n>9?'9+':String(n);c.classList.toggle('hide',!n);$('nfNone').classList.toggle('hide',n>0);$('nfBell').setAttribute('aria-label',n?'التنبيهات: '+n:'التنبيهات')}
 /* عمود القيمة: تدوس على عنوانه يصغر لشريط رفيع والجدول يوسع، وتدوس تاني يرجع. الاختيار بيتحفظ */
-function vTogUI(){const off=lsv('vHide','')==='1',t=$('vTog');$('rowsW').classList.toggle('v-off',off);if(t){t.setAttribute('aria-label',off?'إظهار عمود القيمة':'إخفاء عمود القيمة');t.title=off?'إظهار القيمة':'إخفاء القيمة'}}
+function vTogUI(){const off=lsv('vHide','')==='1',t=$('vTog'),w=$('rowsW');w.classList.toggle('v-off',off);w.style.setProperty('--vw',off?'22px':'62px');void w.offsetWidth;$('rows').style.transform='translateZ(0)';requestAnimationFrame(()=>requestAnimationFrame(()=>{$('rows').style.transform=''}));if(t){t.setAttribute('aria-label',off?'إظهار عمود القيمة':'إخفاء عمود القيمة');t.title=off?'إظهار القيمة':'إخفاء القيمة'}}
+$('vTog').addEventListener('pointerdown',e=>e.preventDefault());
 $('vTog').onclick=()=>{svk('vHide',lsv('vHide','')==='1'?'':'1');vTogUI()};
 $('vTog').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('vTog').click()}};
 vTogUI();
