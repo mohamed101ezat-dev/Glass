@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='169';
+const APP_VER='170';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1620,7 +1620,8 @@ $('impNo').onclick=()=>{impL=null;$('impAsk').classList.add('hide')};
 $('impGo').onclick=()=>{if(!impL||!impL.length)return;const n=impL.length,t=Date.now();DV++;S[impK].push(...impL);impL.forEach(o=>{o.u=t;pushDoc(impK,o)});lset(impK,S[impK]);impL=null;$('impAsk').classList.add('hide');refreshAll();$('impMsg').textContent='اتضاف '+n+(impK==='customers'?' عميل ✓':' صنف ✓')};
 /* جرس التنبيهات جنب السحابة: كل اللي مستني المستخدم في مكان واحد */
 function bellUI(){let l=[];try{l=nfList()}catch(e){}const rem=!$('remBan').classList.contains('hide');if(rem)l=l.filter(x=>x.k!=='rem');$('nfRows').innerHTML=l.map(x=>`<button type="button" class="nfr" data-nk="${x.k}"><span>${esc(x.m)}</span><span class="sa">‹</span></button>`).join('');const n=l.length+['autoBan','remBan','ordBan','bkBanner'].filter(i=>!$(i).classList.contains('hide')).length,c=$('nfCnt');c.textContent=n>9?'9+':String(n);c.classList.toggle('hide',!n);$('nfNone').classList.toggle('hide',n>0);$('nfBell').setAttribute('aria-label',n?'التنبيهات: '+n:'التنبيهات')}
-$('nfBell').onclick=()=>{bellUI();$('nfOv').classList.remove('hide')};$('nfX').onclick=()=>$('nfOv').classList.add('hide');
+/* شاشة واحدة بس مفتوحة: الجرس بيقفل قايمة «محتاجين تذكير» لو كانت مفتوحة، والعكس */
+$('nfBell').onclick=()=>{$('remL').classList.add('hide');bellUI();$('nfOv').classList.remove('hide')};$('nfX').onclick=()=>$('nfOv').classList.add('hide');
 $('nfOv').addEventListener('click',e=>{if(e.target===$('nfOv')){$('nfOv').classList.add('hide');return}const r=e.target.closest('[data-nk]');if(r){$('nfOv').classList.add('hide');nfGo(r.dataset.nk);return}if(e.target.closest('#autoBan button,#remBan button,#ordBan,#bkBanner button')&&e.target.id!=='nfX')setTimeout(()=>{$('nfOv').classList.add('hide');bellUI()},0)});
 if(window.MutationObserver){const mo=new MutationObserver(()=>bellUI());['autoBan','remBan','ordBan','bkBanner'].forEach(i=>mo.observe($(i),{attributes:true,attributeFilter:['class']}))}
 function nfBoot(){if(nfState()==='on')nfBg();const g=/^#go=(\w+)/.exec(location.hash);if(g){history.replaceState(null,'',location.pathname);setTimeout(()=>nfGo(g[1]),300)}}
@@ -1805,7 +1806,7 @@ function remDraw(){const l=remList(),bn=$('remBan'),dn=l.filter(x=>x.k==='due').
   if(!$('remL').classList.contains('hide'))$('remLList').innerHTML=l.map(x=>`<div class="rec"><div class="ro" style="color:var(--ink)"><b>${esc(x.c.name)}</b><span class="cb dr num">${bal(x.c)}</span></div>
     <div class="mute" style="margin-top:2px">${esc(remWhy(x))}</div>
     <div class="btns"><button class="main b-green" data-rr="${x.c.id}">📨 تذكير</button><button class="alt" data-rs="${x.c.id}" style="flex:none">⏰ بكرة</button><button class="alt" data-ro="${x.c.id}" style="flex:none">فتح</button></div></div>`).join('')||'<p class="mute">مفيش حد محتاج تذكير دلوقتي ✓</p>'}
-const openRemL=()=>{$('remL').classList.remove('hide');remDraw()};
+const openRemL=()=>{$('nfOv').classList.add('hide');$('remL').classList.remove('hide');remDraw()};
 $('remBan').onclick=e=>{if(e.target.closest('[data-rb]'))openRemL()};
 $('remLX').onclick=()=>$('remL').classList.add('hide');
 $('remL').addEventListener('click',e=>{const t=e.target;if(t===$('remL')){$('remL').classList.add('hide');return}
