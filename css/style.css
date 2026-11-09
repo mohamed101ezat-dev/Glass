@@ -1070,6 +1070,5 @@ html[data-theme]:is([data-pal="sage"],[data-pal="dusk"],[data-pal="latte"],[data
 #rowsW.v-off{--vw:22px}
 #rowsW.v-off #rowsHd .hv .hv-t{display:none}
 #rowsW.v-off #rowsHd .hv .hv-a{transform:scaleX(-1)}
-#rowsW.v-off #rows .vc{font-size:0!important;color:transparent}
-#rowsW.v-off #rows .vc *{display:none}
+#rowsW.v-off #rows .vc>.val{visibility:hidden}
 #rowsW.v-off #rows .row.act:not(.blank) .vc{padding:0}
