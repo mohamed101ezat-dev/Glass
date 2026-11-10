@@ -122,6 +122,10 @@ table.st{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
 .rtl{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}.rtl input[type=text]{width:56px;flex:none;height:28px;text-align:center}
 .qs{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 6px}
 .qs button{padding:3px 10px;font-size:12px;border-radius:99px;flex:none}.qs small{opacity:.7;margin-inline-start:4px}
+/* صفين وسكرول جانبي بدل اللف لعدد غير محدود من الأزرار: بيملا الفراغات بكفاءة ويسيبك تسحب لباقي الأسماء من غير بحث */
+.qs2{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,auto);grid-auto-columns:max-content;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;padding-bottom:2px}
+.qs2 button{scroll-snap-align:start}
+.qs2::-webkit-scrollbar{height:4px}
 .qmore{font-size:12px;padding:0}
 .catsel{width:auto;flex:none;max-width:104px;height:30px;font-size:13px;padding:0 4px}
 .hdr-ver{justify-self:end;font-size:12px;font-weight:700;opacity:.92;letter-spacing:.3px;direction:ltr}
@@ -474,7 +478,7 @@ label{font-size:calc(var(--fs) - 2px)}
 #t-dash .stat-value{font-size:calc(var(--fs) + 2px)}#t-dash .stat-label{font-size:calc(var(--fs) - 2.5px)}
 /* مسح خانات البحث */
 .xw{position:relative;flex:1;min-width:0;display:block}.xw>input{display:block;width:100%}
-.xclr{position:absolute;right:6px;left:auto;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;border:0;background:rgba(128,128,128,.22);background:color-mix(in srgb,var(--mute) 28%,transparent);color:var(--ink);font-size:14px;line-height:22px;text-align:center;padding:0;margin:0;min-height:0;cursor:pointer;display:none}
+.xclr{position:absolute;right:6px;left:auto;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;border:0;background:rgba(128,128,128,.22);background:color-mix(in srgb,var(--mute) 28%,transparent);color:var(--ink);font-size:14px;line-height:22px;text-align:center;padding:0;margin:0;min-height:0;cursor:pointer;display:none;z-index:3}
 .xw.has .xclr{display:block}
 .xw.has>input,.xw>input[readonly]{background-image:none!important}.xw.has>input{padding-right:34px!important;padding-left:8px!important}.xw>input[readonly]~.xclr{display:none!important}
 /* ===== (2) خانات أوضح: الخانة أبيض على الكارت في النهاري، وأغمق من الكارت في الليلي ===== */
