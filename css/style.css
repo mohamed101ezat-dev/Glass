@@ -583,7 +583,7 @@ input,textarea,select,button{font-variant-numeric:tabular-nums}
 /* الهيدر */
 .app-header{box-shadow:0 2px 12px rgba(0,0,0,.16)}
 .app-header .app-title{justify-self:center;font-size:16px;font-weight:700;letter-spacing:.2px;text-shadow:0 1px 2px rgba(0,0,0,.2)}
-.hdr-set{width:34px;height:34px;border-radius:50%;font-size:19px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.16);transition:background-color .2s,transform .12s}
+.hdr-set{width:40px;height:40px;border-radius:50%;font-size:19px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.16);transition:background-color .2s,transform .12s}
 .hdr-set.on{background:rgba(255,255,255,.34)}
 
 /* التنقل السفلي: أيقونات خطية + كبسولة للمفتوح */
@@ -748,7 +748,7 @@ html:not(.xalw) #t-new .isum>.xg:not(:has(>div:not(.hide))){display:none}
 
 /* ================= v137 · علامة السحابة فوق ================= */
 .hdr-end{justify-self:end;display:flex;align-items:center;gap:6px}
-.hdr-cloud{position:relative;width:34px;height:34px;border-radius:50%;border:0;padding:0;background:rgba(255,255,255,.16);font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff}
+.hdr-cloud{position:relative;width:40px;height:40px;border-radius:50%;border:0;padding:0;background:rgba(255,255,255,.16);font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff}
 .hdr-cloud .cs-d{position:absolute;bottom:3px;left:3px;width:13px;height:13px;border-radius:50%;font-size:9px;font-weight:800;line-height:13px;text-align:center;color:#fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.18)}
 .hdr-cloud.ok .cs-d{background:#16a34a}.hdr-cloud.ok .cs-d::after{content:"✓"}
 .hdr-cloud.busy .cs-d{background:#f59e0b}.hdr-cloud.busy .cs-d::after{content:"…"}
@@ -898,7 +898,7 @@ body{font-size:var(--t-m)}
 .ic{width:1.5em;height:1.5em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
 /* الشريط اللي فوق */
 .hdr-end{gap:4px}
-.hdr-btn,.hdr-cloud,.hdr-set{position:relative;width:34px;height:34px;border:0;border-radius:var(--r);background:transparent!important;color:#fff;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;font-size:var(--t-s)}
+.hdr-btn,.hdr-cloud,.hdr-set{position:relative;width:40px;height:40px;border:0;border-radius:var(--r);background:transparent!important;color:#fff;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;font-size:var(--t-s)}
 .hdr-btn:active,.hdr-cloud:active,.hdr-set:active,.hdr-set.on{background:rgba(255,255,255,.16)!important}
 .hdr-cloud .cs-i{display:block}
 .hdr-cloud .cs-d{bottom:4px;left:3px;width:12px;height:12px;line-height:12px;font-size:8px;box-shadow:0 0 0 1.5px var(--h1)}
