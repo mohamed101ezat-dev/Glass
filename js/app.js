@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='185';
+const APP_VER='186';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -930,6 +930,7 @@ $('t-new').addEventListener('click',e=>{const t=e.target.dataset.ret;if(!t)retur
   const up=()=>w.classList.toggle('has',!!i.value);i.addEventListener('input',up);up();
   i.addEventListener('focus',()=>{setTimeout(()=>{try{i.select()}catch(e){}},0)});
   b.addEventListener('mousedown',e=>e.preventDefault());
+  b.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
   b.onclick=()=>{if(i.readOnly)return;i.value='';up();i.dispatchEvent(new Event('input',{bubbles:true}));i.focus()}})})();
 let retInv=null;
 const rkey=x=>nkey(x.n||'')+'|'+(+x.w||0)+'|'+(+x.h||0);
@@ -974,20 +975,14 @@ function drawQS(){const w=$('qwrap'),q=$('qs'),ab=$('addbar');
   q.innerHTML=mine.map(it=>`<button class="alt ${it.type==='rd'?'b-rd':'b-blue'}" data-q="${it.id}" title="${it.type==='rd'?'جاهز':'مقطع'}">${esc(it.name)}${szOf(it)?` <small class="num sz">${esc(szOf(it))}</small>`:''}${priceOf(it,invCat)?` <small class="num pr">${priceOf(it,invCat)}</small>`:''}</button>`).join('');q.scrollLeft=0}
 $('qs').onclick=e=>{const b=e.target.closest('button[data-q]');if(!b)return;const it=S.items.find(x=>x.id===b.dataset.q);if(!it)return;
   const rd=it.type==='rd',d=addRow(it.type);d.dataset.iid=it.id;setVals(d,rd?{n:it.h&&it.w?`${it.name} ${it.w}×${it.h}`:it.name,p:it.p||''}:{n:it.name,w:it.w||'',h:it.h||'',p:priceOf(it,invCat)||''});calc();const e0=['w','h','c','p'].map(k=>d.querySelector('input.'+k)).filter(Boolean).find(i=>!i.value)||d.querySelector('input.c');if(e0)e0.focus()};
-function renderFit(box,items,last){const mk=l=>l.map(x=>x.h).join('');
-  const vis=()=>{const ch=[...box.children];if(!ch.length)return 0;const tops=[...new Set(ch.map(c=>c.offsetTop))].sort((a,b)=>a-b),lim=tops[Math.min(1,tops.length-1)];return ch.filter(c=>c.offsetTop<=lim).length};
-  box.innerHTML=mk(items);if(!box.clientWidth||!items.length)return;
-  if(last&&!items.some(x=>x.k===last.k)){box.innerHTML=mk(items.concat(last));if(vis()===items.length+1)return;box.innerHTML=mk(items)}
-  const n=vis();let list=items.slice(0,n);
-  if(last&&!list.some(x=>x.k===last.k)){list=items.filter(x=>x.k!==last.k).slice(0,Math.max(0,n-1)).concat(last);box.innerHTML=mk(list);
-    while(list.length>1&&vis()<list.length){list.splice(list.length-2,1);box.innerHTML=mk(list)}}
-  else box.innerHTML=mk(list)}
+/* صفين بيتملوا بالأكثر استخدامًا، وباقي العملاء يتوصلهم بسحبة لجنب (qs2 في الـCSS) */
 function drawRecent(){const box=$('recentC');if($('cust').value.trim()||editId){box.innerHTML='';return}
   const cnt=new Map(),last=new Map();S.invoices.forEach(r=>{if(r.type!=='pay')cnt.set(r.cid,(cnt.get(r.cid)||0)+1);if(!last.has(r.cid)||r.ts>last.get(r.cid))last.set(r.cid,r.ts)});
   const l=[...last.keys()].map(getC).filter(Boolean).sort((a,b)=>(cnt.get(b.id)||0)-(cnt.get(a.id)||0)||last.get(b.id)-last.get(a.id));
-  const mk=c=>({k:c.id,h:`<button class="alt b-cu" data-rc="${c.id}">${esc(c.name)}</button>`});
   const rec=l.slice().sort((a,b)=>last.get(b.id)-last.get(a.id))[0];
-  renderFit(box,l.map(mk),rec?mk(rec):null)}
+  const N=24;let list=l.slice(0,N);
+  if(rec&&!list.some(c=>c.id===rec.id))list=list.slice(0,N-1).concat(rec);
+  box.innerHTML=list.map(c=>`<button class="alt b-cu" data-rc="${c.id}">${esc(c.name)}</button>`).join('')}
 $('recentC').onclick=e=>{const id=e.target.dataset.rc,c=id&&getC(id);if(!c)return;$('cust').value=c.name;custInput()};
 function xSync(){document.querySelectorAll('.xw').forEach(w=>{const i=w.querySelector('input');w.classList.toggle('has',!!(i&&i.value))})}
 $('repLast').onclick=()=>{if(repR)loadDup(repR)};
