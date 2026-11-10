@@ -114,6 +114,7 @@ table.st{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
 .app-header{position:fixed;top:0;left:0;right:0;z-index:40;background:var(--acc);color:#fff;display:grid;grid-template-columns:auto 1fr auto;align-items:center;height:44px;padding:0 14px;padding-top:env(safe-area-inset-top,0px);box-shadow:0 1px 4px rgba(0,0,0,.15)}
 .app-header .app-title{font-size:16px;font-weight:700;letter-spacing:.5px}
 .app-header .app-subtitle{font-size:11px;opacity:.85}
+.hdr-ver{font-size:11px;font-weight:600;opacity:.6;letter-spacing:.2px;justify-self:start}
 .hdr-set{justify-self:end;border:none;background:rgba(255,255,255,.18);color:#fff;border-radius:10px;width:36px;height:34px;font-size:19px;line-height:1;cursor:pointer;padding:0;font-family:inherit}
 .hdr-set.on{background:rgba(255,255,255,.38)}
 .hdr-logo{justify-self:start;display:flex;align-items:center;justify-content:center;min-width:0}
