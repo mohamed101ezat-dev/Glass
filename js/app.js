@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='186';
+const APP_VER='187';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -929,9 +929,11 @@ $('t-new').addEventListener('click',e=>{const t=e.target.dataset.ret;if(!t)retur
   const b=document.createElement('button');b.type='button';b.className='xclr';b.textContent='×';b.setAttribute('aria-label','مسح');w.appendChild(b);
   const up=()=>w.classList.toggle('has',!!i.value);i.addEventListener('input',up);up();
   i.addEventListener('focus',()=>{setTimeout(()=>{try{i.select()}catch(e){}},0)});
+  const doClear=()=>{if(i.readOnly)return;i.value='';up();i.dispatchEvent(new Event('input',{bubbles:true}));i.focus()};
   b.addEventListener('mousedown',e=>e.preventDefault());
-  b.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
-  b.onclick=()=>{if(i.readOnly)return;i.value='';up();i.dispatchEvent(new Event('input',{bubbles:true}));i.focus()}})})();
+  /* لمس الموبايل: منع افتراضي الـtouchend بيلغي الـclick اللي بعده، فالمسح لازم يحصل هنا مش في onclick */
+  b.addEventListener('touchend',e=>{e.preventDefault();doClear()});
+  b.onclick=doClear})})();
 let retInv=null;
 const rkey=x=>nkey(x.n||'')+'|'+(+x.w||0)+'|'+(+x.h||0);
 /* المتاح للإرجاع لكل بند = العدد الأصلي - اللي اترجع قبل كده (في فواتير محفوظة أو في الفاتورة الحالية) */
@@ -1333,6 +1335,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(FBDB)se
 
 /* ---------- تطبيق الموبايل (PWA) ---------- */
 $('appVer').textContent='نسخة التطبيق: '+APP_VER;
+$('hdrVer').textContent='v'+APP_VER;
 /* لو البرنامج فاضل مفتوح: بنسأل السيرفر كل ساعة، ومبنعرضش التحديث وفي فاتورة بتتكتب عشان ما تضيعش */
 let verAt=0;async function verCheck(){if(location.protocol.indexOf('http')||!navigator.onLine||Date.now()-verAt<36e5||[...$('rows').children].some(d=>!rowBlank(d)))return;verAt=Date.now();
   try{const m=/app\.js\?v=(\d+)/.exec(await(await fetch('index.html',{cache:'no-store'})).text());if(m&&+m[1]>+APP_VER)toast('فيه نسخة جديدة من البرنامج','تحديث',()=>location.reload())}catch(e){}}
