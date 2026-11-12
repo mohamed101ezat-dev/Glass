@@ -45,7 +45,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <link rel="apple-touch-startup-image" href="splash/14_15pro.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/12_13_14promax.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/14_15promax.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
-<link rel="stylesheet" href="css/style.css?v=197">
+<link rel="stylesheet" href="css/style.css?v=198">
 
 
 
@@ -187,7 +187,9 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
     <div id="limW" class="info hide" style="color:var(--danger);margin:0 0 4px" role="status"></div>
     <input id="cust" aria-label="اسم العميل" autocomplete="off" placeholder="اكتب اسم العميل">
     <div class="qs qs2" id="recentC" style="margin:6px 0 0"></div>
+    <div class="qs qs2 hide" id="siteC" style="margin:6px 0 0"></div>
     <div id="phoneBox" class="hide" style="margin-top:6px"><label>واتساب (اختياري)</label><input id="phone" type="tel" inputmode="tel"></div>
+    <button type="button" class="lnk hide" id="saveNewC">➕ احفظه كعميل</button>
     <button type="button" class="lnk hide" id="repLast">↻ كرر آخر فاتورة لنفس العميل</button>
   </div>
   <div id="rowsW"><div id="rowsHd" class="c5"><span>الصنف</span><span>عرض</span><span>طول</span><span>عدد</span><span>سعر</span><span class="hv" id="vTog" role="button" tabindex="0" aria-label="إخفاء عمود القيمة"><b class="hv-t">القيمة</b><i class="hv-a" aria-hidden="true">‹</i></span></div><div id="rows"></div></div>
@@ -235,9 +237,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
     <div id="cuAdd" class="card hide">
       <button type="button" class="alt hide" id="pickC" style="width:100%;margin-bottom:6px">📇 اختار من جهات الاتصال</button>
       <div class="ro" style="gap:6px;margin:0"><input id="nc_name" placeholder="اسم العميل (مطلوب)" style="flex:1;min-width:0"><select id="nc_cat" class="catsel" aria-label="الفئة" style="width:auto;flex:none;max-width:110px"></select></div>
-      <div class="g2" style="margin-top:6px"><input id="nc_phone" type="tel" inputmode="tel" placeholder="واتساب (اختياري)"><input id="nc_bal" type="text" inputmode="decimal" placeholder="حساب قديم عليه"></div>
+      <div class="g2" style="margin-top:6px"><div class="ro" style="gap:4px;margin:0"><input id="nc_phone" type="tel" inputmode="tel" placeholder="واتساب (اختياري)" style="flex:1;min-width:0"><a id="nc_wa" class="ab hide" target="_blank" rel="noopener" href="#" aria-label="جرّب الرقم على واتساب">💬</a></div><div class="ro" style="gap:4px;margin:0"><input id="nc_bal" type="text" inputmode="decimal" placeholder="حساب قديم" style="flex:1;min-width:0"><button type="button" class="ab" id="nc_dir" aria-label="اتجاه الحساب القديم">عليه</button></div></div>
       <div class="g2" style="grid-template-columns:1.3fr 1fr .8fr"><input id="nc_addr" placeholder="العنوان"><input id="nc_note" placeholder="ملاحظات"><input id="nc_lim" type="text" inputmode="decimal" placeholder="حد الدين"></div>
-      <div class="btns" style="margin:0"><button class="main" id="addCu">💾 حفظ العميل</button></div><div class="info" id="cuMsg" style="color:var(--danger)"></div>
+      <div class="btns" style="margin:0"><button class="main" id="addCu">💾 حفظ العميل</button><button class="alt" id="addCu2">➕ حفظ وإضافة تاني</button></div><div class="info" id="cuMsg" style="color:var(--danger)"></div>
+      <button type="button" class="lnk" id="cimpOpen">📥 استيراد عملاء من إكسل</button>
     </div>
     <div id="cuTot" style="margin-bottom:6px;font-size:14px;font-weight:600"></div>
     <div id="cuDup" class="hide" style="margin-bottom:6px"></div>
@@ -478,6 +481,13 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   </div>
 </div>
 
+<div id="cimpOv" class="res-ov hide" style="z-index:70"><div class="card res-in">
+  <div class="ro" style="color:var(--ink)"><b>📥 استيراد عملاء</b><button class="del" id="cimpX" aria-label="إغلاق">×</button></div>
+  <div class="mute" style="margin:4px 0 6px">انسخ من إكسل الأعمدة: الاسم ثم الرقم ثم الحساب (اختياري: الموجب عليه والسالب له) والصقها هنا. أو اختار ملف CSV.</div>
+  <textarea id="cimpTxt" rows="6" style="direction:rtl;text-align:right;font-size:14px;width:100%" aria-label="بيانات العملاء"></textarea>
+  <div class="ro" style="gap:6px;margin-top:6px;justify-content:flex-start"><label class="ab" style="cursor:pointer">📂 ملف CSV<input type="file" id="cimpFile" accept=".csv,.txt,.tsv,text/csv,text/plain" style="display:none"></label><span class="mute" id="cimpInfo"></span></div>
+  <div class="btns"><button class="main" id="cimpGo" disabled>✅ استيراد</button></div>
+</div></div>
 <div id="toast" class="toast hide"></div>
 <nav class="bottom-nav" id="bnav">
   <button data-t="new" class="on"><span class="nav-icon">🧾</span><span class="nav-label">فاتورة</span></button>
@@ -489,10 +499,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=197"></script>
+<script src="js/app.js?v=198"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=197"></script>
-<script src="js/features.js?v=197"></script>
+<script src="js/cutlist.js?v=198"></script>
+<script src="js/features.js?v=198"></script>
 </body>
 </html>
 
