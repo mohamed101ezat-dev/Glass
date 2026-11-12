@@ -45,7 +45,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <link rel="apple-touch-startup-image" href="splash/14_15pro.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/12_13_14promax.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/14_15promax.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
-<link rel="stylesheet" href="css/style.css?v=205">
+<link rel="stylesheet" href="css/style.css?v=207">
 
 
 
@@ -349,7 +349,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <label class="opt"><input type="checkbox" id="autoWa"> بعد حفظ الفاتورة افتح الإرسال للعميل على طول</label>
   <label class="opt"><input type="checkbox" id="bulkRemChk"> زرار تذكير كل المديونين مرة واحدة</label></div>
 <div class="mute" style="margin:2px 4px 6px">اضغط على أي زرار من اللي تحت الرسالة عشان تحط اسم العميل أو المبلغ مكانه، وهيتبدل لوحده وقت الإرسال.</div>
-<div class="card"><b>🧾 رسالة الفاتورة</b><textarea id="tplInv" rows="6" style="margin-top:6px"></textarea><div class="vch" data-for="tplInv"></div><label>شكلها عند العميل</label><div class="wab" id="pvInv"></div></div><div class="card"><b>💵 رسالة الدفعة</b><textarea id="tplPay" rows="4" style="margin-top:6px"></textarea><div class="vch" data-for="tplPay"></div><label>شكلها عند العميل</label><div class="wab" id="pvPay"></div></div><div class="card"><b>🔔 رسالة تذكير الدين</b><textarea id="tplRem" rows="4" style="margin-top:6px"></textarea><div class="vch" data-for="tplRem"></div><label class="opt"><input type="checkbox" id="remDays"> أضيف «مرّ كام يوم على آخر دفعة» في الرسالة لوحدها</label><label>شكلها عند العميل</label><div class="wab" id="pvRem"></div></div><div class="card"><b>📦 رسالة الطلب جاهز</b><textarea id="tplRdy" rows="4" style="margin-top:6px"></textarea><div class="vch" data-for="tplRdy"></div><label>شكلها عند العميل</label><div class="wab" id="pvRdy"></div></div>
+<div class="card"><b>🧾 رسالة الفاتورة</b><textarea id="tplInv" rows="6" style="margin-top:6px"></textarea><div class="vch" data-for="tplInv"></div><label>شكلها عند العميل</label><div class="wab" id="pvInv"></div></div><div class="card"><b>💵 رسالة الدفعة</b><textarea id="tplPay" rows="4" style="margin-top:6px"></textarea><div class="vch" data-for="tplPay"></div><label>شكلها عند العميل</label><div class="wab" id="pvPay"></div></div><div class="card"><b>🔔 رسالة تذكير الدين</b><textarea id="tplRem" rows="4" style="margin-top:6px"></textarea><div class="vch" data-for="tplRem"></div><label class="opt"><input type="checkbox" id="remDays"> أضيف «مرّ كام يوم على آخر دفعة» في الرسالة لوحدها</label><label class="opt"><input type="checkbox" id="remOld"> أذكر أقدم فاتورة متأخرة (تاريخها والمتبقي)</label><div class="ro" style="gap:6px;margin:4px 0 0"><label style="flex:1;margin:0;font-size:12px">الصياغة تبقى أحزم بعد كام يوم (0 = مقفول)</label><input id="remFirm" type="text" inputmode="numeric" style="width:64px;flex:none;text-align:center"></div><input id="remPay" placeholder="بيانات الدفع: رقم محفظة أو حساب (بتتضاف آخر الرسالة)" style="margin-top:6px"><label>شكلها عند العميل</label><div class="wab" id="pvRem"></div></div><div class="card"><b>📦 رسالة الطلب جاهز</b><textarea id="tplRdy" rows="4" style="margin-top:6px"></textarea><div class="vch" data-for="tplRdy"></div><label>شكلها عند العميل</label><div class="wab" id="pvRdy"></div></div>
 <button type="button" class="alt b-red" id="tplReset" style="width:100%;margin-top:4px">↩️ رجوع للرسايل الأصلية</button>
 </div>
 <div class="stp hide" data-sp="rem"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🔔 تذكير المديونين</b></div>
@@ -513,10 +513,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=205"></script>
+<script src="js/app.js?v=207"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=205"></script>
-<script src="js/features.js?v=205"></script>
+<script src="js/cutlist.js?v=207"></script>
+<script src="js/features.js?v=207"></script>
 </body>
 </html>
 
