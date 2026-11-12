@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='215';
+const APP_VER='216';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1830,7 +1830,7 @@ $('topDebt').onclick=e=>{const r=e.target.closest('[data-tdr]');if(r){const c=ge
   const o=e.target.closest('[data-tdo]');if(o){infoMode=false;dbMode=true;dbSel=o.dataset.tdo;dbPay=null;drawDebt();window.scrollTo(0,0)}};
 /* رسمة ورشة الزجاج: كل فاتورة النهارده لوح بيمشي على السير، والعملات في الأنبوب = المحصّل من المبيعات، واللوحة فيها +مبلغ لما تتسجل فاتورة جديدة */
 let scnLast=null;
-let scnLab=null;
+let scnLab=null,scRg='';
 /* المشهد بيتبع فترة اللوحة (اليوم / أمس / أيام / 7 أيام / الشهر / 30 يوم / من-إلى) من from إلى to */
 function scene(from,to,lab){const rg=S.invoices.filter(r=>r.ts>=from&&r.ts<to),tInvs=rg.filter(r=>r.type==='inv'),tPay=rg.filter(r=>r.type==='pay').reduce((a,r)=>a+r.amount,0);
   const n=tInvs.length,sales=tInvs.reduce((a,r)=>a+val(r),0),paid=tInvs.reduce((a,r)=>a+r.paid,0)+tPay;
@@ -1863,7 +1863,7 @@ function drawDash(){startUI();drawHero();drawTopDebt();
     ob.classList.toggle('hide',!(op||or));if(op||or)ob.innerHTML=`<b>📦 طلبيات مفتوحة</b><span>${op?`<span class="tag ost p">⏳ ${op} تحت التجهيز</span>`:''}${or?` <span class="tag ost r">✅ ${or} جاهز للاستلام</span>`:''}</span><span class="mute">عرض ›</span>`}
   $('hRg').classList.toggle('hide',hP!=='rg');
   const q=$('hq').value.trim(),from=hP==='d'?todayTs:hP==='n'?dAgo(hN-1):hP==='x'?hDay:hP==='w'?weekTs:hP==='m'?dAgo(29):hP==='mo'?new Date(t0.getFullYear(),t0.getMonth(),1).getTime():hP==='rg'?hRF:0,to=hP==='x'?dEnd(hDay):hP==='rg'&&hRT?dEnd(hRT):Infinity;
-  {const td=hP==='all'||hP==='d',lab=td?'اليوم':hP==='n'?(hN===2?'يومين':'آخر '+hN+' أيام'):hP==='x'?(hDay===dAgo(1)?'أمس':dshort(hDay)):hP==='w'?'آخر 7 أيام':hP==='mo'?'الشهر ده':hP==='m'?'آخر 30 يوم':'الفترة';scene(td?todayTs:from,td?Infinity:to,lab)}
+  {const td=hP==='all'||hP==='d',lab=td?'اليوم':hP==='n'?(hN===2?'يومين':'آخر '+hN+' أيام'):hP==='x'?(hDay===dAgo(1)?'أمس':dshort(hDay)):hP==='w'?'آخر 7 أيام':hP==='mo'?'الشهر ده':hP==='m'?'آخر 30 يوم':(scRg||'الفترة');scene(td?todayTs:from,td?Infinity:to,lab)}
   const pm=hTy==='paid';/* المدفوع: أي فاتورة اتدفع فيها حاجة + أي دفعة (نفس حساب كارت "المدفوع اليوم") */
   const tyOk=r=>hTy==='all'||(hTy==='inv'&&r.type==='inv')||(hTy==='pay'&&r.type==='pay')||(pm&&(r.type==='pay'||rd2(r.paid||0)!==0))||(hTy==='ret'&&hasRet(r))||(hTy==='due'&&r.type==='inv'&&rd2(val(r)-r.paid)>0)||(hTy==='ord'&&ordSt(r)!=='d');
   const dueOf=r=>r.type==='inv'?Math.max(0,rd2(val(r)-(r.paid||0))):0;
@@ -1885,7 +1885,7 @@ function drawDash(){startUI();drawHero();drawTopDebt();
   $('hList').innerHTML=h||(S.invoices.length?'<p class="mute">مفيش معاملات بالفلتر ده. اختار «📋 الكل» فوق، أو امسح البحث.</p>':'<p class="mute">لسه مفيش معاملات. أول فاتورة هتظهر هنا.</p>');drawDebt();try{remDraw()}catch(e){}}
 $('hq').oninput=()=>{hLim=30;drawDash()};
 $('hSort').onchange=()=>{hSort=$('hSort').value;hLim=30;drawDash()};
-{const pdt=v=>{if(!v)return 0;const[y,m,d]=v.split('-').map(Number);return new Date(y,m-1,d).getTime()};$('hRF').onchange=()=>{hRF=pdt($('hRF').value);hLim=30;drawDash()};$('hRT').onchange=()=>{hRT=pdt($('hRT').value);hLim=30;drawDash()}}
+{const pdt=v=>{if(!v)return 0;const[y,m,d]=v.split('-').map(Number);return new Date(y,m-1,d).getTime()};$('hRF').onchange=()=>{hRF=pdt($('hRF').value);hLim=30;scRg='';drawDash()};$('hRT').onchange=()=>{hRT=pdt($('hRT').value);hLim=30;scRg='';drawDash()}}
 /* تصدير القايمة اللي ظاهرة (بالفلتر والبحث الحاليين) كملف CSV بيفتح في إكسل */
 $('hExp').onclick=async()=>{if(!hCur.length){toast('مفيش معاملات للتصدير');return}
   const q=v=>{v=String(v==null?'':v);return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v},ymd=t=>{const d=new Date(t);return d.getFullYear()+'-'+two(d.getMonth()+1)+'-'+two(d.getDate())+' '+two(d.getHours())+':'+two(d.getMinutes())};
@@ -1943,8 +1943,10 @@ $('scPer').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b
   hLim=30;if(k==='1')hP='d';else if(k==='y'){hP='x';hDay=dAgo(1)}else{hP='n';hN=+k}
   document.querySelectorAll('#hPer button').forEach(x=>x.classList.toggle('on',x.dataset.p===hP));drawDash()};
 /* زرار فترة المشهد: اليوم ← أمس ← آخر 7 أيام ← الشهر ده، وبيغيّر فترة اللوحة كلها (نفس أزرار الفترة) */
-$('scPerB').onclick=e=>{e.stopPropagation();const seq=['اليوم','أمس','آخر 7 أيام','الشهر ده'],nx=seq[(Math.max(0,seq.indexOf(scnLab))+1)%4];hLim=30;
-  if(nx==='اليوم')hP='d';else if(nx==='أمس'){hP='x';hDay=dAgo(1)}else hP=nx==='الشهر ده'?'mo':'w';
+$('scPerB').onclick=e=>{e.stopPropagation();const seq=['اليوم','أمس','آخر 7 أيام','الشهر ده','الشهر اللي فات','السنة دي'],nx=seq[(Math.max(0,seq.indexOf(scnLab))+1)%seq.length];hLim=30;scRg='';
+  if(nx==='اليوم')hP='d';else if(nx==='أمس'){hP='x';hDay=dAgo(1)}else if(nx==='الشهر ده')hP='mo';else if(nx==='آخر 7 أيام')hP='w';
+  else{const n=new Date(),Y=n.getFullYear(),M=n.getMonth(),ymd=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+    hP='rg';scRg=nx;hRF=nx==='السنة دي'?new Date(Y,0,1).getTime():new Date(Y,M-1,1).getTime();hRT=nx==='السنة دي'?new Date(Y,11,31).getTime():new Date(Y,M,0).getTime();$('hRF').value=ymd(hRF);$('hRT').value=ymd(hRT)}
   document.querySelectorAll('#hPer button').forEach(x=>x.classList.toggle('on',x.dataset.p===hP));drawDash()};
 $('scDate').onchange=e=>{const v=e.target.value;if(!v)return;const[y,m,d]=v.split('-').map(Number);hDay=new Date(y,m-1,d).getTime();hP='x';hLim=30;document.querySelectorAll('#hPer button').forEach(x=>x.classList.remove('on'));drawDash()};
 function drawDebt(){scMark();$('hMain').classList.toggle('hide',dbMode||infoMode);$('infoView').classList.toggle('hide',!infoMode||dbMode);$('infoCard').classList.toggle('on',infoMode&&!dbMode);$('dbView').classList.toggle('hide',!dbMode);$('dbCard').classList.toggle('on',dbMode);if(!dbMode)return;
