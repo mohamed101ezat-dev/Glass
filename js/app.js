@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='210';
+const APP_VER='211';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -582,8 +582,8 @@ function rowsOf(c){let run=c.open||0;const asc=ledger(c).sort((a,b)=>a.ts-b.ts).
 function lastPay(c){let t=0;ledger(c).forEach(r=>{if(((r.type==='pay'&&r.amount>0)||(r.type==='inv'&&r.paid>0))&&r.ts>t)t=r.ts});return t}
 function aging(c){if(balOf(c)<=0)return null;const t=lastPay(c),now=Date.now(),first=Math.min(now,...ledger(c).map(r=>r.ts)),ref=Math.floor((now-(t||first))/864e5);
   return{d:t?ref:null,color:ref>60?'#dc2626':ref>30?'#f97316':'#f59e0b'}}
-function cSub(c){const l=ledger(c),t=Math.max(0,...l.map(r=>r.ts)),a=aging(c);
-  return [c.lim>0&&balOf(c)>c.lim?'⚠ عدّى الحد':'',c.phone,l.length?plN(l.length,'معاملة')+' · آخر '+(new Date(t).getFullYear()===new Date().getFullYear()?new Date(t).getDate()+'/'+(new Date(t).getMonth()+1):dshort(t)):'مفيش معاملات',a?(a.d===null?'مفيش دفعات':(a.d===0?'آخر دفعة النهارده':a.d===1?'آخر دفعة امبارح':'آخر دفعة من '+a.d+' يوم')):''].filter(Boolean).join(' · ')}
+function cSub(c,np){const l=ledger(c),t=Math.max(0,...l.map(r=>r.ts)),a=aging(c);
+  return [c.lim>0&&balOf(c)>c.lim?'⚠ عدّى الحد':'',np?'':c.phone,l.length?plN(l.length,'معاملة')+' · آخر '+(new Date(t).getFullYear()===new Date().getFullYear()?new Date(t).getDate()+'/'+(new Date(t).getMonth()+1):dshort(t)):'مفيش معاملات',a?(a.d===null?'مفيش دفعات':(a.d===0?'آخر دفعة النهارده':a.d===1?'آخر دفعة امبارح':'آخر دفعة من '+a.d+' يوم')):''].slice(0,np===1?3:4).filter(Boolean).join(' · ')}
 const agStyle=c=>{const a=aging(c);return a?` style="border-right:4px solid ${a.color}"`:''};
 const av=n=>{const s=String(n||"?").trim();let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return`<span class="av" style="--h:${h}">${esc([...s][0]||"?")}</span>`};
 /* بحث العميل برقم التليفون: أرقام بس (عربي أو إنجليزي) ولازم 3 أرقام على الأقل */
@@ -1935,7 +1935,7 @@ function drawDebt(){scMark();$('hMain').classList.toggle('hide',dbMode||infoMode
   if(c){let run=c.open||0;const rows=ledger(c).slice().sort((a,b)=>a.ts-b.ts).map(r=>{run=rd2(run+(r.type==='pay'?-r.amount:val(r)-r.paid));return{r,run}}).reverse();
     const b=balOf(c),wn=waNum(c.phone),tn=telNum(c.phone);
     $('dbDet').innerHTML=`<div class="card"><div class="dbh"><button class="lnk" data-dback="1" aria-label="رجوع للمديونين">→</button><div class="cn">${esc(c.name)}</div><span class="dbamt ${bcls(c)}">${b?`<small>${b>0?'عليه':'له'}</small> <b class="num">${f(Math.abs(b))}</b>`:'<b>خالص</b>'}</span><button class="main b-green" data-dpay="1">💵 دفع</button></div>
-      <div class="mute dbsub">${esc(cSub(c)+(c.remAt?' · آخر تذكير '+agoTxt(c.remAt):''))}</div>
+      <div class="mute dbsub">${esc(cSub(c,2)+(c.remAt?' · آخر تذكير '+agoTxt(c.remAt):''))}</div>
       <div class="dbact"><button class="ab b-out" data-dfull="1">👤 صفحة العميل</button>${b>0?`<button class="ab b-out" data-drem="1">📨 تذكير</button>`:''}${wn?`<a class="ab wa" target="_blank" rel="noopener" href="https://wa.me/${wn}">💬 رسالة</a>`:''}${tn?`<a class="ab tel" href="tel:${tn}">📞 اتصال</a>`:''}</div>
       ${wn?'':'<div class="mute" style="margin-top:4px">مفيش رقم متسجل للعميل · يتضاف من صفحة العملاء</div>'}
       ${b>0?(c.due?`<div class="dbdue${dAgo(0)>=c.due?' late':''}">📅 ميعاد السداد: <b>${dueLabel(c.due)}</b>${dAgo(0)>c.due?` <span>(عدّى من ${dz(Math.round((dAgo(0)-c.due)/864e5))})</span>`:''}<button type="button" class="lnk" data-ddx="1">✖️ إلغاء</button></div>`:`<div class="dbdue"><span>📅 ميعاد سداد:</span><button type="button" class="ab" data-dd="1">بكرة</button><button type="button" class="ab" data-dd="2">بعد يومين</button><button type="button" class="ab" data-dd="7">بعد أسبوع</button><input type="date" data-ddate="1" aria-label="اختار تاريخ"></div>`):''}
@@ -1947,7 +1947,7 @@ function drawDebt(){scMark();$('hMain').classList.toggle('hide',dbMode||infoMode
   const q=$('dbq').value.trim(),l=S.customers.filter(x=>balOf(x)>0&&qm(x.name,q)).sort((a,b)=>balOf(b)-balOf(a));
   $('dbTot').innerHTML='<small>إجمالي المديونيات · '+plN(l.length,'عميل')+'</small><span class="num">'+f(l.reduce((a,x)=>a+balOf(x),0))+'</span>';
   $('bulkRem').classList.toggle('hide',!(pget('bulkRem',true)&&l.length));
-  $('dbList').innerHTML=l.map(x=>`<div class="rec cr2 dbr" data-dopen="${x.id}"${agStyle(x)}>${av(x.name)}<div class="dbm"><div class="cn">${esc(x.name)}</div><div class="mute">${lateTag(x)}${esc(cSub(x))}</div></div>${x.due?(dAgo(0)>=x.due?'<span class="tag dr">⚠ ميعاده جه</span>':`<span class="tag ok">📅 ${new Date(x.due).getDate()}/${new Date(x.due).getMonth()+1}</span>`):''}<span class="cb ${bcls(x)} num">${bal(x)}</span><div class="dbq"><button type="button" class="ab b-green qa" data-dquick="${x.id}">💵 دفع</button>${waNum(x.phone)?`<a class="ab wa qa" target="_blank" rel="noopener" href="https://wa.me/${waNum(x.phone)}?text=${encodeURIComponent(remText(x))}">💬 تذكير</a>`:''}${telNum(x.phone)?`<a class="ab tel qa" href="tel:${telNum(x.phone)}">📞</a>`:''}</div></div>`).join('')||'<p class="mute">مفيش مديونين ✓</p>'}
+  $('dbList').innerHTML=l.map(x=>`<div class="rec cr2 dbr" data-dopen="${x.id}"${agStyle(x)}>${av(x.name)}<div class="dbm"><div class="cn">${esc(x.name)}</div><div class="mute">${lateTag(x)}${esc(cSub(x,1))}</div></div>${x.due?(dAgo(0)>=x.due?'<span class="tag dr">⚠ ميعاده جه</span>':`<span class="tag ok">📅 ${new Date(x.due).getDate()}/${new Date(x.due).getMonth()+1}</span>`):''}<span class="cb ${bcls(x)} num">${bal(x)}</span><div class="dbq"><button type="button" class="ab b-green qa" data-dquick="${x.id}">💵 دفع</button>${waNum(x.phone)?`<a class="ab wa qa" target="_blank" rel="noopener" href="https://wa.me/${waNum(x.phone)}?text=${encodeURIComponent(remText(x))}">💬 تذكير</a>`:''}${telNum(x.phone)?`<a class="ab tel qa" href="tel:${telNum(x.phone)}">📞</a>`:''}</div></div>`).join('')||'<p class="mute">مفيش مديونين ✓</p>'}
 $('dbq').oninput=drawDebt;
 $('dbDet').addEventListener('change',e=>{const t=e.target;if(!t.dataset.ddate||!t.value)return;const c=getC(dbSel);if(!c)return;const[y,m,d]=t.value.split('-').map(Number);c.due=new Date(y,m-1,d).getTime();delete c.snz;put('customers',c);drawDebt();remDraw()});
 $('bnav').addEventListener('click',e=>{if(e.target.closest('button[data-t="dash"]')&&(dbMode||infoMode)){dbMode=false;infoMode=false;dbSel=null;drawDebt()}});
