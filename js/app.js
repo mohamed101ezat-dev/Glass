@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='207';
+const APP_VER='208';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -505,7 +505,7 @@ $('resprint').onclick=()=>{if(!curBlob)return;
     if(im.complete)go();else im.onload=go}
   catch(e){$('resm').textContent=baseMsg+' · الطباعة منفعتش، جرّب تاني'}};
 
-const TPLD={inv:'{المحل}\n{اللقب} / {العميل}\n{الفاتورة} - {التاريخ}\nالإجمالي: {الإجمالي}\nالمدفوع: {المدفوع}\nالمتبقي: {المتبقي}',pay:'{المحل}\n{اللقب} / {العميل}\nإيصال دفعة كود {الكود}: {المبلغ}\nالحساب بعد الدفعة: {الحساب}',rem:'السلام عليكم {اللقب} {العميل}\nحسابك عندنا في {المحل}: {الحساب} جنيه.\nبرجاء السداد في أقرب وقت. شكراً لتعاملك معنا.',rdy:'السلام عليكم {اللقب} {العميل}\nطلبك (كود {الكود}) جاهز للاستلام من {المحل}.\n{الحساب}\nفي انتظارك، شكراً لتعاملك معنا.'};
+const TPLD={inv:'{المحل}\n{اللقب} / {العميل}\n{الفاتورة} - {التاريخ}\nالإجمالي: {الإجمالي}\nالمدفوع: {المدفوع}\nالمتبقي: {المتبقي}',pay:'{المحل}\n{اللقب} / {العميل}\nإيصال دفعة كود {الكود}: {المبلغ}\nالحساب بعد الدفعة: {الحساب}',rem:'السلام عليكم {اللقب} {العميل}\nحسابك عندنا في {المحل}: {الحساب} جنيه.\n{ختام_السداد}. شكراً لتعاملك معنا.',rdy:'السلام عليكم {اللقب} {العميل}\nطلبك (كود {الكود}) جاهز للاستلام من {المحل}.\n{الحساب}\nفي انتظارك، شكراً لتعاملك معنا.'};
 const tplOf=k=>{const v=lsv('tpl_'+k,'');return v.trim()?v:TPLD[k]},shopN=()=>lsv('shop',''),docW=()=>lsv('docw','إذن صرف'),custW=()=>lsv('custw','الأستاذ');
 function fillTpl(k,m,tp){m['اللقب']=custW();return (tp||tplOf(k)).split('\n').map(l=>{const had=/\{[^}]+\}/.test(l),o=l.replace(/\{([^}]+)\}/g,(x,key)=>key in m?m[key]:x).replace(/ {2,}/g,' ').replace(/^\s*\/\s*/,'');return{o,skip:had&&!o.trim()}}).filter(x=>x.skip===false).map(x=>x.o).join('\n')}
 function txtOf(r){const m={'المحل':shopN(),'العميل':r.cname,'التاريخ':dshort(r.ts),'طريقة_الدفع':r.pfWhy||'','عمولة_الدفع':r.pfv?f(r.pfv):'','الخصم':r.disc?f(r.disc):'','سبب_الخصم':r.discWhy||''};
@@ -513,21 +513,23 @@ function txtOf(r){const m={'المحل':shopN(),'العميل':r.cname,'التا
   if(r.type==='pay'){m['المبلغ']=f(r.amount);m['الحساب']=fb(r.rest);return fillTpl('pay',m)}
   m['كود_المرتجع']=r.rcode?String(r.rcode):'';
   m['الفاتورة']=(r.code?'كود '+r.code+' · ':'')+(docW()?docW()+' ':'')+'رقم '+r.no+(r.rcode?' · كود المرتجع '+r.rcode:'');m['الإجمالي']=fb(r.total);m['المدفوع']=f(r.paid);m['المتبقي']=fb(r.rest);return fillTpl('inv',m)}
-/* مدة عدم الدفع: بقالها كام يوم من آخر دفعة (أو من أول فاتورة لو ما دفعش خالص). بتتحط في رسالة التذكير لوحدها بعد سطر الحساب، أو في المكان اللي تكتب فيه {مدة_الدين} */
+/* رسالة التذكير: القالب + سطور بتتضاف لوحدها لو ليها قيمة (مدة عدم الدفع · أقدم فاتورة متأخرة · رصيد سابق · بيانات الدفع). كل صياغة بتتعدّل من الإعدادات، والصياغة بتتحزّم بعد عدد أيام وتبقى «تواصل معنا» بعد مدة أطول */
 const dayW=d=>d===1?'يوم':d===2?'يومين':d<=10?d+' أيام':d+' يوم';
 function lateInfo(c){let last=0,first=0;S.invoices.forEach(r=>{if(r.cid!==c.id)return;if(pd(r)>0&&r.ts>last)last=r.ts;if(!first||r.ts<first)first=r.ts});const t=last||first;return t?{d:Math.floor((Date.now()-t)/864e5),paid:!!last}:null}
-const lateTxt=c=>{const li=lateInfo(c);return li&&li.d>=1?(li.paid?'مرّ '+dayW(li.d)+' على آخر دفعة منك':'مرّ '+dayW(li.d)+' من غير ما يتدفع حاجة'):''};
-/* رسالة التذكير: بتتبني من القالب + سطور بتتضاف لوحدها لو ليها قيمة: مدة عدم الدفع · أقدم فاتورة متأخرة · بيانات الدفع، والصياغة بتبقى أحزم بعد عدد أيام. كل سطر ليه متغيّر ممكن تحطه بنفسك في القالب */
-const SOFT='برجاء السداد في أقرب وقت',FIRM='نرجو السداد خلال الأيام القادمة، لأن المبلغ متأخر من فترة';
-const remFirmD=()=>{const v=parseInt(toEn(lsv('remfirm','30')),10);return isNaN(v)?30:v},remPayTxt=()=>{const p=lsv('rempay','').trim();return p?'للدفع: '+p:''};
+const RT0={soft:'برجاء السداد في أقرب وقت',firm:'نرجو السداد خلال الأيام القادمة، لأن المبلغ متأخر من فترة',long:'برجاء التواصل معنا في أقرب وقت لترتيب السداد',paid:'مرّ {عدد} على آخر دفعة منك',never:'مرّ {عدد} من غير ما يتدفع حاجة',old:'أقدم فاتورة متأخرة: {التاريخ} · متبقي {المتبقي}',bal:'عليك رصيد سابق: {المبلغ}',pay:'للدفع: {البيانات}'};
+const rt=k=>{const v=lsv('rt_'+k,'').trim();return v||RT0[k]},rtf=(s,o)=>s.replace(/\{([^}]+)\}/g,(x,k)=>k in o?o[k]:x);
+const numSet=(k,d)=>{const v=parseInt(toEn(lsv(k,String(d))),10);return isNaN(v)?d:v},remFirmD=()=>numSet('remfirm',30),remLongD=()=>numSet('remlong',90);
+const lateTxt=c=>{const li=lateInfo(c);return li&&li.d>=1?rtf(rt(li.paid?'paid':'never'),{'عدد':dayW(li.d)}):''};
+const remPayTxt=()=>{const p=lsv('rempay','').trim();return p?rtf(rt('pay'),{'البيانات':p}):''};
 const dueNow=r=>r.type==='inv'?Math.max(0,rd2(val(r)-(r.paid||0))):0;
-const oldTxt=c=>{let o=null;S.invoices.forEach(r=>{if(r.cid!==c.id||dueNow(r)<=0||Date.now()-r.ts<864e5)return;if(!o||r.ts<o.ts)o=r});return o?'أقدم فاتورة متأخرة: '+dshort(o.ts)+' · متبقي '+f(dueNow(o)):''};
-function remMake(m,firm){let tp=tplOf('rem');m['ختام_السداد']=firm?FIRM:SOFT;
-  if(firm&&!tp.includes('{ختام_السداد}'))tp=tp.split(SOFT).join(FIRM);
+const oldTxt=c=>{let o=null;S.invoices.forEach(r=>{if(r.cid!==c.id||dueNow(r)<=0||Date.now()-r.ts<864e5)return;if(!o||r.ts<o.ts)o=r});return o?rtf(rt('old'),{'التاريخ':dshort(o.ts),'المتبقي':f(dueNow(o))}):''};
+const balTxt=c=>+c.open>0?rtf(rt('bal'),{'المبلغ':f(c.open)}):'';
+function remMake(m,tone){let tp=tplOf('rem');const end=tone==='long'?rt('long'):tone==='firm'?rt('firm'):rt('soft');m['ختام_السداد']=end;
+  if(!tp.includes('{ختام_السداد}'))tp=tp.split(RT0.soft).join(end);
   const ins=(v,after)=>{if(!m[v]||tp.includes('{'+v+'}'))return;const ls=tp.split('\n');let i=-1;for(const x of after||[]){i=ls.findIndex(l=>l.includes(x));if(i>=0)break}ls.splice(i<0?ls.length:i+1,0,'{'+v+'}');tp=ls.join('\n')};
-  if(pget('remDays',true))ins('مدة_الدين',['{الحساب}']);if(pget('remOld',true))ins('أقدم_فاتورة',['{مدة_الدين}','{الحساب}']);ins('بيانات_الدفع',null);
+  if(pget('remDays',true))ins('مدة_الدين',['{الحساب}']);if(pget('remOld',true))ins('أقدم_فاتورة',['{مدة_الدين}','{الحساب}']);if(pget('remBal',true))ins('رصيد_سابق',['{أقدم_فاتورة}','{مدة_الدين}','{الحساب}']);ins('بيانات_الدفع',null);
   return fillTpl('rem',m,tp)}
-const remText=c=>{const li=lateInfo(c),fd=remFirmD();return remMake({'العميل':c.name,'المحل':shopN(),'الحساب':f(balOf(c)),'مدة_الدين':lateTxt(c),'أقدم_فاتورة':oldTxt(c),'بيانات_الدفع':remPayTxt()},fd>0&&!!li&&li.d>=fd)};
+const remText=c=>{const li=lateInfo(c),fd=remFirmD(),ld=remLongD(),d=li?li.d:0;return remMake({'العميل':c.name,'المحل':shopN(),'الحساب':f(balOf(c)),'مدة_الدين':lateTxt(c),'أقدم_فاتورة':oldTxt(c),'رصيد_سابق':balTxt(c),'بيانات_الدفع':remPayTxt()},ld>0&&d>=ld?'long':fd>0&&d>=fd?'firm':'soft')};
 /* ===== متابعة الطلبيات: st = p (تحت التجهيز) / r (جاهز) / d أو مفيش (اتسلّم). الفواتير القديمة كلها محسوبة اتسلّمت ===== */
 const ordOn=()=>pget('ordOn',true),OST={p:'⏳ تحت التجهيز',r:'✅ جاهز',d:'📦 اتسلّم'};
 const ordSt=r=>r&&r.type==='inv'&&(r.st==='p'||r.st==='r')?r.st:'d';
@@ -1313,7 +1315,7 @@ const isGen=()=>lsv('biz','')==='gen',defT=()=>isGen()?'rd':'mq';
 function applyBiz(){const g=isGen();document.documentElement.classList.toggle('biz-gen',g);curIT=g?'rd':'mq';document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.it===curIT));$('bizSel').value=g?'gen':'cut';
   $('subLbl').textContent=g?'إجمالي الأصناف':'إجمالي الإذن';const l=$('rows').lastElementChild;if(l&&rowBlank(l)&&l.dataset.t!==defT()){l.remove();calc()}if(curTab==='cl'&&g)document.querySelector('#bnav [data-t="new"]').click();try{drawItems()}catch(e){}}
 function bizSet(v){svk('biz',v==='gen'?'gen':'cut');if(v==='gen'&&!lsv('docw',''))svk('docw','فاتورة');applyBiz();loadMsgUI()}
-const SET_K=['biz','shop','logo','logoOn','shopTxt','custw','docw','tpl_inv','tpl_pay','tpl_rem','tpl_rdy','invdesign','invtpls','invWm','invpal','fancyInv','paper','gnote','invNotes','pfPre','remDays','remOld','remfirm','rempay'],SET_S=new Set(SET_K);
+const SET_K=['biz','shop','logo','logoOn','shopTxt','custw','docw','tpl_inv','tpl_pay','tpl_rem','tpl_rdy','invdesign','invtpls','invWm','invpal','fancyInv','paper','gnote','invNotes','pfPre','remDays','remOld','remBal','remfirm','remlong','rempay','rt_soft','rt_firm','rt_long','rt_paid','rt_never','rt_old','rt_bal','rt_pay'],SET_S=new Set(SET_K);
 const setGet=()=>{const o={};SET_K.forEach(k=>{const v=lsv(k,null);if(v!==null)o[k]=v});return o},setKey=o=>hs(JSON.stringify(Object.keys(o).sort().map(k=>[k,o[k]])));
 function setApply(){try{applyBiz();loadLogo();if(!typing($('t-st'))){loadMsgUI();shopTxtLoad();$('paperSel').value=paperKey();$('logoOn').checked=pget('logoOn',true);$('fancyInv').checked=pget('fancyInv',true)}}catch(e){}}
 let setBusy=null,setT=0,setAt=0;
@@ -1482,7 +1484,7 @@ $('themeChk').onchange=()=>setTheme($('themeChk').checked);
 (function(){let p='sage';try{p=localStorage.getItem('pal')||'sage'}catch(e){}setPal(p);
 document.querySelectorAll('#pals button,#palsCalm button').forEach(b=>b.onclick=()=>setPal(b.dataset.p));$('palCustom').value=getCC();$('palCustom').oninput=()=>{try{localStorage.setItem('cc',$('palCustom').value)}catch(e){}setPal('custom')};
 $('animChk').checked=pget('anim',animDef());$('animChk').onchange=()=>{pset('anim',$('animChk').checked);applyAnim()};applyAnim();perfWatch()})();
-[['editInv','editInv'],['dupInv','dupInv'],['repLastOn','repLastOn'],['dayCl','dayCl'],['weekCl','weekCl'],['monCl','monCl'],['bulkRemChk','bulkRem'],['trashOn','trashOn'],['bkAl','bkAl'],['snapOn','snapOn'],['autoBk','autoBk'],['logoOn','logoOn'],['fancyInv','fancyInv'],['pdfOn','pdfOn'],['ceilSz','ceilSz'],['rndTot','rndTot'],['rndDn','rndDn'],['nfRem','nfRem'],['nfStk','nfStk'],['rcOn','rcOn'],['qtOn','qtOn'],['remDays','remDays'],['remOld','remOld']].forEach(([id,k])=>{$(id).checked=pget(k,true);$(id).onchange=()=>{pset(k,$(id).checked);applyFeatures();drawCusts();if(k==='ceilSz'||k==='rndTot'||k==='rndDn')calc()}});
+[['editInv','editInv'],['dupInv','dupInv'],['repLastOn','repLastOn'],['dayCl','dayCl'],['weekCl','weekCl'],['monCl','monCl'],['bulkRemChk','bulkRem'],['trashOn','trashOn'],['bkAl','bkAl'],['snapOn','snapOn'],['autoBk','autoBk'],['logoOn','logoOn'],['fancyInv','fancyInv'],['pdfOn','pdfOn'],['ceilSz','ceilSz'],['rndTot','rndTot'],['rndDn','rndDn'],['nfRem','nfRem'],['nfStk','nfStk'],['rcOn','rcOn'],['qtOn','qtOn'],['remDays','remDays'],['remOld','remOld'],['remBal','remBal']].forEach(([id,k])=>{$(id).checked=pget(k,true);$(id).onchange=()=>{pset(k,$(id).checked);applyFeatures();drawCusts();if(k==='ceilSz'||k==='rndTot'||k==='rndDn')calc()}});
 /* متابعة الطلبيات: مفتوحة افتراضياً */
 $('ordOn').checked=ordOn();$('ordOn').onchange=()=>{pset('ordOn',$('ordOn').checked);drawDash();calc()};
 /* الإضافات ظاهرة دايماً: مقفولة افتراضياً لأنها مش في كل فاتورة */
@@ -1496,7 +1498,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoBan()}
 
 /* رسائل الواتساب */
 const svk=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}if(SET_S.has(k))setSoon()};
-function loadMsgUI(){$('shopN').value=shopN();$('custW').value=custW();$('docW').value=docW();$('tplInv').value=tplOf('inv');$('tplPay').value=tplOf('pay');$('tplRem').value=tplOf('rem');$('remFirm').value=lsv('remfirm','30');$('remPay').value=lsv('rempay','');$('tplRdy').value=tplOf('rdy')}
+function loadMsgUI(){$('shopN').value=shopN();$('custW').value=custW();$('docW').value=docW();$('tplInv').value=tplOf('inv');$('tplPay').value=tplOf('pay');$('tplRem').value=tplOf('rem');$('remFirm').value=lsv('remfirm','30');$('remLong').value=lsv('remlong','90');$('remPay').value=lsv('rempay','');RTF.forEach(([id,k])=>{$(id).value=lsv('rt_'+k,'');$(id).placeholder=RT0[k]});$('tplRdy').value=tplOf('rdy')}
 $('shopN').oninput=()=>svk('shop',$('shopN').value.trim());$('docW').oninput=()=>svk('docw',$('docW').value.trim());$('custW').oninput=()=>svk('custw',$('custW').value.trim());
 [['tplInv','tpl_inv'],['tplPay','tpl_pay'],['tplRem','tpl_rem'],['tplRdy','tpl_rdy']].forEach(([i,k])=>$(i).oninput=()=>svk(k,$(i).value));
 $('fzSel').value=lsv('fz','m')||'m';$('fzSel').onchange=()=>{const v=$('fzSel').value;svk('fz',v);document.documentElement.classList.remove('fz-x','fz-s','fz-l','fz-xl');if(v!=='m')document.documentElement.classList.add('fz-'+v);fixBar()};
@@ -1630,7 +1632,7 @@ $('pmCust').addEventListener('click',e=>{const b=e.target.closest('[data-pcx]');
 /* رسايل الواتساب: زراير بتحط البيانات في الرسالة + معاينة زي الواتساب */
 const VARS={tplInv:[['العميل','اسم العميل'],['اللقب','اللقب'],['المحل','اسم المحل'],['الفاتورة','رقم الفاتورة'],['الكود','الكود'],['التاريخ','التاريخ'],['الإجمالي','الإجمالي'],['المدفوع','المدفوع'],['المتبقي','المتبقي'],['الخصم','الخصم'],['سبب_الخصم','سبب الخصم'],['طريقة_الدفع','طريقة الدفع'],['عمولة_الدفع','عمولة الدفع']],
   tplPay:[['العميل','اسم العميل'],['اللقب','اللقب'],['المحل','اسم المحل'],['الكود','الكود'],['المبلغ','مبلغ الدفعة'],['الحساب','الحساب بعد الدفعة'],['التاريخ','التاريخ'],['طريقة_الدفع','طريقة الدفع'],['عمولة_الدفع','عمولة الدفع']],
-  tplRem:[['العميل','اسم العميل'],['اللقب','اللقب'],['المحل','اسم المحل'],['الحساب','الحساب'],['مدة_الدين','مدة عدم الدفع'],['أقدم_فاتورة','أقدم فاتورة متأخرة'],['بيانات_الدفع','بيانات الدفع'],['ختام_السداد','ختام السداد (يتحزّم بعد مدة)']],
+  tplRem:[['العميل','اسم العميل'],['اللقب','اللقب'],['المحل','اسم المحل'],['الحساب','الحساب'],['مدة_الدين','مدة عدم الدفع'],['أقدم_فاتورة','أقدم فاتورة متأخرة'],['رصيد_سابق','رصيد سابق'],['بيانات_الدفع','بيانات الدفع'],['ختام_السداد','ختام السداد (يتحزّم بعد مدة)']],
   tplRdy:[['العميل','اسم العميل'],['اللقب','اللقب'],['المحل','اسم المحل'],['الكود','كود الفاتورة'],['الحساب','الحساب (لو عليه)']]};
 document.querySelectorAll('.vch').forEach(d=>{d.innerHTML=VARS[d.dataset.for].map(([k,l])=>`<button type="button" data-v="${k}">+ ${l}</button>`).join('');
   d.addEventListener('mousedown',e=>{if(e.target.closest('[data-v]'))e.preventDefault()});
@@ -1639,10 +1641,11 @@ document.querySelectorAll('.vch').forEach(d=>{d.innerHTML=VARS[d.dataset.for].ma
 function msgPrev(){const now=Date.now();
   $('pvInv').textContent=txtOf({type:'inv',cname:'محمد علي',ts:now,code:1024,no:7,total:1569,paid:500,rest:1069,pfv:0,pfWhy:'فودافون كاش',disc:40,discWhy:'عميل قديم'});
   $('pvPay').textContent=txtOf({type:'pay',cname:'محمد علي',ts:now,code:1025,amount:1000,rest:569,pfv:0,pfWhy:'فودافون كاش'});
-  $('pvRem').textContent=remMake({'العميل':'محمد علي','المحل':shopN(),'الحساب':f(1250),'مدة_الدين':'مرّ 12 يوم على آخر دفعة منك','أقدم_فاتورة':'أقدم فاتورة متأخرة: 12/10 · متبقي 400','بيانات_الدفع':remPayTxt()},false);
+  $('pvRem').textContent=remMake({'العميل':'محمد علي','المحل':shopN(),'الحساب':f(1250),'مدة_الدين':rtf(rt('paid'),{'عدد':dayW(12)}),'أقدم_فاتورة':rtf(rt('old'),{'التاريخ':'12/10','المتبقي':'400'}),'رصيد_سابق':rtf(rt('bal'),{'المبلغ':'500'}),'بيانات_الدفع':remPayTxt()},$('remPvT').value||'soft');
   $('pvRdy').textContent=fillTpl('rdy',{'العميل':'محمد علي','المحل':shopN(),'الكود':'1024','الحساب':'حسابك: '+f(1069)+' جنيه'})}
 ['tplInv','tplPay','tplRem','tplRdy','shopN','custW','docW'].forEach(id=>$(id).addEventListener('input',msgPrev));
-$('remFirm').oninput=()=>svk('remfirm',$('remFirm').value.trim());$('remPay').oninput=()=>{svk('rempay',$('remPay').value);msgPrev()};['remDays','remOld'].forEach(id=>$(id).addEventListener('change',msgPrev));
+const RTF=[['rtSoft','soft'],['rtFirm','firm'],['rtLong','long'],['rtPaid','paid'],['rtNever','never'],['rtOld','old'],['rtBal','bal'],['rtPay','pay']];
+RTF.forEach(([id,k])=>{$(id).oninput=()=>{svk('rt_'+k,$(id).value);msgPrev()}});$('rtReset').onclick=()=>{RTF.forEach(([id,k])=>{svk('rt_'+k,'');$(id).value=''});msgPrev()};$('remPvT').onchange=msgPrev;$('remLong').oninput=()=>svk('remlong',$('remLong').value.trim());$('remFirm').oninput=()=>svk('remfirm',$('remFirm').value.trim());$('remPay').oninput=()=>{svk('rempay',$('remPay').value);msgPrev()};['remDays','remOld','remBal'].forEach(id=>$(id).addEventListener('change',msgPrev));
 /* حجم الخط: زراير بدل القايمة */
 function fzMark(){const v=$('fzSel').value;document.querySelectorAll('#fzSeg button').forEach(b=>b.classList.toggle('on',b.dataset.z===v))}
 $('saveImgOn').checked=pget('saveImgOn',false);$('saveImgOn').onchange=()=>{pset('saveImgOn',$('saveImgOn').checked);applyFeatures()};
