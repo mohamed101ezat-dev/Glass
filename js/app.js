@@ -1,6 +1,6 @@
-﻿/* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
+/* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='216';
+const APP_VER='217';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -207,7 +207,7 @@ if(window.visualViewport){visualViewport.addEventListener('resize',kbFix);visual
 document.addEventListener('focusin',()=>setTimeout(kbFix,300));document.addEventListener('focusout',()=>setTimeout(kbFix,300));
 window.addEventListener('resize',fixBar);
 let curTab='new',tabHist=[],navNoHist=false;
-const navClick=e=>{const b=e.target.closest('button[data-t]');if(!b)return;const t=b.dataset.t;if(!navNoHist&&t!==curTab)tabHist.push(curTab);curTab=t;
+const navClick=e=>{const b=e.target.closest('button[data-t]');if(!b)return;const t=b.dataset.t;if(!navNoHist&&t!==curTab)tabHist.push(curTab);curTab=t;try{sessionStorage.setItem('lastTab',t)}catch(e){}
   document.querySelectorAll('#bnav button,#hdrSet').forEach(x=>x.classList.toggle('on',x===b));if(t==='it')$('hdrSet').classList.add('on');
   ['dash','new','cl','cu','it','st'].forEach(k=>$('t-'+k).classList.toggle('hide',k!==t));
   $('saveBar').classList.toggle('hide',t!=='new');document.body.classList.toggle('onNew',t==='new');fixBar();
@@ -2249,7 +2249,7 @@ function draftBoot(){let d=null;try{d=JSON.parse(localStorage.getItem('invDraft'
 lockInit();loadMsgUI();loadLogo();paperLabels();fixBar();document.body.classList.add('onNew');
 (async()=>{try{await instInit();await dataInit()}catch(e){if(window.__bootFail)window.__bootFail('storage: '+(e&&e.message||e));return}
   if(!fbCfg()){reflowAll();syncNames()}drawDash();drawCusts();drawItems();calc();bkInfo();applyFeatures();drawTrash();drawRecent();qtBtn();try{draftBoot()}catch(e){logErr(e,'draftBoot')}
-  window.__bootOK=true;applyBiz();bellUI();startUI();fbBoot();cloudUI();welcMaybe();setTimeout(nfDaily,1800);nfBoot();setTimeout(storCheck,2500);setTimeout(cloudNag,6000);if(migNote)setTimeout(()=>toast(migNote),700)})();
+  window.__bootOK=true;applyBiz();bellUI();startUI();try{const lt=sessionStorage.getItem('lastTab');if(lt&&lt!==curTab){const bt=lt==='st'?$('hdrSet'):document.querySelector('#bnav button[data-t="'+lt+'"]');if(bt&&!bt.closest('.hide')&&!bt.classList.contains('hide'))bt.click()}}catch(e){}fbBoot();cloudUI();welcMaybe();setTimeout(nfDaily,1800);nfBoot();setTimeout(storCheck,2500);setTimeout(cloudNag,6000);if(migNote)setTimeout(()=>toast(migNote),700)})();
 /* ---------- زرار الرجوع في الموبايل ---------- */
 const OVS=['res','rem','remL','bulk','calcModal','clOv','pinOv','qtOv','dzOv'],OVX={dzOv:'dzX',res:'resx',rem:'remX',remL:'remLX',bulk:'bulkX',calcModal:'calcClose',clOv:'clX',pinOv:'pinNo',qtOv:'qtX'};
 let NS=[],navIgnore=false,exitArm=false,exitT=0,navOK=false;
