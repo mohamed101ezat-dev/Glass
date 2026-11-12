@@ -233,7 +233,7 @@
     '.cl .df .btn{min-height:38px}',
     '.cl .btn[disabled]{opacity:.5;cursor:default}',
     '@media (max-width:560px){.cl .ov{padding:0;align-items:flex-end}.cl .dlg{width:100%;max-height:92vh;border-radius:10px 10px 0 0}.cl .df{padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}}',
-    '@media (pointer:coarse){.cl .t input{height:32px;font-size:16px}.cl .ic{width:28px;height:28px}.cl .t td.act{width:62px}.cl .opt input.k{height:28px;font-size:16px}.cl .tool button{min-width:34px;height:32px}}',
+    '@media (pointer:coarse){.cl .t input{height:27px;font-size:16px}.cl .t th{padding:2px 6px}.cl .tmb{height:24px}.cl .ic{width:28px;height:28px}.cl .t td.act{width:62px}.cl .opt input.k{height:28px;font-size:16px}.cl .tool button{min-width:34px;height:32px}}',
     '.cl{--rowsel:#cfe8d3}.cl[data-theme="dark"]{--rowsel:#22402d}',
     '.cl .bar{background:var(--hd);color:var(--hd-fg);flex-wrap:nowrap;gap:6px;min-height:46px;padding:5px max(8px,env(safe-area-inset-right,0px)) 5px max(8px,env(safe-area-inset-left,0px));position:relative}',
     '.cl .bar .brand{margin-inline-end:auto;font-size:15px;white-space:nowrap}',
@@ -835,7 +835,7 @@
     var L = T[lang];
     var storageKey = options.storageKey === undefined ? 'cutlist-widget-v1' : options.storageKey;
     var S = EXAMPLE();
-    var view = { zoom: 1, font: 11, color: true, dims: true, sheet: 0, tab: 'in', sel: null };
+    var view = { zoom: 1, font: 11, color: true, dims: true, sheet: 0, tab: 'in', sel: null, hi: null };
     var R = null;
     var geo = { s: 1, ml: 0, mt: 0 };
     var drag = null;
@@ -1032,8 +1032,9 @@
           var fill = view.color ? 'url(#clg' + gid + '-' + hu + ')' : 'var(--stripe)';
           var shp = p.it && p.it.s, nonRect = shp === 'c' || shp === 'o';
           var isSel = view.sel && view.sel.si === si && view.sel.pi === pi;
-          var stroke = isSel ? 'stroke="var(--focus)" stroke-width="3"' : p.free ? 'stroke="var(--dimline)" stroke-width="1.6" stroke-dasharray="4 2"' : p.locked ? 'stroke="var(--hd)" stroke-width="2"' : 'stroke="var(--sheet-line)" stroke-width="1"';
-          g += '<g class="pn" data-si="' + si + '" data-pi="' + pi + '" style="touch-action:none"><title>' + L.panel + ' ' + pair(p.w, p.h) + (p.rot ? ' (' + L.rot + ')' : '') + (nonRect ? ' · ' + (shp === 'c' ? L.shapeC : L.shapeO) : '') + (p.locked ? ' · ' + L.pinned : '') + '</title>' +
+          var isHi = view.hi != null && p.it && p.it.ri === view.hi, dim0 = view.hi != null && !isHi;
+          var stroke = (isSel || isHi) ? 'stroke="var(--focus)" stroke-width="3"' : p.free ? 'stroke="var(--dimline)" stroke-width="1.6" stroke-dasharray="4 2"' : p.locked ? 'stroke="var(--hd)" stroke-width="2"' : 'stroke="var(--sheet-line)" stroke-width="1"';
+          g += '<g class="pn" data-si="' + si + '" data-pi="' + pi + '" style="touch-action:none' + (dim0 ? ';opacity:.35' : '') + '"><title>' + L.panel + ' ' + pair(p.w, p.h) + (p.rot ? ' (' + L.rot + ')' : '') + (nonRect ? ' · ' + (shp === 'c' ? L.shapeC : L.shapeO) : '') + (p.locked ? ' · ' + L.pinned : '') + '</title>' +
             '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + fill + '"' + (nonRect ? ' fill-opacity=".28"' : '') + ' ' + stroke + '/>' +
             (nonRect ? '<ellipse cx="' + (x + w / 2) + '" cy="' + (y + h / 2) + '" rx="' + (w / 2) + '" ry="' + (h / 2) + '" fill="' + fill + '" stroke="var(--sheet-line)" stroke-width="1.2"/>' : '') +
             '<g fill="var(--fg)" font-size="' + fs + '">';
@@ -1250,6 +1251,10 @@
     });
     root.addEventListener('focusin', function (e) {
       var inp = e.target; if (inp && inp.matches && inp.matches('.t input[data-k="q"]')) { try { inp.select(); } catch (x) {} }
+      /* تعليم قطع الصف المحدد في الرسم */
+      var hi = null;
+      if (inp && inp.closest) { var tr = inp.closest('[data-t="panels"] tr[data-i]'); if (tr) hi = +tr.dataset.i; }
+      if (hi !== view.hi) { view.hi = hi; if (R) draw(); }
     });
     root.addEventListener('change', function (e) {
       var sel = e.target.closest('select[data-o]');
