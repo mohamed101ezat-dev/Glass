@@ -1139,3 +1139,6 @@ body.wk #cuDup,body.wk #cuTot>span:last-child{display:none!important}
 #dbList .dbr .dbm .tag{flex:none;margin:0;padding:0 7px;font-size:10.5px}
 #dbList .dbr .dbm .lt{flex:none;font-size:11px;white-space:nowrap}
 #dbList .dbr .dbq .cb{margin-inline-start:auto;flex:none}
+/* v213: الاسم كامل دايمًا (بيتلف لو طويل) واللافتات تنزل تحته لو مفيش مكان */
+#dbList .dbr .dbm{flex-wrap:wrap!important;overflow:visible!important;row-gap:1px}
+#dbList .dbr .dbm .cn{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;flex:0 1 auto;max-width:100%;line-height:1.3}
