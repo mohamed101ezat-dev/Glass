@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='212';
+const APP_VER='214';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1832,10 +1832,19 @@ $('topDebt').onclick=e=>{const r=e.target.closest('[data-tdr]');if(r){const c=ge
 let scnLast=null;
 function scene(tInvs,tPay){const n=tInvs.length,sales=tInvs.reduce((a,r)=>a+val(r),0),paid=tInvs.reduce((a,r)=>a+r.paid,0)+tPay;
   $('scS').textContent=f(sales);$('scC2').textContent=f(paid);$('scE').classList.toggle('hide',n>0);
-  const P=Math.min(n,6),dur=9;
-  $('scnP').innerHTML=Array.from({length:P},(_,i)=>`<g class="scn-p" style="animation-delay:-${(i*dur/P).toFixed(2)}s;--i:${i}"><rect x="0" y="66" width="22" height="36" rx="2" fill="url(#scnGl)" stroke="#5aa6c9" stroke-width="1.4"/><path d="M4 70h8L4 84z" fill="#fff" opacity=".7"/></g>`).join('');
-  const k=paid>0?Math.max(1,Math.round(Math.min(1,paid/Math.max(sales,1))*10)):0;
-  $('scnC').innerHTML=Array.from({length:k},(_,i)=>`<ellipse cx="27" cy="${(103-i*5.8).toFixed(1)}" rx="11" ry="3.4" fill="#f5b82e" stroke="#c98a00" stroke-width="1"/>`).join('');
+  /* كل فاتورة عربية رايحة للخزنة: مدفوعة = عملات فوقها، ناقصة = علامة ⏳ حمرا، من غير دفع = صندوق فاضي بعلامة */
+  const recent=tInvs.slice().sort((a,b)=>b.ts-a.ts).slice(0,4),dur=8,P=recent.length;
+  $('scnP').innerHTML=recent.map((r,i)=>{const v=val(r),pd0=Math.min(r.paid,v),full=v>0&&pd0>=v-0.5,none=pd0<=0,col=full?'#16a34a':none?'#c0392b':'#e67e22';
+    const cargo=none?`<rect x="6" y="84" width="14" height="10" fill="#d9c2a0" stroke="#8a6d3b" stroke-width="1"/><text x="13" y="92.5" font-size="9" text-anchor="middle" fill="#c0392b" font-weight="700">!</text>`:`<ellipse cx="13" cy="92" rx="8" ry="2.6" fill="#f5b82e" stroke="#c98a00" stroke-width=".8"/><ellipse cx="13" cy="88.6" rx="8" ry="2.6" fill="#f5b82e" stroke="#c98a00" stroke-width=".8"/>${full?'<ellipse cx="13" cy="85.2" rx="8" ry="2.6" fill="#f5b82e" stroke="#c98a00" stroke-width=".8"/>':''}`;
+    return `<g class="scn-p" style="animation-delay:-${(i*dur/P).toFixed(2)}s;--i:${i}"><rect x="0" y="94" width="30" height="11" rx="2" fill="${col}"/><rect x="30" y="97" width="9" height="8" rx="1.5" fill="${col}"/>${cargo}<circle cx="7" cy="107" r="3.2" fill="#2b2f33"/><circle cx="31" cy="107" r="3.2" fill="#2b2f33"/>${full?'':`<text x="20" y="102.5" font-size="7.5" text-anchor="middle" fill="#fff" font-weight="700">${none?'لسه':'⏳'}</text>`}</g>`}).join('');
+  const k=paid>0?Math.max(1,Math.round(Math.min(1,paid/Math.max(sales,1))*14)):0;
+  $('scnC').innerHTML=Array.from({length:k},(_,i)=>`<ellipse cx="23" cy="${(86-i*5).toFixed(1)}" rx="14" ry="3.3" fill="#f5b82e" stroke="#c98a00" stroke-width="1"/>`).join('');
+  document.querySelector('#infoCard .scn-fall').style.display=paid>0?'':'none';
+  const left=Math.max(0,tInvs.reduce((a,r)=>a+Math.max(0,val(r)-r.paid),0)),t0=new Date();t0.setHours(0,0,0,0);
+  const exp=S.expenses.filter(x=>x.ts>=t0.getTime()).reduce((a,x)=>a+(+x.amt||0),0);
+  $('scR').textContent=f(left);$('scRc').classList.toggle('hide',!(n&&left>0));$('scX2').textContent=f(exp);$('scXc').classList.toggle('hide',!(exp>0));
+  /* مصروفات اليوم = عملات بتخرج من الخزنة ناحية المحل */
+  $('scnX').innerHTML=exp>0?[0,1,2].map(i=>`<circle class="scn-out" style="animation-delay:${i*.7}s" cx="246" cy="108" r="3.2" fill="#f5b82e" stroke="#c98a00" stroke-width=".8"/>`).join(''):'';
   const pl=$('scPlus');if(scnLast!==null&&n>scnLast){const last=tInvs.slice().sort((a,b)=>a.ts-b.ts).pop();pl.textContent='+'+f(val(last));pl.classList.remove('go');void pl.offsetWidth;pl.classList.add('go')}scnLast=n}
 function drawDash(){startUI();drawHero();drawTopDebt();
   const t0=new Date();t0.setHours(0,0,0,0);const todayTs=t0.getTime(),weekTs=dAgo(6);

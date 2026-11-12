@@ -1158,3 +1158,17 @@ body.wk #cuDup,body.wk #cuTot>span:last-child{display:none!important}
 @keyframes scnCloud{to{transform:translateX(40px)}}
 @keyframes scnPlus{0%{opacity:0;transform:translateY(6px)}15%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
 @media (prefers-reduced-motion:reduce){.scn-p,.scn-saw,.scn-belt,.scn-smoke circle,.scn-cloud{animation:none}.scn-p{transform:translateX(calc(70px + var(--i,0)*38px))}}
+
+/* v213: مشهد الخزنة: عربيات الفواتير + أنبوب الفلوس + مصروفات */
+@keyframes scnMove2{from{transform:translateX(-45px)}to{transform:translateX(150px)}}
+@keyframes scnFall{0%{transform:translateY(0);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translateY(62px);opacity:0}}
+@keyframes scnOut{0%{transform:translateX(0);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translateX(34px);opacity:0}}
+.scn-p{animation:scnMove2 8s linear infinite}
+.scn-fall{animation:scnFall 1.6s ease-in infinite}
+.scn-out{animation:scnOut 2.1s linear infinite}
+.scn-chips{flex-wrap:wrap;justify-content:flex-start}
+.scn-chip.r{background:#9a2a1f}.scn-chip.o{background:#8a5a12}
+.scn-board{left:10px;transform:none;top:12px;min-width:104px}
+@media (prefers-reduced-motion:reduce){.scn-fall,.scn-out{animation:none}.scn-p{transform:translateX(calc(10px + var(--i,0)*42px))}}
+
+body.wk .scn-chip.r{display:none!important}
