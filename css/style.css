@@ -114,7 +114,7 @@ table.st{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
 .app-header{position:fixed;top:0;left:0;right:0;z-index:40;background:var(--acc);color:#fff;display:grid;grid-template-columns:auto 1fr auto;align-items:center;height:44px;padding:0 14px;padding-top:env(safe-area-inset-top,0px);box-shadow:0 1px 4px rgba(0,0,0,.15)}
 .app-header .app-title{font-size:16px;font-weight:700;letter-spacing:.5px}
 .app-header .app-subtitle{font-size:11px;opacity:.85}
-.hdr-ver{font-size:11px;font-weight:600;opacity:.6;letter-spacing:.2px;justify-self:start}
+.hdr-ver{font-size:11px;font-weight:600;opacity:.6;letter-spacing:.2px;justify-self:stretch;text-align:right;direction:ltr}
 .hdr-set{justify-self:end;border:none;background:rgba(255,255,255,.18);color:#fff;border-radius:10px;width:36px;height:34px;font-size:19px;line-height:1;cursor:pointer;padding:0;font-family:inherit}
 .hdr-set.on{background:rgba(255,255,255,.38)}
 .hdr-logo{justify-self:start;display:flex;align-items:center;justify-content:center;min-width:0}
@@ -129,7 +129,6 @@ table.st{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
 .qs2::-webkit-scrollbar{height:4px}
 .qmore{font-size:12px;padding:0}
 .catsel{width:auto;flex:none;max-width:104px;height:30px;font-size:13px;padding:0 4px}
-.hdr-ver{justify-self:end;font-size:12px;font-weight:700;opacity:.92;letter-spacing:.3px;direction:ltr}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:40;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 -2px 10px rgba(0,0,0,.08);transition:background-color .3s,border-color .3s}
 .bottom-nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px 4px;border:none;background:none;color:var(--mute);font-family:inherit;font-size:11px;cursor:pointer;transition:color .2s;position:relative}
 .bottom-nav button .nav-icon{font-size:18px;line-height:1}
@@ -1094,3 +1093,19 @@ html #rows .row input.c.c1::placeholder{color:var(--ink)!important;opacity:.45!i
 .cu-ro #qtOpen{flex:none;margin-inline-start:auto}
 #cinfo,#cinfo:not(:empty){display:block;flex:1 1 auto;min-width:0;margin:0;padding:0;background:none!important;border:0;border-radius:0;color:var(--mute)!important;font-weight:400!important;font-size:11px!important;line-height:1.35;opacity:.9}
 #cinfo:empty{display:none}
+
+/* v189: زرار التأكيد (حذف / إلغاء التعديل) كان كلامه بنفس لون الخلفية فمش باين */
+#resdel.arm,#editCancel.arm,.lnk[data-delc].arm{color:#fff!important}
+/* v189: مبلغ 8 أرقام يبان كله في خانة الدفع */
+.sprow .spa.lg{font-size:10.5px!important;padding:0 1px!important;letter-spacing:-.2px}
+
+/* v190: زراير كانت أصغر من 24 بكسل على الصباع */
+.sth>.lnk,.dbh>.lnk{min-width:40px;min-height:32px;display:inline-flex;align-items:center;justify-content:center;font-size:18px}
+.res-ov .del,.pmr .del{min-width:34px;min-height:30px;display:inline-flex;align-items:center;justify-content:center}
+.xd{min-width:30px;min-height:28px}
+.seg.s button{min-height:28px}
+.ab,.hday .lnk,.dbdue .ab{min-height:28px}
+.xclr{min-width:28px;min-height:28px}
+#resTxtBox>summary{padding:6px 0}
+/* v190: علامة المرتجع في السجل */
+.tag.rt{background:color-mix(in srgb,var(--mute) 14%,transparent);color:var(--ink)}
