@@ -45,7 +45,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <link rel="apple-touch-startup-image" href="splash/14_15pro.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/12_13_14promax.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/14_15promax.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
-<link rel="stylesheet" href="css/style.css?v=208">
+<link rel="stylesheet" href="css/style.css?v=212">
 
 
 
@@ -140,7 +140,29 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <section id="t-dash" class="hide">
   <div class="stat-grid">
-    <div class="stat-card" id="infoCard" role="button" tabindex="0"><div class="stat-label">فواتير اليوم ›</div><div class="stat-value num" id="d_info">0</div></div>
+    <div class="stat-card scn" id="infoCard" role="button" tabindex="0" aria-label="فواتير اليوم">
+      <svg class="scn-svg" viewBox="0 0 360 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><linearGradient id="scnSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--s1)"/><stop offset="1" stop-color="var(--s2)"/></linearGradient>
+          <linearGradient id="scnGl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6f6ff"/><stop offset="1" stop-color="#8fc9e6"/></linearGradient></defs>
+        <rect width="360" height="120" fill="url(#scnSky)"/>
+        <g class="scn-cloud"><ellipse cx="70" cy="22" rx="22" ry="6" fill="#fff" opacity=".55"/><ellipse cx="86" cy="19" rx="14" ry="5" fill="#fff" opacity=".55"/></g>
+        <rect x="70" y="52" width="230" height="52" fill="var(--bd)"/>
+        <rect x="64" y="46" width="242" height="8" fill="var(--rf)"/>
+        <rect x="270" y="26" width="10" height="22" fill="var(--rf)"/>
+        <g class="scn-smoke"><circle cx="275" cy="22" r="4"/><circle cx="275" cy="22" r="4"/><circle cx="275" cy="22" r="4"/></g>
+        <circle cx="175" cy="78" r="17" fill="var(--sw1)" stroke="var(--sw2)" stroke-width="3"/>
+        <g class="scn-saw"><path d="M175 63v30M160 78h30M164.4 67.4l21.2 21.2M185.6 67.4l-21.2 21.2" stroke="var(--sw2)" stroke-width="2.2" stroke-linecap="round"/></g>
+        <rect x="70" y="102" width="230" height="6" rx="3" fill="var(--cv)"/>
+        <line class="scn-belt" x1="70" y1="105" x2="300" y2="105" stroke="var(--cv2)" stroke-width="2" stroke-dasharray="6 8"/>
+        <rect x="0" y="108" width="360" height="12" fill="var(--gr)"/>
+        <g id="scnP"></g>
+        <g id="scnJ"><rect x="10" y="40" width="34" height="68" rx="8" fill="#ffffff" fill-opacity=".35" stroke="var(--sw2)" stroke-width="2"/><g id="scnC"></g></g>
+      </svg>
+      <div class="scn-lbl">فواتير اليوم ›</div>
+      <div class="scn-board"><small>مبيعات اليوم</small><b class="num" id="scS">0</b><span class="scn-plus" id="scPlus"></span></div>
+      <div class="scn-chips"><span class="scn-chip">🧾 <b class="num" id="d_info">0</b> فاتورة</span><span class="scn-chip g">💰 <b class="num" id="scC2">0</b> محصّل</span></div>
+      <div class="scn-empty hide" id="scE">لسه مفيش فواتير النهارده</div>
+    </div>
     <div class="stat-card good" data-sc="paid" role="button" tabindex="0"><div class="stat-label" id="l_paid">المدفوع اليوم ›</div><div class="stat-value num" id="d_todayPaid">0</div></div>
     <div class="stat-card accent" data-sc="today" role="button" tabindex="0"><div class="stat-label" id="l_today">مبيعات اليوم ›</div><div class="stat-value num" id="d_today">0</div><div id="heroX" class="hx"></div></div>
     <div class="stat-card warn" id="dbCard" role="button" tabindex="0"><div class="stat-label">المديونيات ›</div><div class="stat-value num" id="d_debt">0</div></div>
@@ -513,10 +535,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=208"></script>
+<script src="js/app.js?v=212"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=208"></script>
-<script src="js/features.js?v=208"></script>
+<script src="js/cutlist.js?v=212"></script>
+<script src="js/features.js?v=212"></script>
 </body>
 </html>
 

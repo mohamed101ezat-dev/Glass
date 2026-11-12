@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='208';
+const APP_VER='212';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1828,13 +1828,22 @@ function drawTopDebt(){const box=$('topDebt');if(!box)return;const l=S.customers
 $('topDebt').onclick=e=>{const r=e.target.closest('[data-tdr]');if(r){const c=getC(r.dataset.tdr);if(c)openRem(c);return}if(e.target.closest('a'))return;
   if(e.target.closest('[data-tdall]')){infoMode=false;dbMode=true;dbSel=null;drawDebt();window.scrollTo(0,0);return}
   const o=e.target.closest('[data-tdo]');if(o){infoMode=false;dbMode=true;dbSel=o.dataset.tdo;dbPay=null;drawDebt();window.scrollTo(0,0)}};
+/* رسمة ورشة الزجاج: كل فاتورة النهارده لوح بيمشي على السير، والعملات في الأنبوب = المحصّل من المبيعات، واللوحة فيها +مبلغ لما تتسجل فاتورة جديدة */
+let scnLast=null;
+function scene(tInvs,tPay){const n=tInvs.length,sales=tInvs.reduce((a,r)=>a+val(r),0),paid=tInvs.reduce((a,r)=>a+r.paid,0)+tPay;
+  $('scS').textContent=f(sales);$('scC2').textContent=f(paid);$('scE').classList.toggle('hide',n>0);
+  const P=Math.min(n,6),dur=9;
+  $('scnP').innerHTML=Array.from({length:P},(_,i)=>`<g class="scn-p" style="animation-delay:-${(i*dur/P).toFixed(2)}s;--i:${i}"><rect x="0" y="66" width="22" height="36" rx="2" fill="url(#scnGl)" stroke="#5aa6c9" stroke-width="1.4"/><path d="M4 70h8L4 84z" fill="#fff" opacity=".7"/></g>`).join('');
+  const k=paid>0?Math.max(1,Math.round(Math.min(1,paid/Math.max(sales,1))*10)):0;
+  $('scnC').innerHTML=Array.from({length:k},(_,i)=>`<ellipse cx="27" cy="${(103-i*5.8).toFixed(1)}" rx="11" ry="3.4" fill="#f5b82e" stroke="#c98a00" stroke-width="1"/>`).join('');
+  const pl=$('scPlus');if(scnLast!==null&&n>scnLast){const last=tInvs.slice().sort((a,b)=>a.ts-b.ts).pop();pl.textContent='+'+f(val(last));pl.classList.remove('go');void pl.offsetWidth;pl.classList.add('go')}scnLast=n}
 function drawDash(){startUI();drawHero();drawTopDebt();
   const t0=new Date();t0.setHours(0,0,0,0);const todayTs=t0.getTime(),weekTs=dAgo(6);
   const inv=S.invoices.filter(r=>r.type==='inv'),tInvs=inv.filter(r=>r.ts>=todayTs);
   const tPay=S.invoices.filter(r=>r.type==='pay'&&r.ts>=todayTs).reduce((a,r)=>a+r.amount,0);
   $('d_today').textContent=f(tInvs.reduce((a,r)=>a+val(r),0));
   $('d_todayPaid').textContent=f(tInvs.reduce((a,r)=>a+r.paid,0)+tPay);
-  $('d_info').textContent=f(tInvs.length);
+  $('d_info').textContent=f(tInvs.length);scene(tInvs,tPay);
   $('d_debt').textContent=f(debtAll());
   {const on=ordOn();if(!on&&hTy==='ord'){hTy='all';document.querySelectorAll('#hTy button').forEach(b=>b.classList.toggle('on',b.dataset.y==='all'))}
     $('hTyOrd').classList.toggle('hide',!on);const op=on?inv.filter(r=>ordSt(r)==='p').length:0,or=on?inv.filter(r=>ordSt(r)==='r').length:0,ob=$('ordBan');
