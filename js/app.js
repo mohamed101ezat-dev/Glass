@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='208';
+const APP_VER='209';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1936,7 +1936,7 @@ function drawDebt(){scMark();$('hMain').classList.toggle('hide',dbMode||infoMode
     const b=balOf(c),wn=waNum(c.phone),tn=telNum(c.phone);
     $('dbDet').innerHTML=`<div class="card"><div class="dbh"><button class="lnk" data-dback="1" aria-label="رجوع للمديونين">→</button><div class="cn">${esc(c.name)}</div><span class="dbamt ${bcls(c)}">${b?`<small>${b>0?'عليه':'له'}</small> <b class="num">${f(Math.abs(b))}</b>`:'<b>خالص</b>'}</span><button class="main b-green" data-dpay="1">💵 دفع</button></div>
       <div class="mute dbsub">${esc(cSub(c)+(c.remAt?' · آخر تذكير '+agoTxt(c.remAt):''))}</div>
-      ${b>0||wn?`<div class="dbact">${b>0?`<button class="ab b-out" data-drem="1">📨 تذكير</button>`:''}${wn?`<a class="ab wa" target="_blank" rel="noopener" href="https://wa.me/${wn}">💬 رسالة</a>`:''}${tn?`<a class="ab tel" href="tel:${tn}">📞 اتصال</a>`:''}</div>`:''}
+      <div class="dbact"><button class="ab b-out" data-dfull="1">👤 صفحة العميل</button>${b>0?`<button class="ab b-out" data-drem="1">📨 تذكير</button>`:''}${wn?`<a class="ab wa" target="_blank" rel="noopener" href="https://wa.me/${wn}">💬 رسالة</a>`:''}${tn?`<a class="ab tel" href="tel:${tn}">📞 اتصال</a>`:''}</div>
       ${wn?'':'<div class="mute" style="margin-top:4px">مفيش رقم متسجل للعميل · يتضاف من صفحة العملاء</div>'}
       ${b>0?(c.due?`<div class="dbdue${dAgo(0)>=c.due?' late':''}">📅 ميعاد السداد: <b>${dueLabel(c.due)}</b>${dAgo(0)>c.due?` <span>(عدّى من ${dz(Math.round((dAgo(0)-c.due)/864e5))})</span>`:''}<button type="button" class="lnk" data-ddx="1">✖️ إلغاء</button></div>`:`<div class="dbdue"><span>📅 ميعاد سداد:</span><button type="button" class="ab" data-dd="1">بكرة</button><button type="button" class="ab" data-dd="2">بعد يومين</button><button type="button" class="ab" data-dd="7">بعد أسبوع</button><input type="date" data-ddate="1" aria-label="اختار تاريخ"></div>`):''}
       ${dbPay===c.id?`<div class="dbpay">
@@ -1947,7 +1947,7 @@ function drawDebt(){scMark();$('hMain').classList.toggle('hide',dbMode||infoMode
   const q=$('dbq').value.trim(),l=S.customers.filter(x=>balOf(x)>0&&qm(x.name,q)).sort((a,b)=>balOf(b)-balOf(a));
   $('dbTot').innerHTML='<small>إجمالي المديونيات · '+plN(l.length,'عميل')+'</small><span class="num">'+f(l.reduce((a,x)=>a+balOf(x),0))+'</span>';
   $('bulkRem').classList.toggle('hide',!(pget('bulkRem',true)&&l.length));
-  $('dbList').innerHTML=l.map(x=>`<div class="rec cr2" data-dopen="${x.id}"${agStyle(x)}>${av(x.name)}<div style="flex:1;min-width:0"><div class="cn">${esc(x.name)}</div><div class="mute">${esc(cSub(x))}</div><div class="dbq">${lateTag(x)}${waNum(x.phone)?`<a class="ab wa qa" target="_blank" rel="noopener" href="https://wa.me/${waNum(x.phone)}?text=${encodeURIComponent(remText(x))}">💬 تذكير</a>`:''}${telNum(x.phone)?`<a class="ab tel qa" href="tel:${telNum(x.phone)}">📞</a>`:''}</div></div>${x.due?(dAgo(0)>=x.due?'<span class="tag dr">⚠ ميعاده جه</span>':`<span class="tag ok">📅 ${new Date(x.due).getDate()}/${new Date(x.due).getMonth()+1}</span>`):''}<span class="cb ${bcls(x)} num">${bal(x)}</span></div>`).join('')||'<p class="mute">مفيش مديونين ✓</p>'}
+  $('dbList').innerHTML=l.map(x=>`<div class="rec cr2" data-dopen="${x.id}"${agStyle(x)}>${av(x.name)}<div style="flex:1;min-width:0"><div class="cn">${esc(x.name)}</div><div class="mute">${esc(cSub(x))}</div><div class="dbq">${lateTag(x)}<button type="button" class="ab b-green qa" data-dquick="${x.id}">💵 دفع</button>${waNum(x.phone)?`<a class="ab wa qa" target="_blank" rel="noopener" href="https://wa.me/${waNum(x.phone)}?text=${encodeURIComponent(remText(x))}">💬 تذكير</a>`:''}${telNum(x.phone)?`<a class="ab tel qa" href="tel:${telNum(x.phone)}">📞</a>`:''}</div></div>${x.due?(dAgo(0)>=x.due?'<span class="tag dr">⚠ ميعاده جه</span>':`<span class="tag ok">📅 ${new Date(x.due).getDate()}/${new Date(x.due).getMonth()+1}</span>`):''}<span class="cb ${bcls(x)} num">${bal(x)}</span></div>`).join('')||'<p class="mute">مفيش مديونين ✓</p>'}
 $('dbq').oninput=drawDebt;
 $('dbDet').addEventListener('change',e=>{const t=e.target;if(!t.dataset.ddate||!t.value)return;const c=getC(dbSel);if(!c)return;const[y,m,d]=t.value.split('-').map(Number);c.due=new Date(y,m-1,d).getTime();delete c.snz;put('customers',c);drawDebt();remDraw()});
 $('bnav').addEventListener('click',e=>{if(e.target.closest('button[data-t="dash"]')&&(dbMode||infoMode)){dbMode=false;infoMode=false;dbSel=null;drawDebt()}});
@@ -1958,6 +1958,8 @@ $('t-dash').addEventListener('click',e=>{const t=e.target;
   if(t.closest('#infoBack')){infoMode=false;drawDebt();window.scrollTo(0,0);return}
   if(t.closest('#dbCard')){infoMode=false;dbMode=true;dbSel=null;drawDebt();window.scrollTo(0,0);return}
   if(t.closest('#dbBack')){dbMode=false;dbSel=null;drawDebt();window.scrollTo(0,0);return}
+  {const dq=t.closest('[data-dquick]');if(dq){dbSel=dq.dataset.dquick;dbPay=dbSel;delete PW.db;drawDebt();window.scrollTo(0,0);const i=document.querySelector('[data-pw="db"] .spa');if(i)i.focus();return}}
+  {const df=t.closest('[data-dfull]');if(df){const id=dbSel;document.querySelector('#bnav button[data-t="cu"]').click();selC=id;delete PW.cu;per='all';cdq='';pMo=0;editOpen=false;cuEd=false;cuPm=false;drawCusts();window.scrollTo(0,0);return}}
   const o=t.closest('[data-dopen]');if(o){dbSel=o.dataset.dopen;dbPay=null;drawDebt();window.scrollTo(0,0);return}
   if(t.closest('[data-dback]')){dbSel=null;dbPay=null;drawDebt();return}
   if(t.closest('[data-drem]')){const c=getC(dbSel);if(c)openRem(c);return}
