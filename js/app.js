@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='198';
+const APP_VER='199';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -632,6 +632,7 @@ function drawDet(){const c=getC(selC),l=rowsOf(c);
    <div id="cdEdit" class="${cuEd?'':'hide'}" style="border-top:1px dashed var(--line);margin-top:6px;padding-top:6px">
     <div class="ro" style="margin-bottom:6px"><input data-f="name" value="${esc(c.name)}" aria-label="اسم العميل" style="font-weight:700;flex:1;min-width:0"><select data-f="cat" class="catsel" aria-label="الفئة">${catOpts(custCat(c))}</select></div>
     <div class="g2" style="grid-template-columns:1.8fr 1fr"><div><label>واتساب</label><input data-f="phone" type="tel" inputmode="tel" value="${esc(c.phone||'')}" style="direction:ltr;text-align:center;letter-spacing:.3px"></div><div><label>رصيد افتتاحي</label>${editOpen?`<input data-f="open" type="text" inputmode="decimal" value="${c.open||''}" placeholder="0">`:`<div class="ro" style="color:var(--ink);height:var(--ih);border:1px dashed var(--line);border-radius:7px;padding:0 8px"><b class="num">${f(c.open||0)}</b><button class="lnk" data-eo="1">تعديل</button></div>`}</div></div>
+    ${phoneChipsHtml(c.phone,'data-ppe')?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin:0 0 6px">${phoneChipsHtml(c.phone,'data-ppe')}</div>`:''}
     <div class="g2" style="grid-template-columns:1.3fr 1fr .8fr"><div><label>العنوان</label><input data-f="addr" value="${esc(c.addr||'')}"></div><div><label>ملاحظات</label><input data-f="note" value="${esc(c.note||'')}"></div><div><label>حد الدين</label><input data-f="lim" type="text" inputmode="decimal" value="${c.lim||''}" placeholder="0"></div></div>
     <div class="g2" style="grid-template-columns:1.8fr 1fr"><div><label>📍 مواقع / مشاريع (بفاصلة)</label><input data-f="sites" value="${esc((c.sites||[]).join('، '))}"></div><div><label>📅 ميعاد شهري (يوم)</label><input data-f="dd" type="text" inputmode="numeric" value="${c.dd||''}" placeholder="1-31"></div></div>
     <button class="main" data-esave="1" style="width:100%;margin-top:6px">💾 حفظ التعديل</button>
@@ -652,6 +653,7 @@ $('t-cu').addEventListener('click',e=>{const t=e.target,d=t.dataset;
   const op=t.closest('[data-open]');if(op){selC=op.dataset.open;delete PW.cu;per='all';cdq='';pMo=0;editOpen=false;cuEd=false;cuPm=false;drawCusts();window.scrollTo(0,0);return}
   if(d.tg){if(d.tg==='ed'){cuEd=!cuEd;$('cdEdit').classList.toggle('hide',!cuEd)}else{cuPm=!cuPm;delete PW.cu;drawDet();const i=document.querySelector('#cuDet [data-pw="cu"] .spa');if(i)i.focus()}return}
   if(d.eo){editOpen=true;cuEd=true;drawDet();return}
+  {const pe=t.closest('[data-ppe]');if(pe){const c=getC(selC);if(c){c.phone=phoneMakePrimary(c.phone,+pe.dataset.ppe);put('customers',c);drawDet()}return}}
   if(d.esave){const c=getC(selC);if(!c)return;if(!c.name){$('cdMsg').textContent='الاسم لا يمكن أن يكون فاضي';return}c.phone=normPhones(c.phone);flushTouch();put('customers',c);syncNames();cuEd=false;editOpen=false;drawDet();toast('اتحفظ ✓');return}
   if(d.inv){const c=getC(selC);if(!c)return;document.querySelector('#bnav [data-t="new"]').click();$('cust').value=c.name;custInput();window.scrollTo(0,0);return}
   if(d.back){selC=null;drawCusts();return}
@@ -675,6 +677,11 @@ $('cuDet').addEventListener('input',e=>{const t=e.target,c=getC(selC);if(!c||!t.
   DV++;c[k]=v;touch('customers',c)});
 $('cuDet').addEventListener('change',e=>{if(e.target.dataset.f==='open'){flushTouch();reflow(selC);editOpen=false;drawDet()}else if(e.target.dataset.f==='name'){syncNames();drawDet()}});
 $('cq').oninput=drawCusts;
+/* رقم أساسي: لو العميل عنده أكتر من رقم، الأول هو اللي بيتبعتله الواتساب والتذكير. الضغط على رقم بيخليه الأساسي */
+const phoneChipsHtml=(p,a)=>{const l=phoneParts(p);return l.length<2?'':l.map((x,i)=>'<button type="button" class="ab'+(i?'':' on')+'" '+a+'="'+i+'">'+(i?'☆ ':'⭐ ')+esc(x)+'</button>').join('')};
+const phoneMakePrimary=(p,i)=>{const l=phoneParts(p);if(i<=0||i>=l.length)return p;l.unshift(l.splice(i,1)[0]);return l.join(' / ')};
+function ncChips(){const h=phoneChipsHtml($('nc_phone').value,'data-pp'),b=$('nc_pchips');b.innerHTML=h;b.classList.toggle('hide',!h)}
+$('nc_pchips').onclick=e=>{const b=e.target.closest('[data-pp]');if(!b)return;$('nc_phone').value=phoneMakePrimary($('nc_phone').value,+b.dataset.pp);ncChips();ncWa()};
 let ncCr=false;
 function ncWa(){const a=$('nc_wa'),n=waNum($('nc_phone').value);a.classList.toggle('hide',n.length<11);if(n.length>=11)a.href='https://wa.me/'+n}
 function addCust(more){const name=$('nc_name').value.trim().replace(/\s+/g,' '),m=$('cuMsg');m.textContent='';
@@ -682,12 +689,12 @@ function addCust(more){const name=$('nc_name').value.trim().replace(/\s+/g,' '),
   const bv=nv($('nc_bal').value);
   const c={id:uid(),name,phone:normPhones($('nc_phone').value),addr:$('nc_addr').value.trim(),note:$('nc_note').value.trim(),open:ncCr?-Math.abs(bv):bv,cat:$('nc_cat').value};
   {const lim=nv($('nc_lim').value);if(lim>0)c.lim=lim}
-  S.customers.push(c);put('customers',c);['nc_name','nc_phone','nc_bal','nc_addr','nc_note','nc_lim'].forEach(i=>$(i).value='');ncCr=false;$('nc_dir').textContent='عليه';ncWa();
+  S.customers.push(c);put('customers',c);['nc_name','nc_phone','nc_bal','nc_addr','nc_note','nc_lim'].forEach(i=>$(i).value='');ncCr=false;$('nc_dir').textContent='عليه';ncWa();ncChips();
   if(more){$('nc_name').focus();toast('اتحفظ: '+name)}else $('cuAdd').classList.add('hide');drawCusts()}
 $('addCu').onclick=()=>addCust(false);$('addCu2').onclick=()=>addCust(true);
 $('nc_dir').onclick=()=>{ncCr=!ncCr;$('nc_dir').textContent=ncCr?'له':'عليه'};
-$('nc_phone').addEventListener('input',()=>{ncWa()});
-$('nc_phone').addEventListener('change',()=>{$('nc_phone').value=normPhones($('nc_phone').value);ncWa();ncWarn()});
+$('nc_phone').addEventListener('input',()=>{ncWa();ncChips()});
+$('nc_phone').addEventListener('change',()=>{$('nc_phone').value=normPhones($('nc_phone').value);ncWa();ncChips();ncWarn()});
 /* لصق من واتساب أو جهات الاتصال: «اسم + رقم» في خانة الاسم بيتفصلوا لوحدهم */
 $('nc_name').addEventListener('paste',e=>{const t=(e.clipboardData||window.clipboardData).getData('text')||'',m=toEn(t).match(/\+?\d[\d\s\-().]{7,}\d/);if(!m)return;e.preventDefault();
   const nm=t.replace(/[0-9٠-٩+\s\-().]{8,}/,' ').replace(/[:：\-–—،,\/|]+/g,' ').replace(/\s+/g,' ').trim();$('nc_name').value=nm;$('nc_phone').value=normPhones(m[0]);ncWa();ncWarn()});
@@ -1080,7 +1087,10 @@ function custInput(){drawRecent();xSync();const name=$('cust').value.trim(),c=fi
 $('cust').addEventListener('input',custInput);
 /* إضافة عميل: جهات الاتصال (لو المتصفح بيدعمها) + تنبيه لو الاسم موجود */
 if('contacts' in navigator&&'ContactsManager' in window)$('pickC').classList.remove('hide');
-$('pickC').onclick=async()=>{try{const r=await navigator.contacts.select(['name','tel'],{multiple:false});if(r&&r[0]){$('nc_name').value=(r[0].name||[])[0]||'';$('nc_phone').value=(r[0].tel||[])[0]||'';$('nc_name').dispatchEvent(new Event('input'))}}catch(e){}};
+/* جهة اتصال: بياخد كل أرقامها (من غير تكرار نفس الرقم بصيغتين)، والأول هو الأساسي للواتساب والتذكير */
+function fillFromContact(r){const tels=[],seen=new Set();(r.tel||[]).forEach(t=>{const n=normPhone(t),k=phoneKey(n)||n;if(n&&!seen.has(k)){seen.add(k);tels.push(n)}});
+  $('nc_name').value=(r.name||[])[0]||'';$('nc_phone').value=tels.join(' / ');$('nc_name').dispatchEvent(new Event('input'));ncChips();ncWa();ncWarn()}
+$('pickC').onclick=async()=>{try{const r=await navigator.contacts.select(['name','tel'],{multiple:false});if(r&&r[0])fillFromContact(r[0])}catch(e){}};
 /* تنبيه وقت كتابة عميل جديد: نفس الاسم، أو نفس الرقم، أو رقم شكله ناقص */
 function ncWarn(){const v=$('nc_name').value,p=$('nc_phone').value.trim(),pks=phoneKeys(p),dn=v.trim()&&S.customers.find(c=>nkey(c.name)===nkey(v)),dp=pks.length&&S.customers.find(c=>phoneKeys(c.phone).some(k=>pks.includes(k))),short=phoneParts(p).some(x=>/^[\d٠-٩۰-۹\s+\-().]+$/.test(x)&&toEn(x).replace(/\D/g,'').length<9),sm=v.trim()&&!dn?similarCust(v):null;
   $('cuMsg').textContent=dn?'⚠ فيه عميل بنفس الاسم ده: '+dn.name+' ('+bal(dn)+')':dp?'⚠ الرقم ده متسجل للعميل: '+dp.name:sm?'⚠ شبه عميل موجود: '+sm.name:short?'⚠ الرقم شكله ناقص':''}
