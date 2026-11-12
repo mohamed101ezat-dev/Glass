@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='214';
+const APP_VER='215';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1830,8 +1830,13 @@ $('topDebt').onclick=e=>{const r=e.target.closest('[data-tdr]');if(r){const c=ge
   const o=e.target.closest('[data-tdo]');if(o){infoMode=false;dbMode=true;dbSel=o.dataset.tdo;dbPay=null;drawDebt();window.scrollTo(0,0)}};
 /* رسمة ورشة الزجاج: كل فاتورة النهارده لوح بيمشي على السير، والعملات في الأنبوب = المحصّل من المبيعات، واللوحة فيها +مبلغ لما تتسجل فاتورة جديدة */
 let scnLast=null;
-function scene(tInvs,tPay){const n=tInvs.length,sales=tInvs.reduce((a,r)=>a+val(r),0),paid=tInvs.reduce((a,r)=>a+r.paid,0)+tPay;
-  $('scS').textContent=f(sales);$('scC2').textContent=f(paid);$('scE').classList.toggle('hide',n>0);
+let scnLab=null;
+/* المشهد بيتبع فترة اللوحة (اليوم / أمس / أيام / 7 أيام / الشهر / 30 يوم / من-إلى) من from إلى to */
+function scene(from,to,lab){const rg=S.invoices.filter(r=>r.ts>=from&&r.ts<to),tInvs=rg.filter(r=>r.type==='inv'),tPay=rg.filter(r=>r.type==='pay').reduce((a,r)=>a+r.amount,0);
+  const n=tInvs.length,sales=tInvs.reduce((a,r)=>a+val(r),0),paid=tInvs.reduce((a,r)=>a+r.paid,0)+tPay;
+  if(scnLab!==lab){scnLab=lab;scnLast=null}
+  $('d_info').textContent=f(n);$('scS').textContent=f(sales);$('scC2').textContent=f(paid);$('scE').classList.toggle('hide',n>0);
+  $('scE').textContent='لسه مفيش فواتير '+(lab==='اليوم'?'النهارده':'في '+lab);$('scLab').textContent='فواتير '+lab+' ›';$('scPerB').textContent='🗓 '+lab+' ▾';$('scTit').textContent='مبيعات '+lab;
   /* كل فاتورة عربية رايحة للخزنة: مدفوعة = عملات فوقها، ناقصة = علامة ⏳ حمرا، من غير دفع = صندوق فاضي بعلامة */
   const recent=tInvs.slice().sort((a,b)=>b.ts-a.ts).slice(0,4),dur=8,P=recent.length;
   $('scnP').innerHTML=recent.map((r,i)=>{const v=val(r),pd0=Math.min(r.paid,v),full=v>0&&pd0>=v-0.5,none=pd0<=0,col=full?'#16a34a':none?'#c0392b':'#e67e22';
@@ -1840,8 +1845,8 @@ function scene(tInvs,tPay){const n=tInvs.length,sales=tInvs.reduce((a,r)=>a+val(
   const k=paid>0?Math.max(1,Math.round(Math.min(1,paid/Math.max(sales,1))*14)):0;
   $('scnC').innerHTML=Array.from({length:k},(_,i)=>`<ellipse cx="23" cy="${(86-i*5).toFixed(1)}" rx="14" ry="3.3" fill="#f5b82e" stroke="#c98a00" stroke-width="1"/>`).join('');
   document.querySelector('#infoCard .scn-fall').style.display=paid>0?'':'none';
-  const left=Math.max(0,tInvs.reduce((a,r)=>a+Math.max(0,val(r)-r.paid),0)),t0=new Date();t0.setHours(0,0,0,0);
-  const exp=S.expenses.filter(x=>x.ts>=t0.getTime()).reduce((a,x)=>a+(+x.amt||0),0);
+  const left=Math.max(0,tInvs.reduce((a,r)=>a+Math.max(0,val(r)-r.paid),0));
+  const exp=S.expenses.filter(x=>x.ts>=from&&x.ts<to).reduce((a,x)=>a+(+x.amt||0),0);
   $('scR').textContent=f(left);$('scRc').classList.toggle('hide',!(n&&left>0));$('scX2').textContent=f(exp);$('scXc').classList.toggle('hide',!(exp>0));
   /* مصروفات اليوم = عملات بتخرج من الخزنة ناحية المحل */
   $('scnX').innerHTML=exp>0?[0,1,2].map(i=>`<circle class="scn-out" style="animation-delay:${i*.7}s" cx="246" cy="108" r="3.2" fill="#f5b82e" stroke="#c98a00" stroke-width=".8"/>`).join(''):'';
@@ -1852,13 +1857,13 @@ function drawDash(){startUI();drawHero();drawTopDebt();
   const tPay=S.invoices.filter(r=>r.type==='pay'&&r.ts>=todayTs).reduce((a,r)=>a+r.amount,0);
   $('d_today').textContent=f(tInvs.reduce((a,r)=>a+val(r),0));
   $('d_todayPaid').textContent=f(tInvs.reduce((a,r)=>a+r.paid,0)+tPay);
-  $('d_info').textContent=f(tInvs.length);scene(tInvs,tPay);
   $('d_debt').textContent=f(debtAll());
   {const on=ordOn();if(!on&&hTy==='ord'){hTy='all';document.querySelectorAll('#hTy button').forEach(b=>b.classList.toggle('on',b.dataset.y==='all'))}
     $('hTyOrd').classList.toggle('hide',!on);const op=on?inv.filter(r=>ordSt(r)==='p').length:0,or=on?inv.filter(r=>ordSt(r)==='r').length:0,ob=$('ordBan');
     ob.classList.toggle('hide',!(op||or));if(op||or)ob.innerHTML=`<b>📦 طلبيات مفتوحة</b><span>${op?`<span class="tag ost p">⏳ ${op} تحت التجهيز</span>`:''}${or?` <span class="tag ost r">✅ ${or} جاهز للاستلام</span>`:''}</span><span class="mute">عرض ›</span>`}
   $('hRg').classList.toggle('hide',hP!=='rg');
   const q=$('hq').value.trim(),from=hP==='d'?todayTs:hP==='n'?dAgo(hN-1):hP==='x'?hDay:hP==='w'?weekTs:hP==='m'?dAgo(29):hP==='mo'?new Date(t0.getFullYear(),t0.getMonth(),1).getTime():hP==='rg'?hRF:0,to=hP==='x'?dEnd(hDay):hP==='rg'&&hRT?dEnd(hRT):Infinity;
+  {const td=hP==='all'||hP==='d',lab=td?'اليوم':hP==='n'?(hN===2?'يومين':'آخر '+hN+' أيام'):hP==='x'?(hDay===dAgo(1)?'أمس':dshort(hDay)):hP==='w'?'آخر 7 أيام':hP==='mo'?'الشهر ده':hP==='m'?'آخر 30 يوم':'الفترة';scene(td?todayTs:from,td?Infinity:to,lab)}
   const pm=hTy==='paid';/* المدفوع: أي فاتورة اتدفع فيها حاجة + أي دفعة (نفس حساب كارت "المدفوع اليوم") */
   const tyOk=r=>hTy==='all'||(hTy==='inv'&&r.type==='inv')||(hTy==='pay'&&r.type==='pay')||(pm&&(r.type==='pay'||rd2(r.paid||0)!==0))||(hTy==='ret'&&hasRet(r))||(hTy==='due'&&r.type==='inv'&&rd2(val(r)-r.paid)>0)||(hTy==='ord'&&ordSt(r)!=='d');
   const dueOf=r=>r.type==='inv'?Math.max(0,rd2(val(r)-(r.paid||0))):0;
@@ -1936,6 +1941,10 @@ function scMark(){const q=$('hq').value.trim();let any=false;document.querySelec
 $('scPer').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.n;
   if(k==='cal'){const i=$('scDate');try{i.showPicker()}catch(_){i.click()}return}
   hLim=30;if(k==='1')hP='d';else if(k==='y'){hP='x';hDay=dAgo(1)}else{hP='n';hN=+k}
+  document.querySelectorAll('#hPer button').forEach(x=>x.classList.toggle('on',x.dataset.p===hP));drawDash()};
+/* زرار فترة المشهد: اليوم ← أمس ← آخر 7 أيام ← الشهر ده، وبيغيّر فترة اللوحة كلها (نفس أزرار الفترة) */
+$('scPerB').onclick=e=>{e.stopPropagation();const seq=['اليوم','أمس','آخر 7 أيام','الشهر ده'],nx=seq[(Math.max(0,seq.indexOf(scnLab))+1)%4];hLim=30;
+  if(nx==='اليوم')hP='d';else if(nx==='أمس'){hP='x';hDay=dAgo(1)}else hP=nx==='الشهر ده'?'mo':'w';
   document.querySelectorAll('#hPer button').forEach(x=>x.classList.toggle('on',x.dataset.p===hP));drawDash()};
 $('scDate').onchange=e=>{const v=e.target.value;if(!v)return;const[y,m,d]=v.split('-').map(Number);hDay=new Date(y,m-1,d).getTime();hP='x';hLim=30;document.querySelectorAll('#hPer button').forEach(x=>x.classList.remove('on'));drawDash()};
 function drawDebt(){scMark();$('hMain').classList.toggle('hide',dbMode||infoMode);$('infoView').classList.toggle('hide',!infoMode||dbMode);$('infoCard').classList.toggle('on',infoMode&&!dbMode);$('dbView').classList.toggle('hide',!dbMode);$('dbCard').classList.toggle('on',dbMode);if(!dbMode)return;

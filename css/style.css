@@ -1172,3 +1172,8 @@ body.wk #cuDup,body.wk #cuTot>span:last-child{display:none!important}
 @media (prefers-reduced-motion:reduce){.scn-fall,.scn-out{animation:none}.scn-p{transform:translateX(calc(10px + var(--i,0)*42px))}}
 
 body.wk .scn-chip.r{display:none!important}
+
+/* v215: زرار فترة المشهد */
+.scn-top{position:absolute;top:6px;right:8px;display:flex;gap:4px;align-items:center}
+.scn-top .scn-lbl{position:static}
+.scn-per{border:0;background:#1d2a36;color:#fff;font:inherit;font-size:11px;font-weight:700;border-radius:10px;padding:1px 9px;min-height:0;height:auto;cursor:pointer;box-shadow:none}
