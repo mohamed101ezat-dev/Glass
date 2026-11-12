@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='217';
+const APP_VER='219';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1828,35 +1828,14 @@ function drawTopDebt(){const box=$('topDebt');if(!box)return;const l=S.customers
 $('topDebt').onclick=e=>{const r=e.target.closest('[data-tdr]');if(r){const c=getC(r.dataset.tdr);if(c)openRem(c);return}if(e.target.closest('a'))return;
   if(e.target.closest('[data-tdall]')){infoMode=false;dbMode=true;dbSel=null;drawDebt();window.scrollTo(0,0);return}
   const o=e.target.closest('[data-tdo]');if(o){infoMode=false;dbMode=true;dbSel=o.dataset.tdo;dbPay=null;drawDebt();window.scrollTo(0,0)}};
-/* رسمة ورشة الزجاج: كل فاتورة النهارده لوح بيمشي على السير، والعملات في الأنبوب = المحصّل من المبيعات، واللوحة فيها +مبلغ لما تتسجل فاتورة جديدة */
-let scnLast=null;
+/* كارت فواتير اليوم: ملخص عام للفترة المختارة (فواتير · محصّل · لسه · مصروفات · صافي) بشريط تحصيل وأزرار فترة. الضغط عليه بيفتح شاشة فواتير اليوم بكل اختياراتها */
 let scnLab=null,scRg='';
-/* المشهد بيتبع فترة اللوحة (اليوم / أمس / أيام / 7 أيام / الشهر / 30 يوم / من-إلى) من from إلى to */
 function scene(from,to,lab){const rg=S.invoices.filter(r=>r.ts>=from&&r.ts<to),tInvs=rg.filter(r=>r.type==='inv'),tPay=rg.filter(r=>r.type==='pay').reduce((a,r)=>a+r.amount,0);
-  const n=tInvs.length,sales=tInvs.reduce((a,r)=>a+val(r),0),paid=tInvs.reduce((a,r)=>a+r.paid,0)+tPay;
-  if(scnLab!==lab){scnLab=lab;scnLast=null}
-  $('d_info').textContent=f(n);$('scS').textContent=f(sales);$('scC2').textContent=f(paid);$('scE').classList.toggle('hide',n>0);
-  $('scE').textContent='لسه مفيش فواتير '+(lab==='اليوم'?'النهارده':'في '+lab);$('scLab').textContent='فواتير '+lab+' ›';$('scPerB').textContent='🗓 '+lab+' ▾';$('scTit').textContent='مبيعات '+lab;
-  /* كل فاتورة عربية رايحة للخزنة: مدفوعة = عملات فوقها، ناقصة = علامة ⏳ حمرا، من غير دفع = صندوق فاضي بعلامة */
-  const recent=tInvs.slice().sort((a,b)=>b.ts-a.ts).slice(0,4),dur=8,P=recent.length;
-  $('scnP').innerHTML=recent.map((r,i)=>{const v=val(r),pd0=Math.min(r.paid,v),full=v>0&&pd0>=v-0.5,none=pd0<=0,col=full?'#16a34a':none?'#c0392b':'#e67e22';
-    const cargo=none?`<rect x="6" y="84" width="14" height="10" fill="#d9c2a0" stroke="#8a6d3b" stroke-width="1"/><text x="13" y="92.5" font-size="9" text-anchor="middle" fill="#c0392b" font-weight="700">!</text>`:`<ellipse cx="13" cy="92" rx="8" ry="2.6" fill="#f5b82e" stroke="#c98a00" stroke-width=".8"/><ellipse cx="13" cy="88.6" rx="8" ry="2.6" fill="#f5b82e" stroke="#c98a00" stroke-width=".8"/>${full?'<ellipse cx="13" cy="85.2" rx="8" ry="2.6" fill="#f5b82e" stroke="#c98a00" stroke-width=".8"/>':''}`;
-    return `<g class="scn-p" style="animation-delay:-${(i*dur/P).toFixed(2)}s;--i:${i}"><rect x="0" y="94" width="30" height="11" rx="2" fill="${col}"/><rect x="30" y="97" width="9" height="8" rx="1.5" fill="${col}"/>${cargo}<circle cx="7" cy="107" r="3.2" fill="#2b2f33"/><circle cx="31" cy="107" r="3.2" fill="#2b2f33"/>${full?'':`<text x="20" y="102.5" font-size="7.5" text-anchor="middle" fill="#fff" font-weight="700">${none?'لسه':'⏳'}</text>`}</g>`}).join('');
-  const k=paid>0?Math.max(1,Math.round(Math.min(1,paid/Math.max(sales,1))*14)):0;
-  $('scnC').innerHTML=Array.from({length:k},(_,i)=>`<ellipse cx="23" cy="${(86-i*5).toFixed(1)}" rx="14" ry="3.3" fill="#f5b82e" stroke="#c98a00" stroke-width="1"/>`).join('');
-  document.querySelectorAll('#infoCard .scn-fall').forEach(c=>c.style.display=paid>0?'':'none');
-  /* كابل فوق الأنبوب: نسبة التحصيل */
-  $('scTag').classList.toggle('hide',!(sales>0));$('scPct').textContent=sales>0?Math.min(999,Math.round(paid/sales*100)):0;
-  /* ديون كل العملاء: صناديق حمرا واقفة برا (مش بس فواتير الفترة) */
-  {const ow=S.customers.filter(c=>balOf(c)>0),tot=debtAll(),k=Math.min(6,ow.length),slots=[[6,93],[22,93],[38,93],[14,82],[30,82],[22,71]];
-   $('scnD').innerHTML=slots.slice(0,k).map(([x,y])=>`<rect x="${x}" y="${y}" width="14" height="11" fill="#c0392b" stroke="#7f1d14" stroke-width="1"/><text x="${x+7}" y="${y+8.6}" font-size="8" text-anchor="middle" fill="#fff" font-weight="700">!</text>`).join('');
-   $('scDc').classList.toggle('hide',!(ow.length&&tot>0));$('scDb').textContent=f(tot)}
-  const left=Math.max(0,tInvs.reduce((a,r)=>a+Math.max(0,val(r)-r.paid),0));
-  const exp=S.expenses.filter(x=>x.ts>=from&&x.ts<to).reduce((a,x)=>a+(+x.amt||0),0);
-  $('scR').textContent=f(left);$('scRc').classList.toggle('hide',!(n&&left>0));$('scX2').textContent=f(exp);$('scXc').classList.toggle('hide',!(exp>0));
-  /* مصروفات اليوم = عملات بتخرج من الخزنة ناحية المحل */
-  $('scnX').innerHTML=exp>0?[0,1,2].map(i=>`<circle class="scn-out" style="animation-delay:${i*.7}s" cx="246" cy="108" r="3.2" fill="#f5b82e" stroke="#c98a00" stroke-width=".8"/>`).join(''):'';
-  const pl=$('scPlus');if(scnLast!==null&&n>scnLast){const last=tInvs.slice().sort((a,b)=>a.ts-b.ts).pop();pl.textContent='+'+f(val(last));pl.classList.remove('go');void pl.offsetWidth;pl.classList.add('go')}scnLast=n}
+  const n=tInvs.length,sales=tInvs.reduce((a,r)=>a+val(r),0),paid=tInvs.reduce((a,r)=>a+r.paid,0)+tPay,left=Math.max(0,tInvs.reduce((a,r)=>a+Math.max(0,val(r)-r.paid),0)),exp=S.expenses.filter(x=>x.ts>=from&&x.ts<to).reduce((a,x)=>a+(+x.amt||0),0),pct=sales>0?Math.min(100,Math.round(paid/sales*100)):0;
+  scnLab=lab;$('scLab').textContent='فواتير '+lab;$('d_info').textContent=f(n);$('scS').textContent=f(sales);$('scC2').textContent=f(paid);$('scPct').textContent=pct;$('scBar').style.width=pct+'%';
+  $('scR').textContent=f(left);$('scRc').classList.toggle('hide',!(n&&left>0));$('scX2').textContent=f(exp);$('scXc').classList.toggle('hide',!(exp>0));$('scNt').textContent=f(paid-exp);$('scNc').classList.toggle('hide',!(exp>0));
+  $('scE').textContent='لسه مفيش فواتير '+(lab==='اليوم'?'النهارده':'في '+lab);const none=!n&&!paid&&!exp;$('scE').classList.toggle('hide',!none);$('scBody').classList.toggle('hide',none);
+  document.querySelectorAll('#scPerS button').forEach(b=>b.classList.toggle('on',b.dataset.k===lab))}
 function drawDash(){startUI();drawHero();drawTopDebt();
   const t0=new Date();t0.setHours(0,0,0,0);const todayTs=t0.getTime(),weekTs=dAgo(6);
   const inv=S.invoices.filter(r=>r.type==='inv'),tInvs=inv.filter(r=>r.ts>=todayTs);
@@ -1948,8 +1927,8 @@ $('scPer').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b
   if(k==='cal'){const i=$('scDate');try{i.showPicker()}catch(_){i.click()}return}
   hLim=30;if(k==='1')hP='d';else if(k==='y'){hP='x';hDay=dAgo(1)}else{hP='n';hN=+k}
   document.querySelectorAll('#hPer button').forEach(x=>x.classList.toggle('on',x.dataset.p===hP));drawDash()};
-/* زرار فترة المشهد: اليوم ← أمس ← آخر 7 أيام ← الشهر ده، وبيغيّر فترة اللوحة كلها (نفس أزرار الفترة) */
-$('scPerB').onclick=e=>{e.stopPropagation();const seq=['اليوم','أمس','آخر 7 أيام','الشهر ده','الشهر اللي فات','السنة دي'],nx=seq[(Math.max(0,seq.indexOf(scnLab))+1)%seq.length];hLim=30;scRg='';
+/* أزرار فترة كارت فواتير اليوم: بتغيّر فترة اللوحة كلها (نفس أزرار الفترة) */
+$('scPerS').onclick=e=>{e.stopPropagation();const bt=e.target.closest('button');if(!bt)return;const nx=bt.dataset.k;hLim=30;scRg='';
   if(nx==='اليوم')hP='d';else if(nx==='أمس'){hP='x';hDay=dAgo(1)}else if(nx==='الشهر ده')hP='mo';else if(nx==='آخر 7 أيام')hP='w';
   else{const n=new Date(),Y=n.getFullYear(),M=n.getMonth(),ymd=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
     hP='rg';scRg=nx;hRF=nx==='السنة دي'?new Date(Y,0,1).getTime():new Date(Y,M-1,1).getTime();hRT=nx==='السنة دي'?new Date(Y,11,31).getTime():new Date(Y,M,0).getTime();$('hRF').value=ymd(hRF);$('hRT').value=ymd(hRT)}

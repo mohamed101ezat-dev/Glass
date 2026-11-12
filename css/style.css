@@ -1126,71 +1126,23 @@ body.wk #cuDup,body.wk #cuTot>span:last-child{display:none!important}
 /* v208: وانت بتضيف عميل، قايمة العملاء والإجماليات تحتها بتتخبى */
 #cuMain:has(#cuAdd:not(.hide)) #cuTot,#cuMain:has(#cuAdd:not(.hide)) #cuDup,#cuMain:has(#cuAdd:not(.hide)) #cuList{display:none!important}
 
-/* v209: كارت فواتير اليوم = رسمة ورشة زجاج متحركة (بيفتح نفس شاشة فواتير اليوم) */
+/* v218: كارت فواتير اليوم = ملخص عام للفترة (من غير أنيميشن) */
 #t-dash .stat-grid{grid-template-columns:repeat(3,1fr)}
-#t-dash #infoCard.scn{grid-column:1/-1!important;order:-1;width:auto;padding:0!important;text-align:start!important;cursor:pointer;--s1:#cfe9f8;--s2:#eaf6fc;--bd:#8d99a6;--rf:#5d6975;--sw1:#cfd8e0;--sw2:#4b5661;--cv:#4b5661;--cv2:#9aa6b2;--gr:#a9b1b8}
-:root[data-theme="dark"] #infoCard.scn{--s1:#16212d;--s2:#26384a;--bd:#4a5663;--rf:#33404c;--sw1:#2c3743;--sw2:#9fb1c2;--cv:#2a333d;--cv2:#6b7a89;--gr:#222a32}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #infoCard.scn{--s1:#16212d;--s2:#26384a;--bd:#4a5663;--rf:#33404c;--sw1:#2c3743;--sw2:#9fb1c2;--cv:#2a333d;--cv2:#6b7a89;--gr:#222a32}}
-.scn-svg{display:block;width:100%;height:112px;border-radius:12px 12px 0 0}
-.scn-lbl{position:absolute;top:6px;right:8px;font-size:11px;font-weight:700;color:#1f2a35;background:#ffffffcc;padding:1px 8px;border-radius:10px}
-:root[data-theme="dark"] .scn-lbl{color:#e8eef4;background:#0008}
-.scn-board{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:#1d2a36;border:2px solid #f2c24b;border-radius:8px;padding:3px 14px;text-align:center;box-shadow:0 2px 6px #0003;min-width:118px}
-.scn-board small{display:block;font-size:10px;color:#c9d6e2;line-height:1.3}
-.scn-board b{font-size:17px;color:#4ade80;line-height:1.2}
-.scn-plus{position:absolute;top:-12px;right:-10px;background:#16a34a;color:#fff;font-size:11px;font-weight:700;border-radius:10px;padding:0 7px;opacity:0;pointer-events:none}
-.scn-plus.go{animation:scnPlus 1.8s ease-out}
-.scn-chips{display:flex;justify-content:space-between;gap:6px;padding:4px 6px 5px;pointer-events:none}
-.scn-chip{background:#1d2a36;color:#fff;font-size:11px;border-radius:10px;padding:1px 9px}
-.scn-chip.g{background:#14532d}
-.scn-chip b{font-size:12px}
-.scn-empty{position:absolute;top:50px;left:0;right:0;text-align:center;font-size:12px;color:#1f2a35;font-weight:700}
-:root[data-theme="dark"] .scn-empty{color:#e8eef4}
-.scn-p{animation:scnMove 9s linear infinite}
-.scn-saw{transform-box:fill-box;transform-origin:center;animation:scnSpin 2.4s linear infinite}
-.scn-belt{animation:scnBelt .6s linear infinite}
-.scn-smoke circle{fill:#fff;opacity:0;animation:scnSmoke 3.6s ease-out infinite}
-.scn-smoke circle:nth-child(2){animation-delay:1.2s}.scn-smoke circle:nth-child(3){animation-delay:2.4s}
-.scn-cloud{animation:scnCloud 40s linear infinite alternate}
-@keyframes scnMove{from{transform:translateX(300px)}to{transform:translateX(30px)}}
-@keyframes scnSpin{to{transform:rotate(-360deg)}}
-@keyframes scnBelt{to{stroke-dashoffset:14}}
-@keyframes scnSmoke{0%{transform:translate(0,0) scale(.6);opacity:.7}100%{transform:translate(8px,-22px) scale(1.6);opacity:0}}
-@keyframes scnCloud{to{transform:translateX(40px)}}
-@keyframes scnPlus{0%{opacity:0;transform:translateY(6px)}15%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
-@media (prefers-reduced-motion:reduce){.scn-p,.scn-saw,.scn-belt,.scn-smoke circle,.scn-cloud{animation:none}.scn-p{transform:translateX(calc(70px + var(--i,0)*38px))}}
-
-/* v213: مشهد الخزنة: عربيات الفواتير + أنبوب الفلوس + مصروفات */
-@keyframes scnMove2{from{transform:translateX(-45px)}to{transform:translateX(150px)}}
-@keyframes scnFall{0%{transform:translateY(0);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translateY(62px);opacity:0}}
-@keyframes scnOut{0%{transform:translateX(0);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translateX(34px);opacity:0}}
-.scn-p{animation:scnMove2 8s linear infinite}
-.scn-fall{animation:scnFall 1.6s ease-in infinite}
-.scn-out{animation:scnOut 2.1s linear infinite}
-.scn-chips{flex-wrap:wrap;justify-content:flex-start}
-.scn-chip.r{background:#9a2a1f}.scn-chip.o{background:#8a5a12}
-.scn-board{left:10px;transform:none;top:12px;min-width:104px}
-@media (prefers-reduced-motion:reduce){.scn-fall,.scn-out{animation:none}.scn-p{transform:translateX(calc(10px + var(--i,0)*42px))}}
-
-body.wk .scn-chip.r{display:none!important}
-
-/* v215: زرار فترة المشهد */
-.scn-top{position:absolute;top:6px;right:8px;display:flex;gap:4px;align-items:center}
-.scn-top .scn-lbl{position:static}
-.scn-per{border:0;background:#1d2a36;color:#fff;font:inherit;font-size:11px;font-weight:700;border-radius:10px;padding:1px 9px;min-height:0;height:auto;cursor:pointer;box-shadow:none}
-
-/* v217: المشهد أقرب للفيديو: كابل بنسبة التحصيل + فقاعات أرقام + ديون كل العملاء */
-@keyframes scnMove2{0%{transform:translateX(52px);opacity:0}8%{opacity:1}92%{opacity:1}100%{transform:translateX(150px);opacity:0}}
-.scn-top{top:6px;right:6px}
-.scn-tag{position:absolute;top:3px;left:calc(219/360*100%);transform:translateX(-50%);background:#1d2a36;color:#fff;border:2px solid #f2c24b;border-radius:8px;padding:0 8px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 5px #0003;z-index:1}
-.scn-tag b{font-size:12px;color:#4ade80}
-.scn-bub{position:absolute;background:#fff;color:#7f1d14;border:2px solid #c0392b;border-radius:10px;padding:0 8px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 5px #0002}
-.scn-bub::after{content:"";position:absolute;left:-7px;top:50%;margin-top:-4px;border:4px solid transparent;border-right-color:#c0392b}
-.scn-bub b{font-size:12px}
-.scn-bub.r{top:44px;left:calc(250/360*100%)}
-.scn-bub.o{top:26px;left:calc(268/360*100%);color:#6b4308;border-color:#b7791f}
-.scn-bub.o::after{border-right-color:#b7791f}
-.scn-debt{position:absolute;top:58px;left:5px;background:#7f1d14;color:#fff;border-radius:9px;padding:0 7px;font-size:10px;font-weight:700;white-space:nowrap}
-.scn-debt b{font-size:11px}
-.scn-chips .scn-lbl{margin-inline-start:auto;background:transparent;color:inherit;font-size:11px;font-weight:700;padding:1px 4px;position:static}
-.scn-board{top:8px}
-body.wk .scn-bub.r,body.wk .scn-debt{display:none!important}
+#t-dash #infoCard.scn2{grid-column:1/-1!important;order:-1;padding:8px 10px!important;text-align:start!important;cursor:pointer}
+.sc-h{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.sc-h>b{font-size:14px;color:var(--ink)}
+.sc-n{font-size:12px;color:var(--mute)}.sc-n b{color:var(--ink);font-size:13px}
+.sc-go{margin-inline-start:auto;font-size:11px;color:var(--acc);font-weight:700}
+.sc-per{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px}
+.sc-per::-webkit-scrollbar{display:none}
+.sc-per button{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:12px;height:28px;min-height:0;padding:0 11px;border-radius:14px;cursor:pointer;box-shadow:none}
+.sc-per button.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:700}
+.sc-bar{height:8px;border-radius:5px;background:var(--line);overflow:hidden;margin-bottom:5px}
+.sc-bar i{display:block;height:100%;width:0;background:#16a34a;border-radius:5px;transition:width .4s}
+.sc-m{font-size:13px;color:var(--ink);margin-bottom:6px}.sc-m b{font-size:14px}.sc-m span{color:var(--mute);font-size:12px}
+.sc-chips{display:flex;flex-wrap:wrap;gap:4px}
+.sc-chips span{font-size:11.5px;border-radius:9px;padding:2px 7px;white-space:nowrap;background:var(--line);color:var(--ink)}
+.sc-chips .r{background:#fde8e6;color:#9a2a1f}.sc-chips .o{background:#fdf0d8;color:#8a5a12}.sc-chips .n{background:#e3f4e8;color:#14632f}
+.sc-chips b{font-size:12.5px}
+.sc-e{padding:6px 0 2px;color:var(--mute);font-size:13px;text-align:center}
+body.wk #scRc,body.wk #scXc,body.wk #scNc{display:none!important}
