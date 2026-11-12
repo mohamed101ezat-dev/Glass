@@ -45,7 +45,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <link rel="apple-touch-startup-image" href="splash/14_15pro.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/12_13_14promax.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/14_15promax.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
-<link rel="stylesheet" href="css/style.css?v=190">
+<link rel="stylesheet" href="css/style.css?v=192">
 
 
 
@@ -228,8 +228,9 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <section id="t-cu" class="hide">
   <div id="cuMain">
-    <div class="rowc"><input id="cq" placeholder="🔍 ابحث باسم العميل"><button class="main" data-m="add">➕ عميل</button></div>
+    <div class="rowc"><input id="cq" placeholder="🔍 ابحث باسم العميل أو رقمه"><button class="main" data-m="add">➕ عميل</button></div>
     <div class="seg s" id="cuMode"><button data-m="all" class="on">📋 الكل</button><button data-m="debt">🔴 عليهم فلوس</button><button data-m="credit">🟢 ليهم فلوس</button></div>
+    <div class="ro" style="gap:6px;margin:6px 0 0;justify-content:flex-start"><span class="mute">↕ الترتيب:</span><select id="cuSort" aria-label="ترتيب العملاء" style="max-width:190px"><option value="name">بالاسم</option><option value="bal">بالحساب (الأكبر أولًا)</option><option value="last">آخر تعامل</option></select></div>
     <div id="cuAdd" class="card hide">
       <button type="button" class="alt hide" id="pickC" style="width:100%;margin-bottom:6px">📇 اختار من جهات الاتصال</button>
       <input id="nc_name" placeholder="اسم العميل (مطلوب)">
@@ -487,10 +488,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=190"></script>
+<script src="js/app.js?v=192"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=190"></script>
-<script src="js/features.js?v=190"></script>
+<script src="js/cutlist.js?v=192"></script>
+<script src="js/features.js?v=192"></script>
 </body>
 </html>
 
