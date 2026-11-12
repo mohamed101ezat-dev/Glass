@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='192';
+const APP_VER='193';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -546,7 +546,7 @@ const fname=r=>'فاتورة-'+sfn(r.cname)+(r.code?'-'+r.code:(r.no?'-'+r.no:''
 const showRec=async(r,auto,msg)=>{await busyOn('جاري فتح الفاتورة…');try{await showImg(sheet(invSheet(r)),fname(r),msg||'',auto,r.phone,r)}finally{busyOff()}};
 
 /* ---------- العملاء ---------- */
-let cuEd=false,cuPm=false,cuMode='all',cuSort='name',selC=null,per='all',pF='',pT='',editOpen=false,pMo=0,cdq='';
+let cuEd=false,cuPm=false,cuMode='all',cuSort='name',cuIdle=60,selC=null,per='all',pF='',pT='',editOpen=false,pMo=0,cdq='';
 const PL={all:'الكل',mo:'شهر',c:'فترة'};
 const moStart=t=>{const d=new Date(t||Date.now());return new Date(d.getFullYear(),d.getMonth(),1).getTime()};
 const moLab=()=>{const d=new Date(pMo||moStart());return MN[d.getMonth()]+' '+d.getFullYear()};
@@ -583,9 +583,11 @@ $('cuDup').addEventListener('click',e=>{const b=e.target.closest('[data-mg]');if
 function drawCusts(){
   if(selC&&getC(selC)){$('cuMain').classList.add('hide');$('cuDet').classList.remove('hide');drawDet();return}
   selC=null;$('cuDet').classList.add('hide');$('cuMain').classList.remove('hide');
-  const q=$('cq').value.trim();let l=S.customers.filter(c=>(qm(c.name,q)||phoneHit(c,q))&&(cuMode==='debt'?balOf(c)>0:cuMode==='credit'?balOf(c)<0:true));
-  {const byName=(a,b)=>a.name.localeCompare(b.name,'ar'),lastTs=c=>Math.max(0,...ledger(c).map(r=>r.ts));
-   l.sort(cuSort==='bal'?(a,b)=>(cuMode==='credit'?balOf(a)-balOf(b):balOf(b)-balOf(a))||byName(a,b):cuSort==='last'?(a,b)=>lastTs(b)-lastTs(a)||byName(a,b):byName);$('cuTot').innerHTML='<span>👥 <b>'+plN(l.length,'عميل')+'</b></span><span>📒 مديونيات <b class="num" style="color:var(--danger)">'+f(l.reduce((s,c)=>s+Math.max(0,balOf(c)),0))+'</b></span>'}
+  const lastTs=c=>Math.max(0,...ledger(c).map(r=>r.ts)),idleCut=Date.now()-cuIdle*864e5;
+  $('cuIdleBox').classList.toggle('hide',cuMode!=='idle');
+  const q=$('cq').value.trim();let l=S.customers.filter(c=>(qm(c.name,q)||phoneHit(c,q))&&(cuMode==='debt'?balOf(c)>0:cuMode==='credit'?balOf(c)<0:cuMode==='idle'?(t=>t>0&&t<idleCut)(lastTs(c)):true));
+  {const byName=(a,b)=>a.name.localeCompare(b.name,'ar');
+   l.sort(cuSort==='bal'?(a,b)=>(cuMode==='credit'?balOf(a)-balOf(b):balOf(b)-balOf(a))||byName(a,b):cuSort==='last'?(a,b)=>(cuMode==='idle'?lastTs(a)-lastTs(b):lastTs(b)-lastTs(a))||byName(a,b):byName);$('cuTot').innerHTML='<span>👥 <b>'+plN(l.length,'عميل')+'</b></span><span>📒 مديونيات <b class="num" style="color:var(--danger)">'+f(l.reduce((s,c)=>s+Math.max(0,balOf(c)),0))+'</b></span>'}
   {const dg=dupGroups();$('cuDup').classList.toggle('hide',!dg.length);if(dg.length)$('cuDup').innerHTML='<div class="card" style="border-color:var(--danger)"><b>⚠️ في عملاء بنفس الاسم</b><div class="mute" style="margin:2px 0 6px">يمكن يكونوا اتكتبوا غلط مرتين من جهازين. اضغط «خليه الأساسي» على اللي عايز تحتفظ بيه، والباقي هيندمج فيه.</div>'+dg.map(g=>'<div style="margin:8px 0 4px;padding-top:8px;border-top:1px solid var(--line)"><b>'+esc(g[0].name)+'</b></div>'+g.map(c=>'<div class="ro" style="color:var(--ink)"><span>'+esc(cSub(c))+' · <b class="num">'+bal(c)+'</b></span><button type="button" class="alt" data-mg="'+esc(c.id)+'">خليه الأساسي</button></div>').join('')).join('')+'</div>'}
   $('cuList').innerHTML=l.map(c=>`<div class="rec cr2" data-open="${c.id}"${agStyle(c)}>${av(c.name)}<div style="flex:1;min-width:0"><div class="cn">${esc(c.name)}</div><div class="mute">${esc(cSub(c))}</div></div><span class="cb ${bcls(c)} num">${bal(c)}</span></div>`).join('')||`<p class="mute">${S.customers.length?'مفيش عملاء بالبحث أو الفلتر ده. اضغط «📋 الكل» أو امسح البحث.':'لسه مفيش عملاء. اضغط «➕ عميل» أو احفظ فاتورة باسم جديد.'}</p>`}
 
@@ -627,7 +629,7 @@ function stmtImg(){const c=getC(selC),l=rowsOf(c),ss=sumOf(c);const lab=per==='c
     sum:[['الحساب أول الفترة',bsg(ss.open)],['فواتير الفترة ('+ss.n+')',f(ss.inv)],['المدفوع في الفترة',f(ss.pay)],['الحساب آخر الفترة',bsg(ss.end),1]]});
   showImg(cv,'كشف-'+sfn(c.name)+'.png','كشف حساب '+c.name,true,c.phone,null)}
 $('t-cu').addEventListener('click',e=>{const t=e.target,d=t.dataset;
-  if(d.m){if(d.m==='add'){$('cuAdd').classList.toggle('hide');return}cuMode=d.m;cuSort=d.m==='all'?'name':'bal';$('cuSort').value=cuSort;document.querySelectorAll('#cuMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===d.m));drawCusts();return}
+  if(d.m){if(d.m==='add'){$('cuAdd').classList.toggle('hide');return}cuMode=d.m;cuSort=d.m==='all'?'name':d.m==='idle'?'last':'bal';$('cuSort').value=cuSort;document.querySelectorAll('#cuMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===d.m));drawCusts();return}
   const op=t.closest('[data-open]');if(op){selC=op.dataset.open;delete PW.cu;per='all';cdq='';pMo=0;editOpen=false;cuEd=false;cuPm=false;drawCusts();window.scrollTo(0,0);return}
   if(d.tg){if(d.tg==='ed'){cuEd=!cuEd;$('cdEdit').classList.toggle('hide',!cuEd)}else{cuPm=!cuPm;delete PW.cu;drawDet();const i=document.querySelector('#cuDet [data-pw="cu"] .spa');if(i)i.focus()}return}
   if(d.eo){editOpen=true;cuEd=true;drawDet();return}
@@ -642,7 +644,7 @@ $('t-cu').addEventListener('click',e=>{const t=e.target,d=t.dataset;
     if(!ok2(t))return;del('customers',c.id);selC=null;drawCusts();return}
   if(d.pay){const c=getC(selC),r=c&&pwRecord('cu',c);if(!r){$('cdMsg').textContent='اكتب مبلغ الدفعة';return}
     S.invoices.push(r);put('invoices',r);lastSaved={id:r.id,at:Date.now(),dueBak:payDone(c,r)};delete PW.cu;cuPm=false;drawDet();showRec(r,false,'تم تسجيل الدفعة ✓')}});
-$('t-cu').addEventListener('change',e=>{if(e.target.id==='cuSort'){cuSort=e.target.value;drawCusts()}else if(e.target.id==='cdMo'){const v=e.target.value;if(v){const[y,m]=v.split('-').map(Number);pMo=new Date(y,m-1,1).getTime();drawDet()}}else if(e.target.id==='pf'){pF=e.target.value;drawDet()}else if(e.target.id==='pt'){pT=e.target.value;drawDet()}});
+$('t-cu').addEventListener('change',e=>{if(e.target.id==='cuSort'){cuSort=e.target.value;drawCusts()}else if(e.target.id==='cuIdle'){cuIdle=+e.target.value||60;drawCusts()}else if(e.target.id==='cdMo'){const v=e.target.value;if(v){const[y,m]=v.split('-').map(Number);pMo=new Date(y,m-1,1).getTime();drawDet()}}else if(e.target.id==='pf'){pF=e.target.value;drawDet()}else if(e.target.id==='pt'){pT=e.target.value;drawDet()}});
 $('cuDet').addEventListener('input',e=>{if(e.target.id!=='cdq')return;cdq=e.target.value;const c=getC(selC);if(c)$('cdTbl').innerHTML=tblHtml(c)});
 $('cuDet').addEventListener('input',e=>{const t=e.target,c=getC(selC);if(!c||!t.dataset.f)return;const k=t.dataset.f,v=k==='open'?nv(t.value):t.value.trim(),mm=$('cdMsg');
   if(k==='name'){if(!v||S.customers.some(x=>x.id!==c.id&&nkey(x.name)===nkey(v))){if(mm)mm.textContent=!v?'الاسم لا يمكن أن يكون فاضي':'الاسم ده موجود قبل كده';return}if(mm)mm.textContent=''}
