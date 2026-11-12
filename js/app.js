@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='216';
+const APP_VER='217';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1844,7 +1844,13 @@ function scene(from,to,lab){const rg=S.invoices.filter(r=>r.ts>=from&&r.ts<to),t
     return `<g class="scn-p" style="animation-delay:-${(i*dur/P).toFixed(2)}s;--i:${i}"><rect x="0" y="94" width="30" height="11" rx="2" fill="${col}"/><rect x="30" y="97" width="9" height="8" rx="1.5" fill="${col}"/>${cargo}<circle cx="7" cy="107" r="3.2" fill="#2b2f33"/><circle cx="31" cy="107" r="3.2" fill="#2b2f33"/>${full?'':`<text x="20" y="102.5" font-size="7.5" text-anchor="middle" fill="#fff" font-weight="700">${none?'لسه':'⏳'}</text>`}</g>`}).join('');
   const k=paid>0?Math.max(1,Math.round(Math.min(1,paid/Math.max(sales,1))*14)):0;
   $('scnC').innerHTML=Array.from({length:k},(_,i)=>`<ellipse cx="23" cy="${(86-i*5).toFixed(1)}" rx="14" ry="3.3" fill="#f5b82e" stroke="#c98a00" stroke-width="1"/>`).join('');
-  document.querySelector('#infoCard .scn-fall').style.display=paid>0?'':'none';
+  document.querySelectorAll('#infoCard .scn-fall').forEach(c=>c.style.display=paid>0?'':'none');
+  /* كابل فوق الأنبوب: نسبة التحصيل */
+  $('scTag').classList.toggle('hide',!(sales>0));$('scPct').textContent=sales>0?Math.min(999,Math.round(paid/sales*100)):0;
+  /* ديون كل العملاء: صناديق حمرا واقفة برا (مش بس فواتير الفترة) */
+  {const ow=S.customers.filter(c=>balOf(c)>0),tot=debtAll(),k=Math.min(6,ow.length),slots=[[6,93],[22,93],[38,93],[14,82],[30,82],[22,71]];
+   $('scnD').innerHTML=slots.slice(0,k).map(([x,y])=>`<rect x="${x}" y="${y}" width="14" height="11" fill="#c0392b" stroke="#7f1d14" stroke-width="1"/><text x="${x+7}" y="${y+8.6}" font-size="8" text-anchor="middle" fill="#fff" font-weight="700">!</text>`).join('');
+   $('scDc').classList.toggle('hide',!(ow.length&&tot>0));$('scDb').textContent=f(tot)}
   const left=Math.max(0,tInvs.reduce((a,r)=>a+Math.max(0,val(r)-r.paid),0));
   const exp=S.expenses.filter(x=>x.ts>=from&&x.ts<to).reduce((a,x)=>a+(+x.amt||0),0);
   $('scR').textContent=f(left);$('scRc').classList.toggle('hide',!(n&&left>0));$('scX2').textContent=f(exp);$('scXc').classList.toggle('hide',!(exp>0));

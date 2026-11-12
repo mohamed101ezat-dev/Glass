@@ -45,7 +45,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <link rel="apple-touch-startup-image" href="splash/14_15pro.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/12_13_14promax.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/14_15promax.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
-<link rel="stylesheet" href="css/style.css?v=216">
+<link rel="stylesheet" href="css/style.css?v=217">
 
 
 
@@ -154,15 +154,20 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
           <rect x="6" y="14" width="34" height="76" rx="6" fill="url(#scnTube)" stroke="var(--sw2)" stroke-width="2"/>
           <rect x="-2" y="90" width="50" height="9" rx="3" fill="var(--rf)"/>
           <g id="scnC"></g>
-          <circle class="scn-fall" cx="23" cy="-4" r="4.5" fill="#f5b82e" stroke="#c98a00" stroke-width="1"/>
+          <circle class="scn-fall" cx="23" cy="-4" r="4.5" fill="#f5b82e" stroke="#c98a00" stroke-width="1"/><circle class="scn-fall" style="animation-delay:.55s" cx="19" cy="-4" r="4" fill="#f5b82e" stroke="#c98a00" stroke-width="1"/><circle class="scn-fall" style="animation-delay:1.1s" cx="27" cy="-4" r="4" fill="#f5b82e" stroke="#c98a00" stroke-width="1"/>
         </g>
         <g id="scnX"></g>
+        <g id="scnD"></g>
         <g id="scnP"></g>
         <g transform="translate(284,66)" id="scnShop"><rect x="0" y="6" width="56" height="32" fill="var(--bd)"/><path d="M-3 6h62l-5-8H2z" fill="#c0392b"/><path d="M-3 6h62" stroke="#fff" stroke-width="1.2" stroke-dasharray="6 6"/><rect x="21" y="18" width="14" height="20" fill="var(--rf)"/></g>
       </svg>
-      <div class="scn-top"><button type="button" class="scn-per" id="scPerB" aria-label="تغيير الفترة">🗓 اليوم ▾</button><div class="scn-lbl" id="scLab">فواتير اليوم ›</div></div>
+      <div class="scn-top"><button type="button" class="scn-per" id="scPerB" aria-label="تغيير الفترة">🗓 اليوم ▾</button></div>
+      <div class="scn-tag hide" id="scTag">اتحصّل <b class="num" id="scPct">0</b>%</div>
+      <div class="scn-bub r hide" id="scRc">⏳ لسه <b class="num" id="scR">0</b></div>
+      <div class="scn-bub o hide" id="scXc">💸 <b class="num" id="scX2">0</b></div>
+      <div class="scn-debt hide" id="scDc">📒 على العملاء <b class="num" id="scDb">0</b></div>
       <div class="scn-board"><small id="scTit">مبيعات اليوم</small><b class="num" id="scS">0</b><span class="scn-plus" id="scPlus"></span></div>
-      <div class="scn-chips"><span class="scn-chip">🧾 <b class="num" id="d_info">0</b> فاتورة</span><span class="scn-chip g">💰 <b class="num" id="scC2">0</b> محصّل</span><span class="scn-chip r hide" id="scRc">⏳ <b class="num" id="scR">0</b> لسه</span><span class="scn-chip o hide" id="scXc">💸 <b class="num" id="scX2">0</b> مصروفات</span></div>
+      <div class="scn-chips"><span class="scn-chip">🧾 <b class="num" id="d_info">0</b> فاتورة</span><span class="scn-chip g">💰 <b class="num" id="scC2">0</b> محصّل</span><span class="scn-lbl" id="scLab">فواتير اليوم ›</span></div>
       <div class="scn-empty hide" id="scE">لسه مفيش فواتير النهارده</div>
     </div>
     <div class="stat-card good" data-sc="paid" role="button" tabindex="0"><div class="stat-label" id="l_paid">المدفوع اليوم ›</div><div class="stat-value num" id="d_todayPaid">0</div></div>
@@ -537,10 +542,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=216"></script>
+<script src="js/app.js?v=217"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=216"></script>
-<script src="js/features.js?v=216"></script>
+<script src="js/cutlist.js?v=217"></script>
+<script src="js/features.js?v=217"></script>
 </body>
 </html>
 
