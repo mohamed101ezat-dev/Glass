@@ -1146,3 +1146,15 @@ body.wk #cuDup,body.wk #cuTot>span:last-child{display:none!important}
 .sc-chips b{font-size:12.5px}
 .sc-e{padding:6px 0 2px;color:var(--mute);font-size:13px;text-align:center}
 body.wk #scRc,body.wk #scXc,body.wk #scNc{display:none!important}
+
+/* v220: صف فترات واحد (جوه كارت الملخص) + كروت المبيعات والمدفوع اتشالت (أرقامهم في الكارت) والمديونيات سطر صغير */
+#scPer,#hPer{display:none!important}
+#t-dash [data-sc="paid"],#t-dash [data-sc="today"]{display:none!important}
+#t-dash .stat-grid{grid-template-columns:1fr}
+#t-dash #dbCard{display:flex;justify-content:space-between;align-items:center;padding:6px 12px!important;text-align:start!important}
+#t-dash #dbCard .stat-label{margin:0}
+.sc-per{gap:3px}
+.sc-per button{padding:0 6px;font-size:11.5px;height:26px;flex:1 0 auto}
+#t-dash #dbCard{padding:3px 12px!important;min-height:0}
+#t-dash #dbCard .stat-value{font-size:15px}
+.sc-per button{padding:0 4px}
