@@ -45,7 +45,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <link rel="apple-touch-startup-image" href="splash/14_15pro.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/12_13_14promax.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/14_15promax.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
-<link rel="stylesheet" href="css/style.css?v=200">
+<link rel="stylesheet" href="css/style.css?v=203">
 
 
 
@@ -54,7 +54,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <div class="app-header">
   <div class="hdr-logo"><img id="hdrLogo" alt="" class="hide"></div>
   <span class="hdr-ver" id="hdrVer"></span>
-  <div class="hdr-end"><button type="button" id="nfBell" class="hdr-btn" aria-label="التنبيهات">🔔<span id="nfCnt" class="nf-cnt hide"></span></button><button type="button" id="calcFab" class="hdr-btn" aria-label="حاسبة">🧮</button><button type="button" id="cloudSt" class="hdr-cloud" aria-label="حالة الحفظ على السحابة"><span class="cs-i">☁️</span><span class="cs-d"></span></button><script>(function(){try{var b=document.getElementById('cloudSt'),on=localStorage.getItem('fbOn')==='1'||localStorage.getItem('fbCfg'),l=localStorage.getItem('cloudLast');var s=!on?'off':(l==='ok'&&navigator.onLine!==false)?'ok':'busy';b.className='hdr-cloud '+s;b.dataset.s=s}catch(e){}})()</script><button id="hdrSet" class="hdr-set" data-t="st" aria-label="إعدادات">⚙️</button></div>
+  <div class="hdr-end"><button type="button" id="nfBell" class="hdr-btn" aria-label="التنبيهات">🔔<span id="nfCnt" class="nf-cnt hide"></span></button><button type="button" id="calcFab" class="hdr-btn" aria-label="حاسبة">🧮</button><button type="button" id="cloudSt" class="hdr-cloud" aria-label="حالة الحفظ على السحابة"><span class="cs-i">☁️</span><span class="cs-d"></span></button><script>(function(){try{var b=document.getElementById('cloudSt'),on=localStorage.getItem('fbOn')==='1'||localStorage.getItem('fbCfg'),l=localStorage.getItem('cloudLast');var s=!on?'off':(l==='ok'&&navigator.onLine!==false)?'ok':'busy';b.className='hdr-cloud '+s;b.dataset.s=s}catch(e){}})()</script><button id="wkOut" class="hdr-set" aria-label="خروج من وضع العامل" style="font-size:13px;width:auto;padding:0 10px">🔓 مالك</button><button id="hdrSet" class="hdr-set" data-t="st" aria-label="إعدادات">⚙️</button></div>
 </div>
 <div id="busy" class="busy hide" role="status"></div>
 <div id="welc" class="auth hide"><div class="auth-in">
@@ -162,7 +162,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   </div>
   <div id="infoView" class="hide"><div class="card">
     <div class="ro" style="color:var(--ink);margin-bottom:4px"><button class="lnk" id="infoBack">→ رجوع للسجل</button><b>📊 معلومات</b></div>
-    <div class="seg s" id="iSub" style="margin:4px 0 4px"><button data-k="p" class="on">💵 المدفوع</button><button data-k="s">💰 المبيعات</button><button data-k="i">📦 الأصناف</button><button data-k="d">📒 الديون</button><button data-k="w">💳 طرق الدفع</button></div>
+    <div class="seg s" id="iSub" style="margin:4px 0 4px"><button data-k="p" class="on">💵 المدفوع</button><button data-k="s">💰 المبيعات</button><button data-k="i">📦 الأصناف</button><button data-k="d">📒 الديون</button><button data-k="w">💳 طرق الدفع</button><button data-k="r">📈 الربح</button></div>
   <div class="seg s" id="iPer" style="margin:0 0 4px"><button data-k="d">اليوم</button><button data-k="m" class="on">الشهر ده</button><button data-k="pm">الشهر الفات</button><button data-k="y">السنة</button><button data-k="c" id="iCal">📅 شهر</button></div>
   <div class="seg s" id="iCmp" style="margin:0 0 6px"><button data-k="0" class="on">بدون مقارنة</button><button data-k="prev">الفترة اللي قبلها</button><button data-k="yoy">السنة اللي فاتت</button></div>
   <input type="month" id="iMonth" aria-label="اختيار شهر" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
@@ -220,6 +220,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
         </div>
       </div>
     </div>
+    <div id="r_pf" class="hide" style="margin-top:6px;font-weight:700;color:var(--ok,#2e7d4f)"></div>
     <div id="pfStep" class="pstep hide"><span class="mute">نسبة الخصم</span><button type="button" class="alt" data-st="-1" aria-label="قلّل النسبة">▼</button><span class="pin"><input id="pfStepIn" type="text" inputmode="decimal" aria-label="نسبة الخصم"><span>%</span></span><button type="button" class="alt" data-st="1" aria-label="زوّد النسبة">▲</button><span class="mute num" id="pfStepAmt"></span></div>
     <div id="r_dp" class="hide" style="margin-top:6px"><label>طريقة الدفع / خصم من المدفوع<span id="dpAmt"></span></label><div class="ro" style="gap:6px"><input id="pfWhy" placeholder="طريقة الدفع أو ملاحظة (بتظهر في الفاتورة)" style="flex:1;min-width:110px"><input id="dp" type="text" inputmode="decimal" placeholder="خصم %" style="width:68px;flex:none"></div></div>
   </div>
@@ -268,13 +269,17 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <section id="t-st" class="hide">
 <div id="stHome">
-  <div class="stiles"><button type="button" class="stile" data-go="it"><span class="ti">📦</span><b>الأصناف</b><small id="ssIt"></small></button><button type="button" class="stile" data-sp="sup"><span class="ti">🚚</span><b>الموردين</b><small id="ssSup"></small></button><button type="button" class="stile" data-sp="stk"><span class="ti">🧱</span><b>المخزون</b><small id="ssStk"></small></button></div>
+  <div class="ro" style="gap:6px;margin:0 0 6px"><input id="stSrch" type="search" placeholder="🔍 دوّر في الإعدادات: خصم، واتساب، مصروفات…" autocomplete="off" aria-label="بحث في الإعدادات" style="flex:1;height:34px"></div>
+  <div id="stRes" class="sgl hide" style="margin-bottom:8px"></div>
+  <div id="stMain">
+  <div class="stiles" style="grid-template-columns:repeat(4,minmax(0,1fr))"><button type="button" class="stile" data-go="it"><span class="ti">📦</span><b>الأصناف</b><small id="ssIt"></small></button><button type="button" class="stile" data-sp="exp"><span class="ti">💸</span><b>المصروفات</b><small id="ss_exp"></small></button><button type="button" class="stile" data-sp="sup"><span class="ti">🚚</span><b>الموردين</b><small id="ssSup"></small></button><button type="button" class="stile" data-sp="stk"><span class="ti">🧱</span><b>المخزون</b><small id="ssStk"></small></button></div>
   <div class="sgh">الفاتورة</div>
   <div class="sgl"><button type="button" class="sti" data-sp="shop"><span class="si">🏪</span><span class="stt"><b>بيانات المحل</b><small id="ss_shop"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="des"><span class="si">🎨</span><span class="stt"><b>تصميم الفاتورة</b><small id="ss_des"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="notes"><span class="si">📝</span><span class="stt"><b>ملاحظات الفاتورة</b><small id="ss_notes"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="inv"><span class="si">🧾</span><span class="stt"><b>خيارات الفاتورة والطباعة</b><small id="ss_inv"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="pay"><span class="si">💳</span><span class="stt"><b>طرق الدفع</b><small id="ss_pay"></small></span><span class="sa">‹</span></button></div>
   <div class="sgh">الرسائل والتقارير</div>
-  <div class="sgl"><button type="button" class="sti" data-sp="msg"><span class="si">📨</span><span class="stt"><b>رسائل الواتساب</b><small id="ss_msg"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="rem"><span class="si">🔔</span><span class="stt"><b>تذكير المديونين</b><small id="ss_rem"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="cl"><span class="si">📊</span><span class="stt"><b>الإقفال والتقارير</b><small id="ss_cl"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="exp"><span class="si">💸</span><span class="stt"><b>المصروفات</b><small id="ss_exp"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="nf"><span class="si">🔔</span><span class="stt"><b>الإشعارات</b><small id="ss_nf"></small></span><span class="sa">‹</span></button></div>
+  <div class="sgl"><button type="button" class="sti" data-sp="msg"><span class="si">📨</span><span class="stt"><b>رسائل الواتساب</b><small id="ss_msg"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="rem"><span class="si">🔔</span><span class="stt"><b>تذكير المديونين</b><small id="ss_rem"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="cl"><span class="si">📊</span><span class="stt"><b>الإقفال والتقارير</b><small id="ss_cl"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="nf"><span class="si">🔔</span><span class="stt"><b>الإشعارات</b><small id="ss_nf"></small></span><span class="sa">‹</span></button></div>
   <div class="sgh">البرنامج</div>
   <div class="sgl"><button type="button" class="sti" data-sp="look"><span class="si">📱</span><span class="stt"><b>شكل البرنامج</b><small id="ss_look"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="lock"><span class="si">🔒</span><span class="stt"><b>القفل والأمان</b><small id="ss_lock"></small></span><span class="sa">‹</span></button><button type="button" class="sti" data-sp="data"><span class="si">💾</span><span class="stt"><b>الحفظ والنسخ</b><small id="ss_data"></small></span><span class="sa">‹</span></button></div>
+  </div>
   <div class="mute" id="appVer" style="text-align:center;margin:12px 0 4px"></div>
 </div>
 <div class="stp hide" data-sp="shop"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🏪 بيانات المحل</b></div>
@@ -327,6 +332,9 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <label class="opt"><input type="checkbox" id="dupInv"> تكرار فاتورة قديمة لنفس العميل</label>
   <label class="opt"><input type="checkbox" id="repLastOn"> زرار «↻ كرر آخر فاتورة لنفس العميل» تحت اسم العميل</label>
   <label class="opt"><input type="checkbox" id="saveImgOn"> زرار «حفظ كصورة» في شريط الحفظ (بينزّل الصورة في التنزيلات)</label></div>
+<div class="card"><b>🧩 اللي يظهر في شاشة الفاتورة</b>
+  <label class="opt"><input type="checkbox" id="rcOn"> أزرار آخر العملاء تحت خانة الاسم</label>
+  <label class="opt"><input type="checkbox" id="qtOn"> عروض الأسعار (زرار «عرض سعر» وقايمة العروض)</label></div>
 <div class="card"><b>🖨 الطباعة والـ PDF</b>
   <label class="opt"><input type="checkbox" id="pdfOn"> زرار PDF والطباعة تحت الفاتورة</label>
   <div id="paperBox"><label style="margin-top:6px">مقاس الورق</label><select id="paperSel"><option value="a4">A4 عادي</option><option value="t80">ورق حراري 80 مم</option><option value="t58">ورق حراري 58 مم</option></select></div></div>
@@ -415,6 +423,8 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <div class="card"><b>🧰 أدوات</b><label class="opt"><input type="checkbox" id="calcOn"> زرار الآلة الحاسبة</label></div>
 </div>
 <div class="stp hide" data-sp="lock"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>🔒 القفل والأمان</b></div>
+<div class="card"><b>👷 وضع العامل</b><div class="mute">بيخبّي عن الجهاز ده: الربح وسعر الشراء، والمديونيات وأرصدة العملاء، والإعدادات، وحذف وتعديل الفواتير. للرجوع لازم الرقم السري.</div>
+  <button type="button" class="main" id="wkGo" style="width:100%;margin-top:6px">👷 شغّل وضع العامل على الجهاز ده</button><div class="info" id="wkMsg"></div></div>
 <div class="card"><b>🔒 قفل البرنامج</b>
     <label class="opt"><input type="checkbox" id="lkChk"> قفل البرنامج برقم سري</label>
     <div id="lkSet" class="hide"><div class="g2" style="margin-top:6px"><input id="lkP1" type="password" inputmode="numeric" maxlength="6" placeholder="رقم سري (4 إلى 6 أرقام)"><input id="lkP2" type="password" inputmode="numeric" maxlength="6" placeholder="اكتب الرقم تاني"></div>
@@ -428,6 +438,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
     <div id="lkRecSet" class="hide"><button type="button" class="alt" id="lkRecMake" style="width:100%;margin-top:10px"></button><div id="lkRecShow" class="hide" style="margin-top:6px"></div></div></div>
 </div>
 <div class="stp hide" data-sp="data"><div class="sth"><button type="button" class="lnk" data-stback="1" aria-label="رجوع للإعدادات">→</button><b>💾 الحفظ والنسخ</b></div>
+<div class="card"><b>📞 توحيد أرقام العملاء</b><div class="mute">بيصلّح الأرقام القديمة (مسافات، +20، 002…) علشان الواتساب والاتصال يشتغلوا.</div><button type="button" class="alt" id="phFix" style="width:100%;margin-top:6px">🧹 وحّد كل الأرقام</button><div class="info" id="phMsg"></div></div>
 <div class="card"><b>📦 مساحة التخزين</b><div id="stMeter"></div></div>
 <div class="card"><b>☁️ الحفظ والمزامنة</b><div id="stor" class="stor"></div>
     <div id="fbStat" style="margin:4px 0 8px;font-size:14px">مش مربوطة بحساب.</div>
@@ -502,10 +513,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=200"></script>
+<script src="js/app.js?v=203"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=200"></script>
-<script src="js/features.js?v=200"></script>
+<script src="js/cutlist.js?v=203"></script>
+<script src="js/features.js?v=203"></script>
 </body>
 </html>
 

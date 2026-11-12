@@ -1109,3 +1109,15 @@ html #rows .row input.c.c1::placeholder{color:var(--ink)!important;opacity:.45!i
 #resTxtBox>summary{padding:6px 0}
 /* v190: علامة المرتجع في السجل */
 .tag.rt{background:color-mix(in srgb,var(--mute) 14%,transparent);color:var(--ink)}
+
+.no-rc #recentC,.no-qt #qtOpen,.no-qt #saveQt{display:none!important}
+.stflash{outline:2px solid var(--acc,#4f7360);outline-offset:3px;border-radius:8px}
+#stRes .sti{border-bottom:1px solid var(--line)}
+#stRes .stt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;font-size:var(--t-s,13px)}
+
+#wkOut{display:none}body.wk #wkOut{display:inline-flex;align-items:center}
+body.wk #hdrSet,body.wk #dbCard,body.wk #topDebt,body.wk #r_prev,body.wk #cinfo,body.wk #limW,body.wk #bulkRem,body.wk #r_pf,body.wk #iSub [data-k="d"],body.wk #iSub [data-k="r"],body.wk .cb,body.wk #custSum,body.wk #cuMode{display:none!important}
+.dbq{display:flex;align-items:center;gap:4px;margin-top:3px;flex-wrap:wrap}.dbq .ab{padding:2px 9px;min-height:0;font-size:12px;text-decoration:none}
+body.wk #cuDup,body.wk #cuTot>span:last-child{display:none!important}
+#hTot{font-size:12px;line-height:1.5}
+.dbq .qa{flex:none!important;width:auto!important;display:inline-flex!important;align-items:center;justify-content:center;height:26px!important;min-height:0!important;padding:0 10px!important;font-size:12px!important;border-radius:13px!important;margin:0!important}.dbq .tag{margin:0!important}
