@@ -1122,3 +1122,12 @@ body.wk #cuDup,body.wk #cuTot>span:last-child{display:none!important}
 #hTot{font-size:12px;line-height:1.5}
 .dbq .qa{flex:none!important;width:auto!important;display:inline-flex!important;align-items:center;justify-content:center;height:26px!important;min-height:0!important;padding:0 10px!important;font-size:12px!important;border-radius:13px!important;margin:0!important}.dbq .tag{margin:0!important}
 .hr .qa{flex:none;width:auto;display:inline-flex;align-items:center;justify-content:center;height:22px;min-height:0;padding:0 8px;font-size:12px;border-radius:11px;margin:0;text-decoration:none}
+
+/* v210: صف المدين مضغوط: الاسم والرصيد فوق، الأزرار سطر واحد تحت */
+#dbList .dbr{display:grid!important;grid-template-columns:30px minmax(0,1fr) auto auto;grid-template-areas:"av nm due bal" "bt bt bt bt";gap:3px 8px;align-items:center;padding:5px 8px!important}
+#dbList .dbr>.av{grid-area:av}#dbList .dbr>.dbm{grid-area:nm;min-width:0}#dbList .dbr>.tag{grid-area:due}#dbList .dbr>.cb{grid-area:bal}
+#dbList .dbr .dbq{grid-area:bt;margin:0;flex-wrap:nowrap;gap:4px}
+#dbList .dbr .dbq .qa{height:24px!important;padding:0 9px!important;font-size:12px!important}
+#dbList .dbr .dbm .cn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+#dbList .dbr .dbm .mute{display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden;font-size:11px}
+#dbList .dbr .dbm .mute .tag{flex:none;margin:0;padding:0 6px;font-size:10.5px}
