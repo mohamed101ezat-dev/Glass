@@ -1131,3 +1131,11 @@ body.wk #cuDup,body.wk #cuTot>span:last-child{display:none!important}
 #dbList .dbr .dbm .cn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
 #dbList .dbr .dbm .mute{display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden;font-size:11px}
 #dbList .dbr .dbm .mute .tag{flex:none;margin:0;padding:0 6px;font-size:10.5px}
+
+/* v212: صف المدين: الاسم + آخر دفعة + آخر معاملة في سطر، وتحتها الأزرار ثم الرصيد */
+#dbList .dbr{grid-template-columns:30px minmax(0,1fr) auto!important;grid-template-areas:"av nm due" "bt bt bt"!important}
+#dbList .dbr .dbm{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow:hidden}
+#dbList .dbr .dbm .cn{flex:0 1 auto;min-width:0}
+#dbList .dbr .dbm .tag{flex:none;margin:0;padding:0 7px;font-size:10.5px}
+#dbList .dbr .dbm .lt{flex:none;font-size:11px;white-space:nowrap}
+#dbList .dbr .dbq .cb{margin-inline-start:auto;flex:none}
