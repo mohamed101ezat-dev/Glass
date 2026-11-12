@@ -1121,3 +1121,4 @@ body.wk #hdrSet,body.wk #dbCard,body.wk #topDebt,body.wk #r_prev,body.wk #cinfo,
 body.wk #cuDup,body.wk #cuTot>span:last-child{display:none!important}
 #hTot{font-size:12px;line-height:1.5}
 .dbq .qa{flex:none!important;width:auto!important;display:inline-flex!important;align-items:center;justify-content:center;height:26px!important;min-height:0!important;padding:0 10px!important;font-size:12px!important;border-radius:13px!important;margin:0!important}.dbq .tag{margin:0!important}
+.hr .qa{flex:none;width:auto;display:inline-flex;align-items:center;justify-content:center;height:22px;min-height:0;padding:0 8px;font-size:12px;border-radius:11px;margin:0;text-decoration:none}
