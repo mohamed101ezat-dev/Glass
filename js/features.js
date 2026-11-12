@@ -29,38 +29,6 @@
     return r ? toCut(r) : null;
   }
 
-  // زرار «🧾 ضيف للفاتورة»: بيحوّل القطع اللي اتحطت (من غير اللي ما اتحطتش) لبنود في فاتورة جديدة، والسعر بيتحط من الصنف لو الاسم معروف
-  var lastRes = null, toInvBtn = null;
-  function showToInv() {
-    if (!toInvBtn) {
-      toInvBtn = document.createElement('button'); toInvBtn.className = 'ab'; toInvBtn.id = 'clToInv'; toInvBtn.type = 'button';
-      toInvBtn.style.cssText = 'display:block;margin:8px auto 70px'; toInvBtn.textContent = '🧾 ضيف للفاتورة';
-      host.parentNode.insertBefore(toInvBtn, host.nextSibling);
-      toInvBtn.onclick = sendToInvoice;
-    }
-    toInvBtn.hidden = !(lastRes && lastRes.sheets && lastRes.sheets.length);
-  }
-  function sendToInvoice() {
-    try {
-      var st = cl.getState(), un = ((lastRes && lastRes.unplaced) || []).map(function (u) { return [Math.min(u.length, u.width), Math.max(u.length, u.width)].join('x'); });
-      var rows = [], base = st.src && st.src.name ? st.src.name : '';
-      st.panels.forEach(function (r) {
-        var l = +toEn(r.l), w = +toEn(r.w), q = r.q === '' ? 1 : +toEn(r.q) || 1; if (r.on === false || !(l > 0) || !(w > 0)) return;
-        var k = [Math.min(l, w), Math.max(l, w)].join('x');
-        for (var i = 0; i < q; i++) { var j = un.indexOf(k); if (j >= 0) { un.splice(j, 1); q--; i--; } else break; }
-        if (q > 0) rows.push({ n: (r.m || '').trim() || base, w: w, h: l, c: q });
-      });
-      if (!rows.length) { toast('مفيش قطع اتحطت تتنقل للفاتورة'); return; }
-      document.querySelector('#bnav button[data-t="new"]').click();
-      rows.forEach(function (o) {
-        var d = addRow('mq'), it = o.n ? S.items.find(function (x) { return x.name === o.n; }) : null;
-        var v = { n: o.n, w: String(o.w), h: String(o.h), c: String(o.c) }; if (it) { v.i = it.id; var p = priceOf(it, invCat); if (p) v.p = String(p); }
-        setVals(d, v);
-      });
-      calc(); toast('اتنقل ' + rows.length + ' بند للفاتورة');
-    } catch (e) { try { toast('ما قدرتش أنقل للفاتورة'); } catch (x) {} }
-  }
-
   var appTheme = function () { return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'; };
   var cl = window.cutlist = CutlistPlanner.mount(host, {
     lang: 'ar',
@@ -70,8 +38,7 @@
     exportPdf: function (cv, name) { dl(pdfFor(cv, 'a4'), name + '.pdf'); },
     stockFor: function (name) { var m = sheetsMap()[name]; return m && m.length ? m : null; },
     searchHint: 'اكتب كود الفاتورة عشان تنقل مقاسات البنود المقطعة',
-    onResult: function (res) {
-      lastRes = res; showToInv();
+    onResult: function () {
       // أول ما تحسب لصنف جاي من فاتورة، الشيتات اللي استخدمتها تتحفظ للصنف ده وتتقترح المرة الجاية
       try {
         var st = cl && cl.getState(); if (!st || !st.src || !st.src.name) return;

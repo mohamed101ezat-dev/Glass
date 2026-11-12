@@ -21,11 +21,11 @@
       len: 'الطول', wid: 'العرض', qty: 'العدد', mat: 'الخامة',
       kerf: 'سُمك الشفرة (الفاصل)', labels: 'ترقيم القطع', one: 'استخدام شيت واحد فقط',
       material: 'مراعاة الخامة', grain: 'منع تدوير القطع',
-      g: 'الملخص', s: 'إحصائيات الشيت', c: 'القطعات', nfT: 'ما اتحطش', nfP: 'القطعة', nfQ: 'العدد', nfTry: 'جرّب أولوية تانية',
+      g: 'الإحصائيات العامة', s: 'إحصائيات الشيت', c: 'القطعات',
       usedSheets: 'الشيتات المستخدمة', usedArea: 'المساحة المستخدمة', sUsed: 'المساحة المستخدمة', sWaste: 'المساحة الهالكة', wastedArea: 'المساحة الهالكة',
-      totalCuts: 'عدد القصات', totalLen: 'إجمالي طول القص', kerfRow: 'سُمك الشفرة', prio: 'الأولوية',
+      totalCuts: 'عدد القطعات', totalLen: 'إجمالي طول القص', kerfRow: 'سُمك الشفرة', prio: 'الأولوية',
       prioV: 'أقل هالك', unplaced: 'قطع لم تتسع',
-      sheet: 'الشيت', cuts: 'القصات', cutLen: 'طول القص', panelsN: 'عدد القطع', wastedN: 'قطع الهالك',
+      sheet: 'الشيت', cuts: 'القطعات', cutLen: 'طول القص', panelsN: 'عدد القطع', wastedN: 'قطع الهالك',
       cNo: '#', cPanel: 'القطعة', cCut: 'القص', cRes: 'الناتج', vert: 'رأسي', horiz: 'أفقي', surplus: 'هالك',
       sheetOf: function (i, n) { return 'شيت ' + i + ' من ' + n; },
       sheetTab: function (i) { return 'شيت ' + i; },
@@ -58,7 +58,7 @@
       len: 'Length', wid: 'Width', qty: 'Qty', mat: 'Material',
       kerf: 'Cut / blade / kerf thickness', labels: 'Labels on panels', one: 'Use only one sheet from stock',
       material: 'Consider material', grain: 'Consider grain direction',
-      g: 'Summary', s: 'Sheet statistics', c: 'Cuts', nfT: "Didn't fit", nfP: 'Panel', nfQ: 'Qty', nfTry: 'Search harder',
+      g: 'Global statistics', s: 'Sheet statistics', c: 'Cuts',
       usedSheets: 'Used stock sheets', usedArea: 'Total used area', sUsed: 'Used area', sWaste: 'Wasted area', wastedArea: 'Total wasted area',
       totalCuts: 'Total cuts', totalLen: 'Total cut length', kerfRow: 'Kerf thickness', prio: 'Optimization priority',
       prioV: 'Least wasted area', unplaced: 'Unplaced panels',
@@ -182,9 +182,6 @@
     '.cl .kv tr:nth-child(even){background:var(--stripe)}',
     '.cl .kv small{color:var(--muted);margin:0 6px;font-weight:400;display:inline-block}',
     '.cl .bad{color:var(--bad)!important}',
-    '.cl .kv th.sub{background:var(--stripe);text-align:start;font-weight:700;padding-top:8px}',
-    '.cl .card.nf{border-color:var(--bad)}.cl .card.nf[hidden]{display:none}.cl .card.nf>.hd{background:var(--bad);color:#fff}',
-    '.cl .nfh{margin:6px 12px 8px;font-size:12px;color:var(--muted)}',
     '.cl .chips{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px 0}',
     '.cl .chips button{border:1px solid var(--line);background:var(--surface);border-radius:14px;min-height:28px;padding:0 12px;cursor:pointer;font-size:12px}',
     '.cl .chips button[aria-pressed="true"]{background:var(--hd);color:var(--hd-fg);border-color:var(--hd)}',
@@ -233,7 +230,7 @@
     '.cl .df .btn{min-height:38px}',
     '.cl .btn[disabled]{opacity:.5;cursor:default}',
     '@media (max-width:560px){.cl .ov{padding:0;align-items:flex-end}.cl .dlg{width:100%;max-height:92vh;border-radius:10px 10px 0 0}.cl .df{padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}}',
-    '@media (pointer:coarse){.cl .t input{height:27px;font-size:16px}.cl .t th{padding:2px 6px}.cl .tmb{height:24px}.cl .ic{width:28px;height:28px}.cl .t td.act{width:62px}.cl .opt input.k{height:28px;font-size:16px}.cl .tool button{min-width:34px;height:32px}}',
+    '@media (pointer:coarse){.cl .t input{height:32px;font-size:16px}.cl .ic{width:28px;height:28px}.cl .t td.act{width:62px}.cl .opt input.k{height:28px;font-size:16px}.cl .tool button{min-width:34px;height:32px}}',
     '.cl{--rowsel:#cfe8d3}.cl[data-theme="dark"]{--rowsel:#22402d}',
     '.cl .bar{background:var(--hd);color:var(--hd-fg);flex-wrap:nowrap;gap:6px;min-height:46px;padding:5px max(8px,env(safe-area-inset-right,0px)) 5px max(8px,env(safe-area-inset-left,0px));position:relative}',
     '.cl .bar .brand{margin-inline-end:auto;font-size:15px;white-space:nowrap}',
@@ -835,7 +832,7 @@
     var L = T[lang];
     var storageKey = options.storageKey === undefined ? 'cutlist-widget-v1' : options.storageKey;
     var S = EXAMPLE();
-    var view = { zoom: 1, font: 11, color: true, dims: true, sheet: 0, tab: 'in', sel: null, hi: null };
+    var view = { zoom: 1, font: 11, color: true, dims: true, sheet: 0, tab: 'in', sel: null };
     var R = null;
     var geo = { s: 1, ml: 0, mt: 0 };
     var drag = null;
@@ -900,8 +897,8 @@
         '<div data-r="notice"></div><div class="cv-wrap" data-r="canvas"></div>' +
       '</main>' +
       '<aside class="right">' +
-        '<section class="card"><button class="hd">' + L.g + CHEV + '</button><div class="chipsrow" data-r="chips1"></div><div class="cb" data-r="g"></div></section>' +
-        '<section class="card nf" data-r="nfcard" hidden><button class="hd">&#9888; ' + L.nfT + CHEV + '</button><div class="cb" data-r="nf"></div></section>' +
+        '<section class="card"><button class="hd">' + L.g + CHEV + '</button><div class="cb" data-r="g"></div></section>' +
+        '<section class="card"><button class="hd">' + L.s + CHEV + '</button><div class="chipsrow" data-r="chips1"></div><div class="cb" data-r="s"></div></section>' +
         '<section class="card"><button class="hd">' + L.c + CHEV + '</button><div class="chipsrow" data-r="chips2"></div><div class="cb" data-r="c"></div><button class="copy" data-a="copy">' + L.copy + '</button></section>' +
       '</aside>' +
       '</div><div class="toast" role="status"></div>' +
@@ -1002,7 +999,7 @@
     }
     function draw() {
       var cv = rr('canvas'), nt = rr('notice');
-      nt.innerHTML = '';
+      nt.innerHTML = R && R.unplaced.length ? unplacedNotice() : '';
       if (!R || !R.sheets.length) {
         view.sel = null; rr('selbar').hidden = true;
         cv.innerHTML = '<div class="empty" style="direction:' + (lang === 'ar' ? 'rtl' : 'ltr') + '">' + (R && R.nItems > 0 && R.nStock === 0 ? L.empty2 : L.empty1) + '</div>';
@@ -1032,9 +1029,8 @@
           var fill = view.color ? 'url(#clg' + gid + '-' + hu + ')' : 'var(--stripe)';
           var shp = p.it && p.it.s, nonRect = shp === 'c' || shp === 'o';
           var isSel = view.sel && view.sel.si === si && view.sel.pi === pi;
-          var isHi = view.hi != null && p.it && p.it.ri === view.hi, dim0 = view.hi != null && !isHi;
-          var stroke = (isSel || isHi) ? 'stroke="var(--focus)" stroke-width="3"' : p.free ? 'stroke="var(--dimline)" stroke-width="1.6" stroke-dasharray="4 2"' : p.locked ? 'stroke="var(--hd)" stroke-width="2"' : 'stroke="var(--sheet-line)" stroke-width="1"';
-          g += '<g class="pn" data-si="' + si + '" data-pi="' + pi + '" style="touch-action:none' + (dim0 ? ';opacity:.35' : '') + '"><title>' + L.panel + ' ' + pair(p.w, p.h) + (p.rot ? ' (' + L.rot + ')' : '') + (nonRect ? ' · ' + (shp === 'c' ? L.shapeC : L.shapeO) : '') + (p.locked ? ' · ' + L.pinned : '') + '</title>' +
+          var stroke = isSel ? 'stroke="var(--focus)" stroke-width="3"' : p.free ? 'stroke="var(--dimline)" stroke-width="1.6" stroke-dasharray="4 2"' : p.locked ? 'stroke="var(--hd)" stroke-width="2"' : 'stroke="var(--sheet-line)" stroke-width="1"';
+          g += '<g class="pn" data-si="' + si + '" data-pi="' + pi + '" style="touch-action:none"><title>' + L.panel + ' ' + pair(p.w, p.h) + (p.rot ? ' (' + L.rot + ')' : '') + (nonRect ? ' · ' + (shp === 'c' ? L.shapeC : L.shapeO) : '') + (p.locked ? ' · ' + L.pinned : '') + '</title>' +
             '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + fill + '"' + (nonRect ? ' fill-opacity=".28"' : '') + ' ' + stroke + '/>' +
             (nonRect ? '<ellipse cx="' + (x + w / 2) + '" cy="' + (y + h / 2) + '" rx="' + (w / 2) + '" ry="' + (h / 2) + '" fill="' + fill + '" stroke="var(--sheet-line)" stroke-width="1.2"/>' : '') +
             '<g fill="var(--fg)" font-size="' + fs + '">';
@@ -1081,47 +1077,30 @@
       return { a: lab(c.la), b: lab(c.lb) };
     }
     function stats() {
-      var g = rr('g'), c = rr('c'), c1 = rr('chips1'), c2 = rr('chips2');
-      if (!R || !R.sheets.length) { g.innerHTML = c.innerHTML = '<div class="empty" style="padding:18px 0">' + L.none + '</div>'; c1.innerHTML = c2.innerHTML = ''; unfitCard(); return; }
+      var g = rr('g'), s = rr('s'), c = rr('c'), c1 = rr('chips1'), c2 = rr('chips2');
+      if (!R || !R.sheets.length) { g.innerHTML = s.innerHTML = c.innerHTML = '<div class="empty" style="padding:18px 0">' + L.none + '</div>'; c1.innerHTML = c2.innerHTML = ''; return; }
       var tot = R.sheets.reduce(function (a, x) { return a + x.W * x.H; }, 0), used = R.sheets.reduce(function (a, x) { return a + x.used; }, 0);
       var cuts = R.sheets.reduce(function (a, x) { return a + x.cuts.length; }, 0), len = R.sheets.reduce(function (a, x) { return a + x.cutLen; }, 0);
       var grp = {}; R.sheets.forEach(function (x) { var k = pair(x.W, x.H); grp[k] = (grp[k] || 0) + 1; });
       var row = function (a, b, sm, cls) { return '<tr><th' + (cls ? ' class="' + cls + '"' : '') + '>' + a + '</th><td' + (cls ? ' class="' + cls + '"' : '') + '>' + (sm ? '<span class="n">' + b + '</span><small class="n">' + sm + '</small>' : b) + '</td></tr>'; };
-      if (view.sheet >= R.sheets.length) view.sheet = 0;
-      var sh = R.sheets[view.sheet], multi = R.sheets.length > 1;
-      /* جدول واحد: لو شيت واحد الأرقام هي هي، ولو أكتر من شيت بنضيف صف للشيت المختار */
-      var placedN = R.sheets.reduce(function (a, x) { return a + x.placed.length; }, 0), freeN = R.sheets.reduce(function (a, x) { return a + x.free.length; }, 0), gp = R.sheets.reduce(function (a, x) { return a + gapCount(x); }, 0);
       g.innerHTML = '<table class="kv">' +
         row(L.usedSheets, Object.keys(grp).map(function (k) { return '<span class="n">' + k + '</span> <small>×' + grp[k] + '</small>'; }).join('، ')) +
         row(L.usedArea, fmt(Math.round(used)), pct(used, tot) + '%') + row(L.wastedArea, fmt(Math.round(tot - used)), pct(tot - used, tot) + '%') +
-        row(L.panelsN, placedN) + row(L.totalCuts, cuts) + row(L.totalLen, fmt(len)) + row(L.wastedN, freeN) + (gp ? row(L.gapN, gp) : '') + row(L.kerfRow, fmt(R.k)) + row(L.prio, L.prioV) +
-        (R.unplaced.length ? row(L.unplaced, R.unplaced.length, '', 'bad') : '') +
-        (multi ? '<tr><th colspan="2" class="sub">' + L.sheet + ' ' + dim(sh.W, sh.H) + '</th></tr>' +
-          row(L.sUsed, fmt(Math.round(sh.used)), pct(sh.used, sh.W * sh.H) + '%') + row(L.sWaste, fmt(Math.round(sh.waste)), pct(sh.waste, sh.W * sh.H) + '%') +
-          row(L.cuts, sh.cuts.length) + row(L.cutLen, fmt(sh.cutLen)) + row(L.panelsN, sh.placed.length) : '') + '</table>';
-      unfitCard();
+        row(L.totalCuts, cuts) + row(L.totalLen, fmt(len)) + row(L.kerfRow, fmt(R.k)) + row(L.prio, L.prioV) +
+        (R.unplaced.length ? row(L.unplaced, R.unplaced.length, '', 'bad') : '') + '</table>';
+      if (view.sheet >= R.sheets.length) view.sheet = 0;
+      var sh = R.sheets[view.sheet];
       var chips = R.sheets.length > 1 ? '<div class="chips">' + R.sheets.map(function (_, i) { return '<button data-s="' + i + '" aria-pressed="' + (i === view.sheet) + '">' + L.sheetTab(i + 1) + '</button>'; }).join('') + '</div>' : '';
       c1.innerHTML = chips; c2.innerHTML = chips;
+      s.innerHTML = '<table class="kv">' + row(L.sheet, dim(sh.W, sh.H)) +
+        row(L.sUsed, fmt(Math.round(sh.used)), pct(sh.used, sh.W * sh.H) + '%') + row(L.sWaste, fmt(Math.round(sh.waste)), pct(sh.waste, sh.W * sh.H) + '%') +
+        row(L.cuts, sh.cuts.length) + row(L.cutLen, fmt(sh.cutLen)) + row(L.panelsN, sh.placed.length) + row(L.wastedN, sh.free.length) + (gapCount(sh) ? row(L.gapN, gapCount(sh)) : '') + '</table>';
       c.innerHTML = '<table class="cuts"><thead><tr><th>' + L.cNo + '</th><th>' + L.cPanel + '</th><th>' + L.cCut + '</th><th>' + L.cRes + '</th></tr></thead><tbody>' +
         sh.cuts.map(function (x, i) {
           var piece = function (l) { return l.t === 'p' ? dim(l.w, l.h) : l.t === 's' ? '<span class="sur">' + L.surplus + ' ' + dim(l.w, l.h) + '</span>' : '-'; };
           return '<tr><td>' + (i + 1) + '</td><td>' + dim(x.rw, x.rh) + '</td><td>' + (lang === 'en' ? x.axis + '=' : (x.axis === 'x' ? L.vert : L.horiz) + ' ') + '<span class="n">' + fmt(x.pos) + '</span></td>' +
             '<td class="res">' + piece(x.la) + (lang === 'en' ? ' \\ ' : '<br>') + piece(x.lb) + '</td></tr>';
         }).join('') + '</tbody></table>' + (gapCount(sh) ? '<p style="margin:8px 0 0;font-size:12px;color:var(--muted)">' + L.gapNote + '<br>' + sh.placed.filter(function (p) { return p.free; }).map(function (p) { return '<span class="n">' + pair(p.w, p.h) + '</span> (' + fmt(p.x) + ', ' + fmt(p.y) + ')'; }).join(' · ') + '</p>' : '');
-    }
-    /* كارت أحمر بالقطع اللي ما اتحطتش: القطعة والعدد */
-    function unfitCard() {
-      var card = rr('nfcard'), box = rr('nf'); if (!card || !box) return;
-      if (!R || !R.unplaced.length) { card.hidden = true; box.innerHTML = ''; return; }
-      var m = {}, ord = [];
-      R.unplaced.forEach(function (u) { var k = pair(u.w, u.h); if (!m[k]) { m[k] = 0; ord.push(k); } m[k]++; });
-      var stock = R.stock || [];
-      var tooBig = R.unplaced.some(function (u) { return !stock.some(function (st) { return (u.w <= st.W + EPS && u.h <= st.H + EPS) || (!S.opts.grain && u.h <= st.W + EPS && u.w <= st.H + EPS); }); });
-      box.innerHTML = '<table class="cuts"><thead><tr><th>' + L.nfP + '</th><th>' + L.nfQ + '</th></tr></thead><tbody>' +
-        ord.map(function (k) { return '<tr><td><span class="n">' + k + '</span></td><td>' + m[k] + '</td></tr>'; }).join('') + '</tbody></table>' +
-        '<p class="nfh">' + (tooBig ? L.hintBig : S.opts.one ? L.hintOne : S.opts.material ? L.hintMat : L.hintMore) + '</p>' +
-        (tooBig ? '' : '<button class="copy" data-a="more">' + L.nfTry + '</button>');
-      card.hidden = false;
     }
     function gapCount(sh) { return sh.placed.filter(function (p) { return p.free; }).length; }
     function summaryText() {
@@ -1251,10 +1230,6 @@
     });
     root.addEventListener('focusin', function (e) {
       var inp = e.target; if (inp && inp.matches && inp.matches('.t input[data-k="q"]')) { try { inp.select(); } catch (x) {} }
-      /* تعليم قطع الصف المحدد في الرسم */
-      var hi = null;
-      if (inp && inp.closest) { var tr = inp.closest('[data-t="panels"] tr[data-i]'); if (tr) hi = +tr.dataset.i; }
-      if (hi !== view.hi) { view.hi = hi; if (R) draw(); }
     });
     root.addEventListener('change', function (e) {
       var sel = e.target.closest('select[data-o]');
