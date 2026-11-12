@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='206';
+const APP_VER='207';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -631,8 +631,8 @@ function drawDet(){const c=getC(selC),l=rowsOf(c);
    <div class="info" id="cdMsg" style="color:var(--danger)"></div>
    <div id="cdEdit" class="${cuEd?'':'hide'}" style="border-top:1px dashed var(--line);margin-top:6px;padding-top:6px">
     <div class="ro" style="margin-bottom:6px"><input data-f="name" value="${esc(c.name)}" aria-label="اسم العميل" style="font-weight:700;flex:1;min-width:0"><select data-f="cat" class="catsel" aria-label="الفئة">${catOpts(custCat(c))}</select></div>
-    <div class="g2" style="grid-template-columns:1.8fr 1fr"><div><label>واتساب</label><input data-f="phone" type="tel" inputmode="tel" value="${esc(c.phone||'')}" style="direction:ltr;text-align:center;letter-spacing:.3px"></div><div><label>رصيد افتتاحي</label>${editOpen?`<input data-f="open" type="text" inputmode="decimal" value="${c.open||''}" placeholder="0">`:`<div class="ro" style="color:var(--ink);height:var(--ih);border:1px dashed var(--line);border-radius:7px;padding:0 8px"><b class="num">${f(c.open||0)}</b><button class="lnk" data-eo="1">تعديل</button></div>`}</div></div>
-    ${phoneChipsHtml(c.phone,'data-ppe')?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin:0 0 6px">${phoneChipsHtml(c.phone,'data-ppe')}</div>`:''}
+    <div class="g2" style="grid-template-columns:1.8fr 1fr"><div><label>واتساب</label><input data-f="phone" type="tel" inputmode="tel" value="${esc(c.phone||'')}" style="direction:ltr;text-align:center;letter-spacing:.3px${phoneParts(c.phone).length>1&&!phAdd?';display:none':''}">${phoneParts(c.phone).length>1&&!phAdd?'<div class="mute" style="padding:8px 0;text-align:center">'+phoneParts(c.phone).length+' أرقام</div>':''}</div><div><label>رصيد افتتاحي</label>${editOpen?`<input data-f="open" type="text" inputmode="decimal" value="${c.open||''}" placeholder="0">`:`<div class="ro" style="color:var(--ink);height:var(--ih);border:1px dashed var(--line);border-radius:7px;padding:0 8px"><b class="num">${f(c.open||0)}</b><button class="lnk" data-eo="1">تعديل</button></div>`}</div></div>
+    ${phoneChipsHtml(c.phone,'data-ppe','data-pxe','data-pae')?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin:0 0 6px">${phoneChipsHtml(c.phone,'data-ppe','data-pxe','data-pae')}</div>`:''}
     <div class="g2" style="grid-template-columns:1.3fr 1fr .8fr"><div><label>العنوان</label><input data-f="addr" value="${esc(c.addr||'')}"></div><div><label>ملاحظات</label><input data-f="note" value="${esc(c.note||'')}"></div><div><label>حد الدين</label><input data-f="lim" type="text" inputmode="decimal" value="${c.lim||''}" placeholder="0"></div></div>
     <div class="g2" style="grid-template-columns:1.8fr 1fr"><div><label>📍 مواقع / مشاريع (بفاصلة)</label><input data-f="sites" value="${esc((c.sites||[]).join('، '))}"></div><div><label>📅 ميعاد شهري (يوم)</label><input data-f="dd" type="text" inputmode="numeric" value="${c.dd||''}" placeholder="1-31"></div></div>
     <button class="main" data-esave="1" style="width:100%;margin-top:6px">💾 حفظ التعديل</button>
@@ -654,6 +654,8 @@ $('t-cu').addEventListener('click',e=>{const t=e.target,d=t.dataset;
   if(d.tg){if(d.tg==='ed'){cuEd=!cuEd;$('cdEdit').classList.toggle('hide',!cuEd)}else{cuPm=!cuPm;delete PW.cu;drawDet();const i=document.querySelector('#cuDet [data-pw="cu"] .spa');if(i)i.focus()}return}
   if(d.eo){editOpen=true;cuEd=true;drawDet();return}
   {const pe=t.closest('[data-ppe]');if(pe){const c=getC(selC);if(c){c.phone=phoneMakePrimary(c.phone,+pe.dataset.ppe);put('customers',c);drawDet()}return}}
+  {const px=t.closest('[data-pxe]');if(px){const c=getC(selC);if(c){c.phone=phoneRemove(c.phone,+px.dataset.pxe);put('customers',c);drawDet()}return}}
+  {const pa=t.closest('[data-pae]');if(pa){const c=getC(selC);if(c){phAdd=true;c.phone=normPhones(c.phone)+' / ';drawDet();const i=document.querySelector('#cuDet [data-f="phone"]');if(i){i.focus();const n=i.value.length;try{i.setSelectionRange(n,n)}catch(e){}}}return}}
   if(d.esave){const c=getC(selC);if(!c)return;if(!c.name){$('cdMsg').textContent='الاسم لا يمكن أن يكون فاضي';return}c.phone=normPhones(c.phone);flushTouch();put('customers',c);syncNames();cuEd=false;editOpen=false;drawDet();toast('اتحفظ ✓');return}
   if(d.inv){const c=getC(selC);if(!c)return;document.querySelector('#bnav [data-t="new"]').click();$('cust').value=c.name;custInput();window.scrollTo(0,0);return}
   if(d.back){selC=null;drawCusts();return}
@@ -668,7 +670,7 @@ $('t-cu').addEventListener('click',e=>{const t=e.target,d=t.dataset;
     if(!ok2(t))return;del('customers',c.id);selC=null;drawCusts();return}
   if(d.pay){const c=getC(selC),r=c&&pwRecord('cu',c);if(!r){$('cdMsg').textContent='اكتب مبلغ الدفعة';return}
     S.invoices.push(r);put('invoices',r);lastSaved={id:r.id,at:Date.now(),dueBak:payDone(c,r)};delete PW.cu;cuPm=false;drawDet();showRec(r,false,'تم تسجيل الدفعة ✓')}});
-$('t-cu').addEventListener('change',e=>{if(e.target.id==='cuSort'){cuSort=e.target.value;drawCusts()}else if(e.target.dataset.f==='phone'){const c=getC(selC);if(c){e.target.value=normPhones(e.target.value);c.phone=e.target.value;DV++;touch('customers',c)}}else if(e.target.id==='cuIdle'){cuIdle=+e.target.value||60;drawCusts()}else if(e.target.id==='cdMo'){const v=e.target.value;if(v){const[y,m]=v.split('-').map(Number);pMo=new Date(y,m-1,1).getTime();drawDet()}}else if(e.target.id==='pf'){pF=e.target.value;drawDet()}else if(e.target.id==='pt'){pT=e.target.value;drawDet()}});
+$('t-cu').addEventListener('change',e=>{if(e.target.id==='cuSort'){cuSort=e.target.value;drawCusts()}else if(e.target.dataset.f==='phone'){const c=getC(selC);if(c){e.target.value=normPhones(e.target.value);c.phone=e.target.value;DV++;touch('customers',c);if(phAdd){phAdd=false;flushTouch();drawDet()}}}else if(e.target.id==='cuIdle'){cuIdle=+e.target.value||60;drawCusts()}else if(e.target.id==='cdMo'){const v=e.target.value;if(v){const[y,m]=v.split('-').map(Number);pMo=new Date(y,m-1,1).getTime();drawDet()}}else if(e.target.id==='pf'){pF=e.target.value;drawDet()}else if(e.target.id==='pt'){pT=e.target.value;drawDet()}});
 $('cuDet').addEventListener('input',e=>{if(e.target.id!=='cdq')return;cdq=e.target.value;const c=getC(selC);if(c)$('cdTbl').innerHTML=tblHtml(c)});
 $('cuDet').addEventListener('input',e=>{const t=e.target,c=getC(selC);if(!c||!t.dataset.f)return;const k=t.dataset.f,v=k==='open'||k==='lim'?nv(t.value):t.value.trim(),mm=$('cdMsg');
   if(k==='name'){if(!v||S.customers.some(x=>x.id!==c.id&&nkey(x.name)===nkey(v))){if(mm)mm.textContent=!v?'الاسم لا يمكن أن يكون فاضي':'الاسم ده موجود قبل كده';return}if(mm)mm.textContent=''}
@@ -678,10 +680,14 @@ $('cuDet').addEventListener('input',e=>{const t=e.target,c=getC(selC);if(!c||!t.
 $('cuDet').addEventListener('change',e=>{if(e.target.dataset.f==='open'){flushTouch();reflow(selC);editOpen=false;drawDet()}else if(e.target.dataset.f==='name'){syncNames();drawDet()}});
 $('cq').oninput=drawCusts;
 /* رقم أساسي: لو العميل عنده أكتر من رقم، الأول هو اللي بيتبعتله الواتساب والتذكير. الضغط على رقم بيخليه الأساسي */
-const phoneChipsHtml=(p,a)=>{const l=phoneParts(p);return l.length<2?'':l.map((x,i)=>'<button type="button" class="ab'+(i?'':' on')+'" '+a+'="'+i+'">'+(i?'☆ ':'⭐ ')+esc(x)+'</button>').join('')};
+/* أكتر من رقم: الخانة الخام بتتخبى وكل رقم بيظهر لوحده (⭐ أساسي · × حذف) + «＋ رقم» لإضافة رقم. a=الأساسي x=الحذف ad=الإضافة */
+const phoneChipsHtml=(p,a,x,ad)=>{const l=phoneParts(p);return l.length<2?'':l.map((n,i)=>'<span class="ro" style="gap:0;margin:0;flex:none"><button type="button" class="ab'+(i?'':' on')+'" style="border-start-start-radius:0;border-end-start-radius:0" '+a+'="'+i+'">'+(i?'☆ ':'⭐ ')+esc(n)+'</button><button type="button" class="ab" style="padding:0 8px;border-start-end-radius:0;border-end-end-radius:0" '+x+'="'+i+'" aria-label="حذف الرقم">×</button></span>').join('')+'<button type="button" class="ab" '+ad+'="1">＋ رقم</button>'};
+const phoneRemove=(p,i)=>{const l=phoneParts(p);if(i>=0&&i<l.length)l.splice(i,1);return l.join(' / ')};
+let phAdd=false,ncAdd=false;
 const phoneMakePrimary=(p,i)=>{const l=phoneParts(p);if(i<=0||i>=l.length)return p;l.unshift(l.splice(i,1)[0]);return l.join(' / ')};
-function ncChips(){const h=phoneChipsHtml($('nc_phone').value,'data-pp'),b=$('nc_pchips');b.innerHTML=h;b.classList.toggle('hide',!h)}
-$('nc_pchips').onclick=e=>{const b=e.target.closest('[data-pp]');if(!b)return;$('nc_phone').value=phoneMakePrimary($('nc_phone').value,+b.dataset.pp);ncChips();ncWa()};
+function ncChips(){const h=phoneChipsHtml($('nc_phone').value,'data-pp','data-px','data-pa'),b=$('nc_pchips'),i=$('nc_phone');b.innerHTML=h;b.classList.toggle('hide',!h);i.classList.toggle('hide',!!h&&!ncAdd)}
+$('nc_pchips').onclick=e=>{const t=e.target,p=t.closest('[data-pp]'),x=t.closest('[data-px]'),a=t.closest('[data-pa]'),i=$('nc_phone');
+  if(p)i.value=phoneMakePrimary(i.value,+p.dataset.pp);else if(x)i.value=phoneRemove(i.value,+x.dataset.px);else if(a){ncAdd=true;i.value=normPhones(i.value)+' / ';ncChips();i.focus();return}else return;ncChips();ncWa()};
 let ncCr=false;
 function ncWa(){const a=$('nc_wa'),n=waNum($('nc_phone').value);a.classList.toggle('hide',n.length<11);if(n.length>=11)a.href='https://wa.me/'+n}
 function addCust(more){const name=$('nc_name').value.trim().replace(/\s+/g,' '),m=$('cuMsg');m.textContent='';
@@ -693,8 +699,11 @@ function addCust(more){const name=$('nc_name').value.trim().replace(/\s+/g,' '),
   if(more){$('nc_name').focus();toast('اتحفظ: '+name)}else $('cuAdd').classList.add('hide');drawCusts()}
 $('addCu').onclick=()=>addCust(false);$('addCu2').onclick=()=>addCust(true);
 $('nc_dir').onclick=()=>{ncCr=!ncCr;$('nc_dir').textContent=ncCr?'له':'عليه'};
-$('nc_phone').addEventListener('input',()=>{ncWa();ncChips()});
-$('nc_phone').addEventListener('change',()=>{$('nc_phone').value=normPhones($('nc_phone').value);ncWa();ncChips();ncWarn()});
+$('nc_phone').addEventListener('focus',()=>{ncAdd=true;ncChips()});
+$('nc_phone').addEventListener('input',()=>{ncAdd=true;ncWa();ncChips()});
+$('nc_phone').addEventListener('blur',()=>{ncAdd=false;$('nc_phone').value=normPhones($('nc_phone').value);ncWa();ncChips()});
+$('cuDet').addEventListener('focusout',e=>{if(phAdd&&e.target.dataset&&e.target.dataset.f==='phone'){const c=getC(selC);phAdd=false;if(c){e.target.value=normPhones(e.target.value);c.phone=e.target.value;DV++;touch('customers',c);flushTouch()}setTimeout(drawDet,0)}});
+$('nc_phone').addEventListener('change',()=>{ncAdd=false;$('nc_phone').value=normPhones($('nc_phone').value);ncWa();ncChips();ncWarn()});
 /* لصق من واتساب أو جهات الاتصال: «اسم + رقم» في خانة الاسم بيتفصلوا لوحدهم */
 $('nc_name').addEventListener('paste',e=>{const t=(e.clipboardData||window.clipboardData).getData('text')||'',m=toEn(t).match(/\+?\d[\d\s\-().]{7,}\d/);if(!m)return;e.preventDefault();
   const nm=t.replace(/[0-9٠-٩+\s\-().]{8,}/,' ').replace(/[:：\-–—،,\/|]+/g,' ').replace(/\s+/g,' ').trim();$('nc_name').value=nm;$('nc_phone').value=normPhones(m[0]);ncWa();ncWarn()});
