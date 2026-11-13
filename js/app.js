@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='237';
+const APP_VER='238';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -2289,10 +2289,10 @@ const _dc=drawCusts;drawCusts=function(){const r=_dc.apply(this,arguments);syncN
 /* v237: سحب الصفحة لتحت — إيد بتنزل من فوق تمسك الصفحة وتشدّها، ولما تسيب البيانات تتحدّث */
 (()=>{const NEED=80,MAX=150;let st=0,y0=0,x0=0,pull=0,sec=null,hand=null,tip=null;
   const mk=()=>{if(hand)return hand;hand=document.createElement('div');hand.id='ptrHand';hand.setAttribute('aria-hidden','true');
-    hand.innerHTML='<div class="arm"></div><svg viewBox="0 0 64 54" width="64" height="54"><path d="M14 0h36v20c7 2 11 8 11 15 0 11-9 18-29 18S3 46 3 35c0-7 4-13 11-15z" fill="#f2b9a0" stroke="#d98e73" stroke-width="2"/><path d="M19 34v12M32 35v13M45 34v12" stroke="#d98e73" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>';
+    hand.innerHTML='<div class="arm"></div><svg viewBox="0 0 90 80" width="90" height="80"><defs><linearGradient id="phA" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#d98c82"/><stop offset=".28" stop-color="#f4b9ad"/><stop offset=".5" stop-color="#fcd9cf"/><stop offset=".78" stop-color="#f1b0a4"/><stop offset="1" stop-color="#d4857b"/></linearGradient><radialGradient id="phB" cx=".42" cy=".3" r=".8"><stop offset="0" stop-color="#fde0d7"/><stop offset=".55" stop-color="#f4b7ab"/><stop offset="1" stop-color="#d98c82"/></radialGradient><radialGradient id="phC" cx=".4" cy=".25" r=".85"><stop offset="0" stop-color="#fee6de"/><stop offset=".6" stop-color="#f6bdb1"/><stop offset="1" stop-color="#dc9187"/></radialGradient></defs><rect x="25" y="0" width="40" height="30" fill="url(#phA)"/><ellipse cx="45" cy="74" rx="30" ry="5" fill="#000" opacity=".12"/><path d="M13 34Q13 17 30 15H60Q77 17 77 34V50Q77 68 45 70Q13 68 13 50Z" fill="url(#phB)"/><ellipse cx="13" cy="44" rx="8" ry="13" transform="rotate(14 13 44)" fill="url(#phC)"/><path d="M16 50Q45 44 74 50" stroke="#cf7f75" stroke-width="2" fill="none" opacity=".45"/><ellipse cx="24" cy="60" rx="9" ry="13" fill="url(#phC)"/><ellipse cx="38" cy="62" rx="9" ry="14" fill="url(#phC)"/><ellipse cx="52" cy="62" rx="9" ry="14" fill="url(#phC)"/><ellipse cx="66" cy="60" rx="9" ry="13" fill="url(#phC)"/><path d="M31 52v14M45 53v16M59 52v14" stroke="#cf7f75" stroke-width="1.6" stroke-linecap="round" opacity=".55"/></svg>';
     document.body.appendChild(hand);tip=document.createElement('div');tip.id='ptrTip';document.body.appendChild(tip);return hand};
   const scrolled=el=>{for(;el&&el!==document.body;el=el.parentElement)if(el.scrollTop>0)return true;return false};
-  const set=p=>{pull=p;if(sec)sec.style.transform=p?'translateY('+p+'px)':'';const h=mk();h.classList.toggle('show',p>0);h.style.height=(p?p+26:0)+'px';tip.textContent=p>=NEED?'سيب عشان تحدّث':''};
+  const set=p=>{pull=p;if(sec)sec.style.transform=p?'translateY('+p+'px)':'';const h=mk();h.classList.toggle('show',p>0);h.style.height=(p?p+34:0)+'px';tip.textContent=p>=NEED?'سيب عشان تحدّث':''};
   const end=()=>{const h=mk(),s=sec;if(s){s.style.transition='transform .35s cubic-bezier(.3,1.5,.5,1)';s.style.transform='';setTimeout(()=>{s.style.transition='';s.style.transform=''},380)}
     h.style.transition='height .25s ease-in';h.style.height='0px';tip.textContent='';setTimeout(()=>{h.style.transition='';h.classList.remove('show')},260);st=0;pull=0;sec=null};
   addEventListener('touchstart',e=>{st=0;if(e.touches.length!==1||window.scrollY>0)return;const t=e.target,s=t.closest&&t.closest('section');
