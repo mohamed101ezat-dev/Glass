@@ -45,7 +45,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <link rel="apple-touch-startup-image" href="splash/14_15pro.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/12_13_14promax.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/14_15promax.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
-<link rel="stylesheet" href="css/style.css?v=229">
+<link rel="stylesheet" href="css/style.css?v=230">
 
 
 
@@ -145,17 +145,11 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
     <div class="stat-card accent" data-sc="today" role="button" tabindex="0"><div class="stat-label" id="l_today">مبيعات اليوم ›</div><div class="stat-value num" id="d_today">0</div><div id="heroX" class="hx"></div></div>
     <div class="stat-card warn" id="dbCard" role="button" tabindex="0"><div class="stat-label">المديونيات ›</div><div class="stat-value num" id="d_debt">0</div></div>
   </div>
-  <div class="seg s hide" id="scPer"><button data-n="1">اليوم</button><button data-n="y">أمس</button><button data-n="2">يومين</button><button data-n="3">3 أيام</button><button data-n="4">4 أيام</button><button data-n="5">5 أيام</button><button data-n="cal" aria-label="اختيار تاريخ">📅</button></div>
-  <input type="date" id="scDate" aria-label="اختيار يوم" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
   <div id="hMain">
   <div class="card hide" id="topDebt"></div>
   <div class="card">
     <input id="hq" aria-label="بحث في السجل" placeholder="ابحث: اسم · كود · مبلغ (700 · 600-800) · صنف · موقع" inputmode="search">
-    <div class="seg s" id="hPer" style="margin:6px 0 4px"><button data-p="all" class="on">📅 الأسبوع</button><button data-p="d">اليوم</button><button data-p="w">7 أيام</button><button data-p="m">30 يوم</button><button data-p="rg" aria-label="من تاريخ لتاريخ">📅</button></div>
-    <div class="ro hide" id="hRg" style="gap:6px;margin:0 0 4px"><input type="date" id="hRF" aria-label="من" style="flex:1;min-width:0;height:32px"><span class="mute">←</span><input type="date" id="hRT" aria-label="إلى" style="flex:1;min-width:0;height:32px"></div>
-    <div class="seg s" id="hTy" style="margin:0 0 4px"><button data-y="all" class="on">📋 الكل</button><button data-y="inv">🧾 فواتير</button><button data-y="paid">💵 مدفوع</button><button data-y="ret">↩️ مرتجع</button><button data-y="due">⏳ متبقي</button><button data-y="ord" id="hTyOrd">📦 طلبيات</button></div>
     <div class="mute hide" id="hBrk" style="font-weight:700;margin:2px 0"></div>
-    <div class="ro" style="gap:6px;margin:0 0 4px;justify-content:flex-start"><select id="hSort" aria-label="ترتيب السجل" style="width:auto;flex:none;height:30px;min-height:0;padding:0 8px;font-size:13px"><option value="new">↕ الأحدث</option><option value="amt">↕ الأكبر مبلغًا</option><option value="due">↕ الأكبر متبقي</option></select><button type="button" class="ab" id="hExp">📊 تصدير</button></div>
     <div class="ro"><span class="mute" id="hTot"></span></div>
   </div>
   <div id="hList"></div>
@@ -167,9 +161,9 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   <div class="ro hide" id="iMoB" style="margin:0 0 6px"><input type="month" id="iMonth" aria-label="اختيار شهر" style="flex:1;min-width:0;height:32px"></div>
   <div id="infoSum"></div>
   <div class="ichips cmp" id="iCmp"><span>قارن:</span><button data-k="0">بدون</button><button data-k="prev">بالفترة اللي قبلها</button><button data-k="yoy">بالسنة اللي فاتت</button></div>
-  <div class="ichips" id="iSub"><button data-k="p">💵 المدفوع</button><button data-k="s">💰 المبيعات</button><button data-k="i">📦 الأصناف</button><button data-k="d">📒 الديون</button><button data-k="w">💳 طرق الدفع</button><button data-k="r">📈 الربح</button></div>
+  <div class="ichips" id="iSub"><button data-k="p">💵 المدفوع</button><button data-k="s">💰 المبيعات</button><button data-k="i">📦 الأصناف</button><button data-k="d">📒 الديون</button><button data-k="w">💳 طرق الدفع</button><button data-k="t">↩️ المرتجع</button><button data-k="o" id="iOrd">📦 الطلبات</button><button data-k="r">📈 الربح</button></div>
   <div id="infoBody"></div>
-    <div class="ro" style="justify-content:flex-start;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="ab hide" id="clBtn">🗂 الإقفالات</button><button class="ab hide" id="dayClose">🧾 إقفال</button><button class="ab hide" id="monRep">📊 تقرير</button></div>
+    <div class="ro" style="justify-content:flex-start;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="ab" id="iExp">📊 تصدير Excel</button><button class="ab hide" id="clBtn">🗂 الإقفالات</button><button class="ab hide" id="dayClose">🧾 إقفال</button><button class="ab hide" id="monRep">📊 تقرير</button></div>
   </div></div>
   <div id="dbView" class="hide">
     <div id="dbList0">
@@ -515,10 +509,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=229"></script>
+<script src="js/app.js?v=230"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=229"></script>
-<script src="js/features.js?v=229"></script>
+<script src="js/cutlist.js?v=230"></script>
+<script src="js/features.js?v=230"></script>
 </body>
 </html>
 
