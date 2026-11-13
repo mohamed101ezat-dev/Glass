@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='225';
+const APP_VER='226';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -1809,7 +1809,7 @@ $('xlBox').onclick=async e=>{const k=e.target.dataset.xl;if(!k)return;const[n,h,
   const r=await dl(new Blob(['﻿'+[h,...rows].map(x=>x.map(csvC).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}),n+'-'+dshort(Date.now()).replace(/\//g,'-')+'.csv');m.textContent=r==='fail'?'الملف متحفظش':'اتنزل ملف '+n+' ✓'};
 
 /* ========== السجل (الفواتير والدفعات + الإقفال والتقارير) ========== */
-let hMo=1,hP='all',hLim=30,hTy='all',hN=1,hDay=0,hSort='new',hRF=0,hRT=0,hCur=[];
+let hMo=2,hP='all',hLim=30,hTy='all',hN=1,hDay=0,hSort='new',hRF=0,hRT=0,hCur=[];
 /* بحث السجل: اسم أو كود أو مبلغ (700 · 600-800 · 7000+) أو صنف أو موقع/ملاحظة أو طريقة دفع أو «مرتجع» */
 function hMatch(r,q){q=q.trim();if(!q)return true;
   const z=String(q).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[,،\s]/g,''),vals=r.type==='pay'?[Math.abs(r.amount||0)]:[val(r),pd(r),rd2(val(r)-(r.paid||0))].map(v=>Math.abs(+v)).filter(v=>v>0);let m;
@@ -1870,7 +1870,7 @@ function drawDash(){startUI();drawHero();drawTopDebt();
     if(!flat&&k!==last){last=k;h+=`<div class="hday"><span>${dayLabel(r.ts)}</span><span class="num">${pm?'':'مبيعات '+f(T[k].s)+' · '}مدفوع ${f(T[k].p)}</span>${pget('dayCl',true)?`<button class="lnk" data-dc="${r.ts}" style="padding:1px 9px;font-size:calc(var(--fs) - 1px)">🧾 إقفال</button>`:''}</div>`}
     h+=`<div class="hrow" data-h="${r.id}"><div class="hl"><b>${esc(r.cname)}${ordTag(r)}</b><span class="mute">${(r.type==='pay'?'دفعة'+(r.code?' '+r.code:''):'فاتورة '+(r.code||'#'+r.no))+(hasRet(r)&&r.rcode?' ↩'+r.rcode:'')} · ${flat?dshort(r.ts)+' ':''}${hm(r.ts)}${r.by?' · 👷 '+esc(r.by):''}${pm&&r.pfWhy?' · '+esc(r.pfWhy):''}</span></div><div class="hr">${r.type==='pay'?`<b class="num">${f(r.amount)}</b><span class="tag ok">دفعة</span>`:pm?`<b class="num">${f(r.paid)}</b><span class="mute num">من ${f(val(r))}</span>`:`<b class="num">${f(val(r))}</b>${(()=>{const due=rd2(val(r)-r.paid);return pureRet(r)?`<span class="tag rt">↩ مرتجع</span>`:due>0?`<span class="tag dr">متبقي ${f(due)}</span>`+hWa(r):`<span class="tag ok">مدفوعة</span>`})()}`}</div></div>`});
   if(!win&&l.length>hLim)h+=`<button class="lnk" data-more="1">عرض المزيد (${l.length-hLim})</button>`;
-  if(win){let pv=0;S.invoices.forEach(r=>{if(r.ts<from&&r.ts>pv)pv=r.ts});if(!l.length&&S.invoices.length)h='<p class="mute">مفيش معاملات في '+(hMo===1?'الشهر ده':'الفترة دي')+'</p>';
+  if(win){let pv=0;S.invoices.forEach(r=>{if(r.ts<from&&r.ts>pv)pv=r.ts});if(!l.length&&S.invoices.length)h='<p class="mute">مفيش معاملات في '+(hMo<=2?'الشهرين دول':'الفترة دي')+'</p>';
     if(pv){const d=new Date(pv),mo=(t0.getFullYear()-d.getFullYear())*12+t0.getMonth()-d.getMonth()+1;h+=`<button class="lnk" data-mo="${mo}" style="width:100%;margin-top:6px">⬇ المزيد: ${MN[d.getMonth()]} ${d.getFullYear()}</button>`}}
   $('hList').innerHTML=h||(S.invoices.length?'<p class="mute">مفيش معاملات بالفلتر ده. اختار «📋 الكل» فوق، أو امسح البحث.</p>':'<p class="mute">لسه مفيش معاملات. أول فاتورة هتظهر هنا.</p>');drawDebt();try{remDraw()}catch(e){}}
 $('hq').oninput=()=>{hLim=30;drawDash()};
@@ -1886,7 +1886,7 @@ $('hExp').onclick=async()=>{if(!hCur.length){toast('مفيش معاملات لل
 $('ordBan').onclick=$('ordBan').onkeydown=e=>{if(e.type==='keydown'&&e.key!=='Enter'&&e.key!==' ')return;hTy='ord';hP='all';hLim=30;
   document.querySelectorAll('#hTy button').forEach(b=>b.classList.toggle('on',b.dataset.y==='ord'));document.querySelectorAll('#hPer button').forEach(b=>b.classList.toggle('on',b.dataset.p==='all'));drawDash();$('hList').scrollIntoView({block:'start',behavior:'smooth'})};
 $('hTy').onclick=e=>{const y=e.target.dataset.y;if(!y)return;hTy=y;hLim=30;document.querySelectorAll('#hTy button').forEach(b=>b.classList.toggle('on',b===e.target));drawDash()};
-$('hPer').onclick=e=>{const p=e.target.dataset.p;if(!p)return;hP=p;hLim=30;hMo=1;document.querySelectorAll('#hPer button').forEach(b=>b.classList.toggle('on',b===e.target));drawDash()};
+$('hPer').onclick=e=>{const p=e.target.dataset.p;if(!p)return;hP=p;hLim=30;hMo=2;document.querySelectorAll('#hPer button').forEach(b=>b.classList.toggle('on',b===e.target));drawDash()};
 $('hList').addEventListener('click',e=>{const d=e.target.dataset;if(d.mo){hMo=+d.mo;drawDash()}else if(d.more){hLim+=30;drawDash()}else if(d.dc)showClose(+d.dc)});
 function dayStart(ts){const d=new Date(ts);d.setHours(0,0,0,0);return d.getTime()}
 function showClose(ts){const a=dayStart(ts),l=S.invoices.filter(r=>r.ts>=a&&r.ts<dEnd(a)).sort((x,y)=>x.ts-y.ts);
@@ -1922,7 +1922,7 @@ function dbPayGo(btn){const c=getC(dbSel),m=$('dbp_msg');if(!c||!m)return;const 
   S.invoices.push(r);put('invoices',r);lastSaved={id:r.id,at:Date.now(),dueBak:payDone(c,r)};dbPay=null;delete PW.db;try{document.activeElement.blur()}catch(e){}drawDash();showRec(r,false,'تم تسجيل الدفعة ✓')}
 /* كروت السجل: الضغط بيظبط فلاتر السجل نفسه، فإجمالي اللستة = رقم الكارت. ضغطة تانية بترجع السجل عادي */
 const SC={today:['d','inv'],paid:['d','paid'],week:['w','inv']};
-function setH(p,y){hP=p;hTy=y;hLim=30;hMo=1;document.querySelectorAll('#hPer button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));document.querySelectorAll('#hTy button').forEach(b=>b.classList.toggle('on',b.dataset.y===y))}
+function setH(p,y){hP=p;hTy=y;hLim=30;hMo=2;document.querySelectorAll('#hPer button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));document.querySelectorAll('#hTy button').forEach(b=>b.classList.toggle('on',b.dataset.y===y))}
 function scMark(){const q=$('hq').value.trim();let any=false;document.querySelectorAll('[data-sc]').forEach(c=>{const s=SC[c.dataset.sc],on=!dbMode&&!infoMode&&!q&&(hP===s[0]||hP==='n'||hP==='x')&&hTy===s[1];c.classList.toggle('on',on);if(on)any=true});
   const sel=!dbMode&&!infoMode&&(hP==='d'||hP==='n'||hP==='x')&&(hTy==='inv'||hTy==='paid');
   $('scPer').classList.toggle('hide',!sel);$('hPer').classList.toggle('hide',sel);$('hTy').classList.toggle('hide',sel);
