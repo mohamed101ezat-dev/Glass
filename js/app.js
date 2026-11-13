@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='223';
+const APP_VER='224';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -2072,15 +2072,15 @@ function iAgg(a,b){const recs=S.invoices.filter(r=>r.ts>=a&&r.ts<b),G=new Map();
   return{G,tot,cnt,nk,n:recs.length,inv:recs.filter(r=>r.type==='inv').length}}
 function drawInfo(){
   const q=(id,k)=>document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
-  q('iSub',iSub);q('iPer',iPer);q('iCmp',iCmp);
+  $('iSub').value=iSub;$('iPer').value=iPer;$('iCmp').value=iCmp;$('iRgB').classList.toggle('hide',iPer!=='g');$('iMoB').classList.toggle('hide',iPer!=='c');
   const R=iRange(),now=Date.now(),part=R.b>now&&R.a<=now;
-  if(iPer==='c')$('iCal').textContent='📅 '+labT(R.a,'m');else $('iCal').textContent='📅 شهر';
+  if(iPer==='c'){const d=new Date(R.a);$('iMonth').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
   const cur=iAgg(R.a,R.b);let prev=null,pl='',a2=0,b2=0;
   if(iCmp!=='0'){if(R.u==='g'&&iCmp==='prev'){a2=R.a-(R.b-R.a);b2=R.a}else{const uu=R.u==='g'?'y':iCmp==='yoy'?'y':R.u;a2=shiftT(R.a,uu,-1);b2=shiftT(R.b,uu,-1)}if(part)b2=Math.min(b2,a2+(now-R.a));
     prev=iAgg(a2,b2);pl=R.u==='g'?dshort(a2)+' ← '+dshort(b2-1):labT(a2,iCmp==='yoy'&&R.u==='d'?'d':R.u)}
   const bad=iSub==='d',cnt=iSub==='i'||iSub==='r'?'صنف':iSub==='w'?'طريقة':iSub==='s'||iSub==='d'?'عميل':'عميل';
   let h='';
-  {const T=iSum(R.a,R.b);h+=`<div class="rsum"><div><small>المبيعات</small><b class="num">${f(T.s)}</b></div><div><small>المدفوع</small><b class="num">${f(T.p)}</b></div><div><small>المتبقي</small><b class="num${T.d>0?' dn':''}">${f(T.d)}</b></div><div><small>الفواتير</small><b class="num">${f(T.n)}</b></div><div><small>العملاء</small><b class="num">${f(T.c)}</b></div><div><small>متوسط الفاتورة</small><b class="num">${f(T.n?T.s/T.n:0)}</b></div>${T.ex?`<div><small>المصروفات</small><b class="num">${f(T.ex)}</b></div>`:''}</div><div class="mute" style="font-size:12px;margin:2px 0 6px">${rLab(R)}${R.b>now&&R.a<=now?' · لحد دلوقتي':''}</div>`}
+  {const T=iSum(R.a,R.b);h+=`<div class="mute" style="font-weight:700;margin:0 0 4px">${rLab(R)}${R.b>now&&R.a<=now?' (لحد دلوقتي)':''}</div><div class="rsum"><div><small>المبيعات</small><b class="num">${f(T.s)}</b></div><div><small>المدفوع</small><b class="num">${f(T.p)}</b></div><div><small>المتبقي</small><b class="num${T.d>0?' dn':''}">${f(T.d)}</b></div><div><small>الفواتير</small><b class="num">${f(T.n)}</b></div></div><div class="mute" style="font-size:12px;margin:4px 0 0">${plN(T.c,'عميل')} · متوسط الفاتورة ${f(T.n?T.s/T.n:0)}${T.ex?' · مصروفات '+f(T.ex):''}</div>`;$('infoSum').innerHTML=h;h=''}
   const names={p:'المدفوع',s:'المبيعات',i:'قيمة الأصناف',d:'ديون الفترة (اللي لسه متسددتش)',w:'المدفوع حسب الطريقة',r:'ربح الأصناف'};
   h+=`<div class="ir"><span>${names[iSub]}</span><b class="itot num">${f(cur.tot)}</b></div>`;
   h+=`<div class="mute" style="font-size:12px">${plN(cur.G.size,cnt)}${iSub==='s'&&cur.inv?' · '+plN(cur.inv,'فاتورة')+' · متوسط '+f(cur.tot/cur.inv):''}</div>`;
@@ -2096,11 +2096,9 @@ function drawInfo(){
   else if(!prev||!prev.n)h+='<div class="info">مفيش بيانات في الفترة دي.</div>';
   if(iSub==='d'){const dl=S.customers.filter(c=>balOf(c)>0);h+=`<div class="ir" style="margin-top:6px"><span>إجمالي المديونيات الآن</span><b class="num">${f(debtAll())} <span class="mute">(${plN(dl.length,'عميل')})</span></b></div>`}
   $('infoBody').innerHTML=h}
-$('iSub').onclick=e=>{const k=e.target.dataset.k;if(!k)return;iSub=k;drawInfo()};
-$('iCmp').onclick=e=>{const k=e.target.dataset.k;if(!k)return;iCmp=k;drawInfo()};
-$('iPer').onclick=e=>{const k=e.target.dataset.k;if(!k)return;$('iRgB').classList.toggle('hide',k!=='g');if(k==='g'){const z=n=>String(n).padStart(2,'0'),y=t=>{const d=new Date(t);return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())};if(!$('iRF').value)$('iRF').value=y(dAgo(29));if(!$('iRT').value)$('iRT').value=y(dAgo(0))}
-  if(k==='c'){const i=$('iMonth');try{i.showPicker()}catch(_){i.click()}return}
-  iPer=k;drawInfo()};
+$('iSub').onchange=()=>{iSub=$('iSub').value;drawInfo()};
+$('iCmp').onchange=()=>{iCmp=$('iCmp').value;drawInfo()};
+$('iPer').onchange=()=>{iPer=$('iPer').value;if(iPer==='g'){const z=n=>String(n).padStart(2,'0'),y=t=>{const d=new Date(t);return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())};if(!$('iRF').value)$('iRF').value=y(dAgo(29));if(!$('iRT').value)$('iRT').value=y(dAgo(0))}if(iPer==='c'&&!iMon)iMon=mS(new Date().getFullYear(),new Date().getMonth());drawInfo()};
 {const pdt=v=>{if(!v)return 0;const[y,m,d]=v.split('-').map(Number);return new Date(y,m-1,d).getTime()};$('iRF').onchange=()=>{iRF=pdt($('iRF').value);iPer='g';drawInfo()};$('iRT').onchange=()=>{iRT=pdt($('iRT').value);iPer='g';drawInfo()}}
 $('iMonth').onchange=e=>{const v=e.target.value;if(!v)return;const[y,m]=v.split('-').map(Number);iMon=mS(y,m-1);iPer='c';drawInfo()};
 $('clBtn').onclick=()=>{drawCl();$('clOv').classList.remove('hide')};

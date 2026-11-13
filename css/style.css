@@ -1165,3 +1165,7 @@ html[data-theme="dark"] #recentC button.b-cu,html[data-theme="dark"] #siteC butt
 .rsum small{display:block;font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rsum b{display:block;font-size:15px;line-height:1.3}
 .rsum b.dn{color:var(--danger)}
+
+/* v224: تقرير مبسّط: 4 مربعات */
+.rsum{grid-template-columns:repeat(4,1fr)!important}
+.rsum b{font-size:14px!important}
