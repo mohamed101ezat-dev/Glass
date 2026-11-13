@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='224';
+const APP_VER='225';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -2071,34 +2071,32 @@ function iAgg(a,b){const recs=S.invoices.filter(r=>r.ts>=a&&r.ts<b),G=new Map();
     else if(iSub==='i'){if(r.type==='inv')(r.rows||[]).forEach(x=>{/* v189: المرتجع بيتخصم من مبيعات الصنف */add(String(x.n||'').trim(),+x.v||0,(x.rt?-1:1)*(+x.c||0))})}});
   return{G,tot,cnt,nk,n:recs.length,inv:recs.filter(r=>r.type==='inv').length}}
 function drawInfo(){
-  const q=(id,k)=>document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
-  $('iSub').value=iSub;$('iPer').value=iPer;$('iCmp').value=iCmp;$('iRgB').classList.toggle('hide',iPer!=='g');$('iMoB').classList.toggle('hide',iPer!=='c');
+  const on=(id,k)=>document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.toggle('on',x.dataset.k===k));
+  on('iPer',iPer);on('iSub',iSub);on('iCmp',iCmp);$('iRgB').classList.toggle('hide',iPer!=='g');$('iMoB').classList.toggle('hide',iPer!=='c');
   const R=iRange(),now=Date.now(),part=R.b>now&&R.a<=now;
   if(iPer==='c'){const d=new Date(R.a);$('iMonth').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
-  const cur=iAgg(R.a,R.b);let prev=null,pl='',a2=0,b2=0;
+  const cur=iAgg(R.a,R.b),T=iSum(R.a,R.b);let prev=null,Tp=null,pl='',a2=0,b2=0;
   if(iCmp!=='0'){if(R.u==='g'&&iCmp==='prev'){a2=R.a-(R.b-R.a);b2=R.a}else{const uu=R.u==='g'?'y':iCmp==='yoy'?'y':R.u;a2=shiftT(R.a,uu,-1);b2=shiftT(R.b,uu,-1)}if(part)b2=Math.min(b2,a2+(now-R.a));
-    prev=iAgg(a2,b2);pl=R.u==='g'?dshort(a2)+' ← '+dshort(b2-1):labT(a2,iCmp==='yoy'&&R.u==='d'?'d':R.u)}
-  const bad=iSub==='d',cnt=iSub==='i'||iSub==='r'?'صنف':iSub==='w'?'طريقة':iSub==='s'||iSub==='d'?'عميل':'عميل';
-  let h='';
-  {const T=iSum(R.a,R.b);h+=`<div class="mute" style="font-weight:700;margin:0 0 4px">${rLab(R)}${R.b>now&&R.a<=now?' (لحد دلوقتي)':''}</div><div class="rsum"><div><small>المبيعات</small><b class="num">${f(T.s)}</b></div><div><small>المدفوع</small><b class="num">${f(T.p)}</b></div><div><small>المتبقي</small><b class="num${T.d>0?' dn':''}">${f(T.d)}</b></div><div><small>الفواتير</small><b class="num">${f(T.n)}</b></div></div><div class="mute" style="font-size:12px;margin:4px 0 0">${plN(T.c,'عميل')} · متوسط الفاتورة ${f(T.n?T.s/T.n:0)}${T.ex?' · مصروفات '+f(T.ex):''}</div>`;$('infoSum').innerHTML=h;h=''}
-  const names={p:'المدفوع',s:'المبيعات',i:'قيمة الأصناف',d:'ديون الفترة (اللي لسه متسددتش)',w:'المدفوع حسب الطريقة',r:'ربح الأصناف'};
-  h+=`<div class="ir"><span>${names[iSub]}</span><b class="itot num">${f(cur.tot)}</b></div>`;
-  h+=`<div class="mute" style="font-size:12px">${plN(cur.G.size,cnt)}${iSub==='s'&&cur.inv?' · '+plN(cur.inv,'فاتورة')+' · متوسط '+f(cur.tot/cur.inv):''}</div>`;
-  if(iSub==='r'){const ex=exTot(exIn(R.a,R.b));h+=`<div class="ir"><span>− مصروفات الفترة</span><b class="num">${f(ex)}</b></div><div class="ir"><span><b>= صافي الربح</b></span><b class="itot num">${f(rd2(cur.tot-ex))}</b></div>`+(cur.nk?`<div class="mute" style="font-size:12px">مبيعات بقيمة ${f(cur.nk)} ملهاش سعر شراء، مش داخلة في الربح. اكتب سعر الشراء في الأصناف.</div>`:'')+(!cur.G.size?'<div class="info">لسه مفيش ربح. اكتب «شراء» لكل صنف في الأصناف وسجّل فاتورة.</div>':'')}
-  if(prev){
-    if(!prev.n)h+=`<div class="ir"><span>المقارنة (${pl})</span><span class="mute">مفيش بيانات للفترة دي</span></div>`;
-    else{const dif=rd2(cur.tot-prev.tot),pc=prev.tot?Math.round(dif/Math.abs(prev.tot)*100):null,up=dif>0,cls=dif===0?'':(up!==bad?'up':'dn');
-      h+=`<div class="ir"><span>${pl}: <b class="num">${f(prev.tot)}</b></span><b class="${cls} num">${dif>0?'▲ ':dif<0?'▼ ':''}${f(Math.abs(dif))}${pc===null?(cur.tot?' (جديد)':''):' ('+Math.abs(pc)+'%)'}</b></div>`}
-    if(part)h+=`<div class="mute" style="font-size:11px">المقارنة لحد نفس نقطة الفترة (مش الفترة كلها) عشان تبقى عادلة.</div>`}
+    prev=iAgg(a2,b2);Tp=iSum(a2,b2);pl=R.u==='g'?dshort(a2)+' ← '+dshort(b2-1):labT(a2,iCmp==='yoy'&&R.u==='d'?'d':R.u)}
+  const bad=iSub==='d',cnt=iSub==='i'||iSub==='r'?'صنف':iSub==='w'?'طريقة':'عميل';
+  const dlt=(x,y,inv)=>{const dif=rd2(x-y);if(!dif)return'<em>—</em>';const pc=y?Math.round(Math.abs(dif)/Math.abs(y)*100):null;return'<em class="'+((dif>0)!==!!inv?'up':'dn')+'">'+(dif>0?'▲ ':'▼ ')+(pc===null?f(Math.abs(dif)):pc+'%')+'</em>'};
+  let s='<div class="rhero"><small>'+rLab(R)+(part?' · لحد دلوقتي':'')+'</small><div class="rbig"><b class="num">'+f(T.s)+'</b><span>مبيعات</span>'+(Tp?dlt(T.s,Tp.s):'')+'</div>'+(Tp?'<small class="rcmp">مقارنة بـ '+pl+': '+f(Tp.s)+(Tp.n?'':' (مفيش بيانات)')+'</small>':'')
+   +'<div class="rtiles"><div class="rt ok"><small>المدفوع</small><b class="num">'+f(T.p)+'</b>'+(Tp?dlt(T.p,Tp.p):'')+'</div><div class="rt'+(T.d>0?' bad':'')+'"><small>المتبقي</small><b class="num">'+f(T.d)+'</b>'+(Tp?dlt(T.d,Tp.d,1):'')+'</div><div class="rt"><small>الفواتير</small><b class="num">'+f(T.n)+'</b>'+(Tp?dlt(T.n,Tp.n):'')+'</div></div>'
+   +'<small class="rcmp">'+plN(T.c,'عميل')+' · متوسط الفاتورة '+f(T.n?T.s/T.n:0)+(T.ex?' · مصروفات '+f(T.ex):'')+'</small></div>';
+  $('infoSum').innerHTML=s;
+  const names={p:'المدفوع من كل عميل',s:'مبيعات كل عميل',i:'مبيعات كل صنف',d:'الديون اللي لسه متسددتش',w:'المدفوع بكل طريقة',r:'ربح كل صنف'};
+  let h='<div class="isec"><span>'+names[iSub]+'</span><b class="num">'+f(cur.tot)+'</b></div>';
+  if(iSub==='r'){const ex=exTot(exIn(R.a,R.b));h+='<div class="ir"><span>− مصروفات الفترة</span><b class="num">'+f(ex)+'</b></div><div class="ir"><span><b>= صافي الربح</b></span><b class="itot num">'+f(rd2(cur.tot-ex))+'</b></div>'+(cur.nk?'<div class="mute" style="font-size:12px">مبيعات بقيمة '+f(cur.nk)+' ملهاش سعر شراء، مش داخلة في الربح. اكتب سعر الشراء في الأصناف.</div>':'')}
   const keys=new Set([...cur.G.keys(),...(prev?prev.G.keys():[])]);
   const rows=[...keys].map(k=>({k,c:cur.G.get(k)||{v:0,c:0},p:prev&&prev.G.get(k)})).sort((x,y)=>y.c.v-x.c.v||((y.p&&y.p.v)||0)-((x.p&&x.p.v)||0));
-  if(rows.length){h+=`<div class="isec">${iSub==='i'?'الأصناف':iSub==='w'?'الطرق':'العملاء'}</div>`+rows.slice(0,20).map(o=>`<div class="ir"><span>${esc(o.k)}${iSub==='i'&&o.c.c?' <span class="mute">×'+f(o.c.c)+'</span>':''}</span><span><b class="num">${f(o.c.v)}</b>${prev?`<span class="pv num">${o.p?f(o.p.v):'—'}</span>`:''}</span></div>`).join('')+(rows.length>20?`<div class="mute" style="font-size:12px">+ ${rows.length-20} كمان</div>`:'')}
-  else if(!prev||!prev.n)h+='<div class="info">مفيش بيانات في الفترة دي.</div>';
-  if(iSub==='d'){const dl=S.customers.filter(c=>balOf(c)>0);h+=`<div class="ir" style="margin-top:6px"><span>إجمالي المديونيات الآن</span><b class="num">${f(debtAll())} <span class="mute">(${plN(dl.length,'عميل')})</span></b></div>`}
+  const mx=Math.max(1,...rows.map(o=>Math.abs(o.c.v)));
+  if(rows.length)h+=rows.slice(0,20).map(o=>'<div class="irb"><div class="irt"><span>'+esc(o.k)+(iSub==='i'&&o.c.c?' <small class="mute">×'+f(o.c.c)+'</small>':'')+'</span><span><b class="num">'+f(o.c.v)+'</b>'+(prev?'<small class="pv num">'+(o.p?f(o.p.v):'—')+'</small>':'')+'</span></div><div class="ib'+(bad?' bd':'')+'"><i style="width:'+Math.max(3,Math.round(Math.abs(o.c.v)/mx*100))+'%"></i></div></div>').join('')+(rows.length>20?'<div class="mute" style="font-size:12px">+ '+(rows.length-20)+' كمان</div>':'');
+  else h+='<div class="info">مفيش بيانات في الفترة دي.</div>';
+  if(iSub==='d'){const dl=S.customers.filter(c=>balOf(c)>0);h+='<div class="ir" style="margin-top:6px"><span>إجمالي المديونيات الآن</span><b class="num">'+f(debtAll())+' <span class="mute">('+plN(dl.length,'عميل')+')</span></b></div>'}
   $('infoBody').innerHTML=h}
-$('iSub').onchange=()=>{iSub=$('iSub').value;drawInfo()};
-$('iCmp').onchange=()=>{iCmp=$('iCmp').value;drawInfo()};
-$('iPer').onchange=()=>{iPer=$('iPer').value;if(iPer==='g'){const z=n=>String(n).padStart(2,'0'),y=t=>{const d=new Date(t);return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())};if(!$('iRF').value)$('iRF').value=y(dAgo(29));if(!$('iRT').value)$('iRT').value=y(dAgo(0))}if(iPer==='c'&&!iMon)iMon=mS(new Date().getFullYear(),new Date().getMonth());drawInfo()};
+$('iSub').onclick=e=>{const k=e.target.dataset.k;if(!k)return;iSub=k;drawInfo()};
+$('iCmp').onclick=e=>{const k=e.target.dataset.k;if(!k)return;iCmp=k;drawInfo()};
+$('iPer').onclick=e=>{const k=e.target.dataset.k;if(!k)return;iPer=k;if(k==='g'){const z=n=>String(n).padStart(2,'0'),y=t=>{const d=new Date(t);return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())};if(!$('iRF').value)$('iRF').value=y(dAgo(29));if(!$('iRT').value)$('iRT').value=y(dAgo(0))}if(k==='c'&&!iMon)iMon=mS(new Date().getFullYear(),new Date().getMonth());drawInfo()};
 {const pdt=v=>{if(!v)return 0;const[y,m,d]=v.split('-').map(Number);return new Date(y,m-1,d).getTime()};$('iRF').onchange=()=>{iRF=pdt($('iRF').value);iPer='g';drawInfo()};$('iRT').onchange=()=>{iRT=pdt($('iRT').value);iPer='g';drawInfo()}}
 $('iMonth').onchange=e=>{const v=e.target.value;if(!v)return;const[y,m]=v.split('-').map(Number);iMon=mS(y,m-1);iPer='c';drawInfo()};
 $('clBtn').onclick=()=>{drawCl();$('clOv').classList.remove('hide')};
