@@ -1201,3 +1201,5 @@ html[data-theme="dark"] #recentC button.b-cu,html[data-theme="dark"] #siteC butt
 .ib i{display:block;height:100%;border-radius:99px;background:var(--acc)}
 .ib.bd i{background:#ef4444}
 [data-theme="dark"] .rhero em.up{color:#86efac}[data-theme="dark"] .rhero em.dn{color:#fca5a5}[data-theme="dark"] .rt.bad b{color:#fca5a5}
+/* v234: أي ضغطة على كلام أو أيقونة جوه زرار أو كارت بتتحسب ضغطة على الزرار كله */
+button *,[role="button"] *{pointer-events:none}
