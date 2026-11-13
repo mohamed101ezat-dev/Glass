@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='236';
+const APP_VER='237';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -2286,3 +2286,20 @@ window.addEventListener('popstate',e=>{
 try{history.replaceState({base:1},'');history.pushState({d:0},'');navOK=true}catch(e){}
 new MutationObserver(()=>syncNav()).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
 const _dc=drawCusts;drawCusts=function(){const r=_dc.apply(this,arguments);syncNav();return r};
+/* v237: سحب الصفحة لتحت — إيد بتنزل من فوق تمسك الصفحة وتشدّها، ولما تسيب البيانات تتحدّث */
+(()=>{const NEED=80,MAX=150;let st=0,y0=0,x0=0,pull=0,sec=null,hand=null,tip=null;
+  const mk=()=>{if(hand)return hand;hand=document.createElement('div');hand.id='ptrHand';hand.setAttribute('aria-hidden','true');
+    hand.innerHTML='<div class="arm"></div><svg viewBox="0 0 64 54" width="64" height="54"><path d="M14 0h36v20c7 2 11 8 11 15 0 11-9 18-29 18S3 46 3 35c0-7 4-13 11-15z" fill="#f2b9a0" stroke="#d98e73" stroke-width="2"/><path d="M19 34v12M32 35v13M45 34v12" stroke="#d98e73" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>';
+    document.body.appendChild(hand);tip=document.createElement('div');tip.id='ptrTip';document.body.appendChild(tip);return hand};
+  const scrolled=el=>{for(;el&&el!==document.body;el=el.parentElement)if(el.scrollTop>0)return true;return false};
+  const set=p=>{pull=p;if(sec)sec.style.transform=p?'translateY('+p+'px)':'';const h=mk();h.classList.toggle('show',p>0);h.style.height=(p?p+26:0)+'px';tip.textContent=p>=NEED?'سيب عشان تحدّث':''};
+  const end=()=>{const h=mk(),s=sec;if(s){s.style.transition='transform .35s cubic-bezier(.3,1.5,.5,1)';s.style.transform='';setTimeout(()=>{s.style.transition='';s.style.transform=''},380)}
+    h.style.transition='height .25s ease-in';h.style.height='0px';tip.textContent='';setTimeout(()=>{h.style.transition='';h.classList.remove('show')},260);st=0;pull=0;sec=null};
+  addEventListener('touchstart',e=>{st=0;if(e.touches.length!==1||window.scrollY>0)return;const t=e.target,s=t.closest&&t.closest('section');
+    if(!s||t.closest('canvas,input[type=range],textarea,select')||scrolled(t))return;sec=s;y0=e.touches[0].clientY;x0=e.touches[0].clientX;st=1},{passive:true});
+  addEventListener('touchmove',e=>{if(!st)return;const dy=e.touches[0].clientY-y0,dx=e.touches[0].clientX-x0;
+    if(st===1){if(dy<-4||Math.abs(dx)>Math.abs(dy)){st=0;return}if(dy<12)return;if(window.scrollY>0){st=0;return}st=2;if(document.activeElement&&document.activeElement.blur)document.activeElement.blur()}
+    if(e.cancelable)e.preventDefault();set(Math.max(0,Math.min(MAX,(dy-12)*.55)))},{passive:false});
+  const up=()=>{if(st!==2){st=0;return}const go=pull>=NEED;end();if(!go)return;
+    Promise.resolve().then(()=>syncNow()).then(ok=>{try{refreshAll()}catch(e){}toast(ok?'اتحدّث ✓':'اتحدّث من الجهاز (مفيش اتصال بالسحابة)')}).catch(()=>toast('ماقدرش يحدّث دلوقتي'))};
+  addEventListener('touchend',up);addEventListener('touchcancel',()=>{if(st===2)end();st=0})})();

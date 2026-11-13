@@ -1212,3 +1212,10 @@ button *,[role="button"] *{pointer-events:none}
 #infoView .ichips button{padding:3px 9px;font-size:12.5px}
 #infoView .ichips#iSub{padding-top:6px;margin-top:2px}
 #infoView .rstp{margin:6px 0 2px}
+/* v237: إيد السحب لتحت */
+html,body{overscroll-behavior-y:contain}
+#ptrHand{position:fixed;z-index:39;top:calc(var(--hh,44px) + env(safe-area-inset-top,0px));left:50%;width:64px;margin-left:-32px;height:0;overflow:hidden;pointer-events:none;display:none;flex-direction:column;align-items:center;justify-content:flex-end}
+#ptrHand.show{display:flex}
+#ptrHand .arm{flex:1;width:36px;background:#f2b9a0;border-inline:2px solid #d98e73;min-height:0;box-sizing:border-box}
+#ptrHand svg{flex:none;margin-top:-1px;display:block}
+#ptrTip{position:fixed;z-index:39;top:calc(var(--hh,44px) + env(safe-area-inset-top,0px) + 30px);right:calc(50% + 44px);white-space:nowrap;font-size:12px;font-weight:700;color:var(--mute);pointer-events:none}
