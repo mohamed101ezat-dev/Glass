@@ -1207,3 +1207,8 @@ button *,[role="button"] *{pointer-events:none}
 #infoView #iPer .ichips{padding-bottom:4px}
 #infoView #iPer .ichips span{flex:none;font-size:12px;color:var(--mute)}
 #infoView #infoSum{font-size:13px;margin:6px 0;color:var(--mute)}
+/* v236: التقرير من غير سحب أفقي — الأزرار بتلتف على أسطر */
+#infoView .ichips{flex-wrap:wrap;overflow-x:visible;gap:4px;padding-bottom:4px}
+#infoView .ichips button{padding:3px 9px;font-size:12.5px}
+#infoView .ichips#iSub{padding-top:6px;margin-top:2px}
+#infoView .rstp{margin:6px 0 2px}
