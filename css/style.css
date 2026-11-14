@@ -1259,7 +1259,15 @@ html.d3[data-theme] .bottom-nav{box-shadow:0 -1px 0 var(--d3hi) inset,0 -6px 16p
 #cuMain:has(#cuAdd:not(.hide))>:not(.rowc):not(#cuAdd){display:none!important}
 /* v262: شريط زرار الحفظ بياخد لون خلفية الصفحة بدل الأبيض — مفيش شريط أبيض غريب مع الألوان التانية */
 .savebar,html.noanim .savebar{background:var(--bg)!important;box-shadow:none!important;-webkit-backdrop-filter:none;backdrop-filter:none}
-/* v263: نظام ألوان واحد — شرايح العملاء وشاشة CutList بيتبعوا اللون المختار بدل ألوان ثابتة */
-html #recentC button.b-cu,html #siteC button.b-cu{background:var(--accLight)!important;border-color:color-mix(in srgb,var(--acc) 35%,transparent)!important;color:var(--ink)!important}
+/* v263: شاشة CutList بتتبع اللون المختار. (شرايح العملاء رجعت صفرا زي الأول في v264) */
 html .cl{--hd:var(--acc);--hd-fg:var(--accInk,#fff);--hd2:var(--accLight);--hd2-fg:var(--ink);--btn:color-mix(in srgb,var(--acc) 80%,#000);--btn-hover:color-mix(in srgb,var(--acc) 66%,#000);--btn-fg:#fff;--focus:var(--acc);--accent:var(--acc);--rowsel:var(--accLight)}
 html[data-theme="dark"] .cl{--hd:color-mix(in srgb,var(--acc) 38%,#000);--hd-fg:#fff;--hd2:color-mix(in srgb,var(--acc) 22%,#000);--hd2-fg:#e6ebef;--btn:color-mix(in srgb,var(--acc) 42%,#000);--btn-hover:color-mix(in srgb,var(--acc) 55%,#000);--rowsel:color-mix(in srgb,var(--acc) 26%,#000)}
+
+/* v264: جدول الفاتورة بيتلوّن بلون النظام المختار في كل الألوان (مش الأربعة الهادية بس): الرأس بلون النظام وخطوط الجدول من نفس اللون */
+#rowsW{--xl:color-mix(in srgb,var(--acc) 30%,var(--line))}
+html[data-theme="light"] #rowsHd{background:var(--acc)!important;color:var(--accInk,#fff)!important;border-color:var(--acc)!important}
+html[data-theme="light"] #rowsHd span,html[data-theme="light"] #rowsHd::before{border-color:rgba(255,255,255,.25)!important}
+html[data-theme="light"] #rowsHd::before{background:transparent!important;color:inherit}
+html[data-theme="dark"] #rowsHd{background:color-mix(in srgb,var(--acc) 30%,var(--card))!important;color:var(--ink)!important}
+html[data-theme="dark"] #rowsHd::before{background:transparent!important}
+#rows .row:nth-child(even){background:color-mix(in srgb,var(--acc) 6%,var(--card))}
