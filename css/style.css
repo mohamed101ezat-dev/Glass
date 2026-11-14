@@ -1259,3 +1259,7 @@ html.d3[data-theme] .bottom-nav{box-shadow:0 -1px 0 var(--d3hi) inset,0 -6px 16p
 #cuMain:has(#cuAdd:not(.hide))>:not(.rowc):not(#cuAdd){display:none!important}
 /* v262: شريط زرار الحفظ بياخد لون خلفية الصفحة بدل الأبيض — مفيش شريط أبيض غريب مع الألوان التانية */
 .savebar,html.noanim .savebar{background:var(--bg)!important;box-shadow:none!important;-webkit-backdrop-filter:none;backdrop-filter:none}
+/* v263: نظام ألوان واحد — شرايح العملاء وشاشة CutList بيتبعوا اللون المختار بدل ألوان ثابتة */
+html #recentC button.b-cu,html #siteC button.b-cu{background:var(--accLight)!important;border-color:color-mix(in srgb,var(--acc) 35%,transparent)!important;color:var(--ink)!important}
+html .cl{--hd:var(--acc);--hd-fg:var(--accInk,#fff);--hd2:var(--accLight);--hd2-fg:var(--ink);--btn:color-mix(in srgb,var(--acc) 80%,#000);--btn-hover:color-mix(in srgb,var(--acc) 66%,#000);--btn-fg:#fff;--focus:var(--acc);--accent:var(--acc);--rowsel:var(--accLight)}
+html[data-theme="dark"] .cl{--hd:color-mix(in srgb,var(--acc) 38%,#000);--hd-fg:#fff;--hd2:color-mix(in srgb,var(--acc) 22%,#000);--hd2-fg:#e6ebef;--btn:color-mix(in srgb,var(--acc) 42%,#000);--btn-hover:color-mix(in srgb,var(--acc) 55%,#000);--rowsel:color-mix(in srgb,var(--acc) 26%,#000)}
