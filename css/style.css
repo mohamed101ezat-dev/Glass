@@ -1214,7 +1214,8 @@ button *,[role="button"] *{pointer-events:none}
 #infoView .rstp{margin:6px 0 2px}
 /* v243: الخط عادي مش تخين — العريض للأرقام المهمة والعناوين وزرار الحفظ بس، وبدرجة أخف */
 body :is(div,span,p,label,button,input,select,textarea,td,th,a,small,li,summary,h1,h2,h3,h4){font-weight:400!important}
-body :is(b,strong,th,.stat-value,button.main,a.main,h1,h2,h3),body :is(b,strong) *{font-weight:600!important}
+/* v257: مفيش تخين خالص — الأهمية بتبان بالحجم واللون */
+body :is(b,strong,th,.stat-value,button.main,a.main,h1,h2,h3),body :is(b,strong) *{font-weight:400!important}
 /* v244: شكل 3D اختيار مستقل (html.d3) — شغّال مع أي لون ومع الوضع الليلي. اللون بييجي من اللون المختار */
 html.d3{--d3sh:color-mix(in srgb,var(--h1,var(--acc)) 38%,transparent);--d3hi:rgba(255,255,255,.9);--d3in:rgba(0,0,0,.10);--d3acc:var(--h1,var(--acc))}
 html.d3[data-theme="dark"]{--d3sh:rgba(0,0,0,.65);--d3hi:rgba(255,255,255,.07);--d3in:rgba(0,0,0,.38)}

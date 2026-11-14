@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='253';
+const APP_VER='257';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -299,8 +299,12 @@ function sheet(o){lastSpec=o;const D=invd();
   const TH=o.paper==='t80'||o.paper==='t58',W=o.paper==='t58'?300:o.paper==='t80'?420:D.w,P=TH?8:D.m,IW=W-2*P,F=o.fancy&&!TH?D.famCss:'Tahoma, Arial, "Noto Naskh Arabic", sans-serif',mc=document.createElement('canvas').getContext('2d');
   const GR=TH?'#000':'#555',AC=TH?'#000':'#0f766e',nf=TH?13:15,nlh=TH?19:22;
   const wrap=(t,w,font)=>{mc.font=font;mc.direction='rtl';const out=[];let cur='';for(const wd of String(t==null?'':t).split(/\s+/)){const tr=cur?cur+' '+wd:wd;if(!cur||mc.measureText(tr).width<=w)cur=tr;else{out.push(cur);cur=wd}}out.push(cur);return out};
+  /* v254: خانات الجدول سطر واحد دايمًا — الخط بيصغر شوية، ولو لسه مش مكفي الكلام بيتقص بـ… */
+  const fit1=(t,w,z,bold)=>{let s=String(t==null?'':t).replace(/\s+/g,' ').trim(),zz=z;const mn=Math.max(8,z*.6),me=q=>{mc.font=(bold?'bold ':'')+zz+'px '+F;mc.direction='rtl';return mc.measureText(q).width};
+    for(;zz>mn;zz-=.5)if(me(s)<=w)return{s,z:zz};zz=mn;if(me(s)<=w)return{s,z:zz};while(s.length>1&&me(s+'…')>w)s=s.slice(0,-1);return{s:s+'…',z:zz}};
+  let _f,_ft;const fitF=(t,w,font)=>{const m=/^(bold )?([\d.]+)px (.*)$/.exec(font);if(!m)return{s:String(t==null?'':t),font};const q=fit1(t,w,+m[2],!!m[1]);return{s:q.s,font:(m[1]||'')+q.z+'px '+m[3]}};
   const paint=x=>{let y=10;x.direction='rtl';x.textBaseline='middle';
-    const T=(s,px,py,al,font,col)=>{if(/[-]/.test(s))return drawRich(x,s,px,py,al,font,col||'#000');x.font=font;x.textAlign=al;x.fillStyle=col||'#000';x.fillText(String(s),px,py)};
+    const T=(s,px,py,al,font,col)=>{font=String(font).replace(/^bold /,'');if(/[-]/.test(s))return drawRich(x,s,px,py,al,font,col||'#000');x.font=font;x.textAlign=al;x.fillStyle=col||'#000';x.fillText(String(s),px,py)};
     let lg=false;
     if(logoOK()){const k=Math.min(IW*(TH?.6:.26)/logoImg.naturalWidth,(TH?44:52)/logoImg.naturalHeight,1),w=logoImg.naturalWidth*k,h=logoImg.naturalHeight*k;x.drawImage(logoImg,TH?(W-w)/2:W-P-w,y,w,h);
       if(TH)y+=h+4;else{lg=true;x.direction='ltr';T(shopN(),P,y+h/2-9,'left','bold 17px '+F,AC);x.direction='rtl';T(o.date,P,y+h/2+11,'left','13px '+F,GR);y+=h+6}}
@@ -314,11 +318,11 @@ function sheet(o){lastSpec=o;const D=invd();
       const tf=TH&&tb.th.length>(o.paper==='t58'?3:4)?12:15,lh=tf===12?17:22,pad=TH?6:10;
       if(tb.title){T(tb.title,W-P,y+10,'right','bold 15px '+F);y+=24}
       const ws=tb.w.map(v=>v*IW),hh=TH?26:30;let xr=W-P;if(!TH){x.fillStyle='#eee';x.fillRect(P,y,IW,hh)}x.strokeStyle=TH?'#000':'#444';
-      tb.th.forEach((h,i)=>{T(h,xr-ws[i]/2,y+hh/2,'center','bold '+(tf-1)+'px '+F);x.strokeRect(xr-ws[i],y,ws[i],hh);xr-=ws[i]});y+=hh;
-      tb.rows.forEach(row=>{const ln=row.map((c,i)=>wrap(c,ws[i]-pad,tf+'px '+F)),n=Math.max(...ln.map(l=>l.length)),rh=n*lh+pad;let xr=W-P;
-        row.forEach((c,i)=>{ln[i].forEach((s,k)=>T(s,xr-ws[i]/2,y+pad/2+lh*k+lh/2,'center',tf+'px '+F));x.strokeRect(xr-ws[i],y,ws[i],rh);xr-=ws[i]});y+=rh});
+      tb.th.forEach((h,i)=>{T(h,xr-ws[i]/2,y+hh/2,'center',fit1(h,ws[i]-6,tf-1,0).z+'px '+F);x.strokeRect(xr-ws[i],y,ws[i],hh);xr-=ws[i]});y+=hh;
+      tb.rows.forEach(row=>{const fz=[],ln=row.map((c,i)=>{const q=fit1(c,ws[i]-pad,tf,0);fz[i]=q.z;return[q.s]}),n=Math.max(...ln.map(l=>l.length)),rh=n*lh+pad;let xr=W-P;
+        row.forEach((c,i)=>{ln[i].forEach((s,k)=>T(s,xr-ws[i]/2,y+pad/2+lh*k+lh/2,'center',fz[i]+'px '+F));x.strokeRect(xr-ws[i],y,ws[i],rh);xr-=ws[i]});y+=rh});
       y+=8});
-    if(o.sum){const lw=IW*.68,vw=IW-lw,sf=TH?14:15;o.sum.forEach(([a,b,bold])=>{const fo=(bold?'bold ':'')+sf+'px '+F,ls=wrap(a,lw-16,fo),rh=Math.max(TH?26:30,ls.length*(sf+5)+8);
+    if(o.sum){const lw=IW*.68,vw=IW-lw,sf=TH?14:15;o.sum.forEach(([a,b,bold])=>{const _g=fitF(a,lw-16,(bold?'bold ':'')+sf+'px '+F),fo=_g.font,ls=[_g.s],rh=Math.max(TH?26:30,ls.length*(sf+5)+8);
       if(bold&&!TH){x.fillStyle='#e2f1ef';x.fillRect(P,y,IW,rh)}
       ls.forEach((s,k)=>T(s,W-P-8,y+rh/2+(k-(ls.length-1)/2)*(sf+5),'right',fo));T(b,P+vw/2,y+rh/2,'center',fo);
       x.strokeStyle=TH?'#000':'#444';x.strokeRect(W-P-lw,y,lw,rh);x.strokeRect(P,y,vw,rh);y+=rh});y+=6}
@@ -328,7 +332,7 @@ function sheet(o){lastSpec=o;const D=invd();
     return y+(TH?30:4)};
     const PL={bg:D.bg,mar:D.marble,head:D.head,hfg:D.hfg,ink:D.ink,grid:D.grid,edge:D.edge,tot:[D.totBg,D.totFg],gold:[D.remBg,D.remFg],paid:[D.paidBg,D.paidFg],lite:[D.sumA,D.ink],lite2:[D.sumB,D.ink],val:D.ink,rows:D.acc.map(c=>[hexMix(c,D.bg,D.tint/100),c])},PALF=PL.rows,HEADC=PL.head,GRIDC=PL.grid,EDGEC=PL.edge;
   const paintF=x=>{x.direction='rtl';x.textBaseline='middle';const LY=o.edit?[]:null,LR=r=>{if(LY)LY.push(r)},R=D.r,GR=D.muteC||'#555555',GP=D.gap==null?10:+D.gap;
-    const T=(s,px,py,al,font,col)=>{if(/[-]/.test(s))return drawRich(x,s,px,py,al,font,col||PL.ink);x.font=font;x.textAlign=al;x.fillStyle=col||PL.ink;x.fillText(String(s),px,py)};
+    const T=(s,px,py,al,font,col)=>{font=String(font).replace(/^bold /,'');if(/[-]/.test(s))return drawRich(x,s,px,py,al,font,col||PL.ink);x.font=font;x.textAlign=al;x.fillStyle=col||PL.ink;x.fillText(String(s),px,py)};
     const rr=(X,Y,w,h,r)=>{x.beginPath();if(x.roundRect)x.roundRect(X,Y,w,h,r);else x.rect(X,Y,w,h)};
     const xt=(txt,bold,col,sz,k)=>{const z=+sz||D.xs,al=D.xal==='r'?'right':D.xal==='l'?'left':'center',px=D.xal==='r'?W-P:D.xal==='l'?P:W/2,fo=(bold?'bold ':'')+z+'px '+F,y0=y;
       String(txt||'').split('\n').forEach(ln=>{ln=ln.trim();if(!ln)return;wrap(ln,IW,fo).forEach(q=>{T(q,px,y+z/2+4,al,fo,col);y+=z+8})});if(k&&y>y0)LR({t:'txt',k,x:P,y:y0,w:IW,h:y-y0})};
@@ -337,29 +341,29 @@ function sheet(o){lastSpec=o;const D=invd();
     if(logoOK()){const LH=+D.logoH||64,k=Math.min(IW*Math.min(.5,.3*LH/64)/logoImg.naturalWidth,LH/logoImg.naturalHeight,Math.max(1,LH/64));lw=logoImg.naturalWidth*k;lh=logoImg.naturalHeight*k;x.drawImage(logoImg,W-P-lw,y,lw,lh);LR({t:'logo',x:W-P-lw,y,w:lw,h:lh})}
     else{const sn=shopN();x.font='bold '+D.shop+'px '+F;lw=Math.min(x.measureText(sn).width,IW*.3);lh=Math.max(44,D.shop*2);T(sn,W-P,y+lh/2,'right','bold '+D.shop+'px '+F,D.shopC||PL.ink);LR({t:'txt',k:'shop',x:W-P-lw,y,w:lw,h:lh})}
     if(D.sDate){T(d1,P,y+(lh>=44?lh/2-10:20),'left',D.date+'px '+F,GR);T(d2,P,y+(lh>=44?lh/2+10:40),'left',D.date+'px '+F,GR);LR({t:'txt',k:'date',x:P,y,w:95,h:Math.max(lh,44)})}
-    const awS=W-2*(P+Math.max(lw,95)+12),stk=logoOK()&&awS<120,aw=stk?IW:awS,tt=o.title||((custW()?custW()+' / ':'')+o.name),tf='bold '+D.title+'px '+F;
-    const TL=D.mob?22:28,SL=D.mob?16:20,tl=wrap(tt,aw,tf),sl=D.sSub?wrap(o.sub||'',aw,D.sub+'px '+F).filter(Boolean):[],bh=tl.length*TL+sl.length*SL,hh=stk?lh+6+bh+4:Math.max(lh,bh+4,D.mob?40:48);
+    const awS=W-2*(P+Math.max(lw,95)+12),stk=logoOK()&&awS<120,aw=stk?IW:awS,tt=o.title||((custW()?custW()+' / ':'')+o.name),tf=D.title+'px '+F;
+    const TL=D.mob?22:28,SL=D.mob?16:20,tl=[(_ft=fitF(tt,aw,tf)).s],sl=D.sSub?wrap(o.sub||'',aw,D.sub+'px '+F).filter(Boolean):[],bh=tl.length*TL+sl.length*SL,hh=stk?lh+6+bh+4:Math.max(lh,bh+4,D.mob?40:48);
     /* لو اللوجو كبير ومفيش مكان جنبه، اسم العميل ينزل تحته بعرض الفاتورة */
-    let ty=stk?y+lh+6:y+(hh-bh)/2;tl.forEach(s=>{T(s,W/2,ty+TL/2,'center',tf);ty+=TL});sl.forEach(s=>{T(s,W/2,ty+SL/2,'center',D.sub+'px '+F,GR);ty+=SL});
+    let ty=stk?y+lh+6:y+(hh-bh)/2;tl.forEach(s=>{T(s,W/2,ty+TL/2,'center',_ft.font);ty+=TL});sl.forEach(s=>{T(s,W/2,ty+SL/2,'center',D.sub+'px '+F,GR);ty+=SL});
     {const t0=stk?y+lh+6:y+(hh-bh)/2;LR({t:'txt',k:'title',x:(W-aw)/2,y:t0,w:aw,h:tl.length*TL});if(sl.length)LR({t:'txt',k:'sub',x:(W-aw)/2,y:t0+tl.length*TL,w:aw,h:sl.length*SL})}
     y+=hh+8;xt(D.headText,0,null,D.fHead,'head');
     (o.meta||[]).forEach(m=>wrap(m,IW,D.meta+'px '+F).forEach(s=>{T(s,W-P,y+10,'right',D.meta+'px '+F);y+=24}));
     const tbl=(tb,xr0,w,opt)=>{opt=opt||{};const AL=i=>{const a=opt.al&&opt.al[i];return a==='r'?'right':a==='l'?'left':'center'},AX=(xr,c,i)=>{const a=AL(i),px=Math.max(4,D.pad/2+3);return a==='right'?xr-px-(tb.col&&PALF.length?6:0):a==='left'?xr-c+px:xr-c/2};const fs=opt.fs||D.tbl,lhh=fs+(D.mob?4:7),hdh=opt.hh>0?opt.hh:Math.max(+D.hdh||30,D.th+(D.mob?7:16)),cw=tb.w.map(v=>v*w),pad=D.pad;
-      const lines=tb.rows.map(r=>r.map((c,i)=>wrap(c,cw[i]-pad,fs+'px '+F))),rh=lines.map(l=>Math.max(Math.max(...l.map(a=>a.length))*lhh+pad,opt.rh||0)),h=hdh+rh.reduce((a,b)=>a+b,0),X=xr0-w;
+      const FS=[],lines=tb.rows.map((r,k)=>r.map((c,i)=>{const q=fit1(c,cw[i]-pad,fs,(opt.bold&&opt.bold(i))||D.bold);(FS[k]=FS[k]||[])[i]=q.z;return[q.s]})),rh=lines.map(l=>Math.max(Math.max(...l.map(a=>a.length))*lhh+pad,opt.rh||0)),h=hdh+rh.reduce((a,b)=>a+b,0),X=xr0-w;
       x.save();rr(X,y,w,h,R);x.clip();x.fillStyle=HEADC;x.fillRect(X,y,w,hdh);
       let yy=y+hdh;tb.rows.forEach((r,k)=>{if(D.gAlt&&tb.grp&&tb.grp[k]%2){x.fillStyle=D.gAltC||D.sumA;x.fillRect(X,yy,w,rh[k])}const c=tb.col&&tb.col[k];if(c!=null&&PALF[c%PALF.length]){x.fillStyle=PALF[c%PALF.length][0];x.fillRect(X,yy,w,rh[k]);x.fillStyle=PALF[c%PALF.length][1];x.fillRect(xr0-6,yy,6,rh[k])}yy+=rh[k]});
       x.strokeStyle=GRIDC;x.lineWidth=+D.gw||1;let xx=xr0;cw.forEach((c,i)=>{xx-=c;if(i<cw.length-1){x.beginPath();x.moveTo(xx,y);x.lineTo(xx,y+h);x.stroke()}});
       if(D.hLine!==0){x.beginPath();x.moveTo(X,y+hdh);x.lineTo(xr0,y+hdh);x.stroke()}
       yy=y+hdh;rh.forEach((g,k)=>{yy+=g;if(k<rh.length-1){const sp=tb.grp&&tb.grp[k]!==tb.grp[k+1]&&+D.gSep>0;x.save();if(sp){x.strokeStyle=D.gSepC||EDGEC;x.lineWidth=+D.gSep}x.beginPath();x.moveTo(X,yy);x.lineTo(xr0,yy);x.stroke();x.restore()}});x.restore();
-      let xr=xr0;tb.th.forEach((t,i)=>{T(t,AX(xr,cw[i],i),y+hdh/2,AL(i),'bold '+(opt.fs?fs-1:D.th)+'px '+F,PL.hfg);xr-=cw[i]});
-      yy=y+hdh;tb.rows.forEach((r,k)=>{let xr=xr0;r.forEach((c,i)=>{const bold=opt.bold&&opt.bold(i),col=tb.red&&tb.red[k]?(D.retC||'#b42318'):(opt.colr&&opt.colr(i))||PL.ink;const zz=D.mob&&AL(i)==='center'&&tb.th[i]==='المقاس'&&/^\s*[\d.]+\s*\/\s*[\d.]+\s*$/.test(String(c));if(zz){const q=String(c).split('/').map(v=>v.trim()),xc=xr-cw[i]/2,off=5+(cw[i]-10)/4,ff=(D.bold?'bold ':'')+fs+'px '+F,my=yy+rh[k]/2;const gp=Math.round(fs*.7);let mA=0,mB=0;x.save();x.font=ff;tb.rows.forEach(rr=>{const cc=String(rr[i]);if(/^\s*[\d.]+\s*\/\s*[\d.]+\s*$/.test(cc)){const z=cc.split('/').map(v=>v.trim());mA=Math.max(mA,x.measureText(z[0]).width);mB=Math.max(mB,x.measureText(z[1]).width)}});x.restore();x.save();x.font=(fs-2)+'px '+F;const xw=x.measureText('×').width;x.restore();const gp2=2,tot=mB+gp2+xw+gp2+mA,xs=xc-tot/2,dc=D.decC||col,TD=(v,xx)=>{const m=String(v).match(/^(\d*)(\.\d+)?$/);if(!m||!m[2]||dc===col){T(v,xx,my,'left',ff,col);return}T(m[1],xx,my,'left',ff,col);x.save();x.font=ff;const iw=x.measureText(m[1]).width;x.restore();T('\u200E'+m[2],xx+iw,my,'left',ff,dc)};TD(q[1],xs);T('×',xs+mB+gp2+xw/2,my,'center',(fs-2)+'px '+F,GR);TD(q[0],xs+mB+gp2+xw+gp2)}else lines[k][i].forEach((s,j)=>T(s,AX(xr,cw[i],i),yy+(rh[k]-lines[k][i].length*lhh)/2+lhh*j+lhh/2,AL(i),(bold||D.bold?'bold ':'')+fs+'px '+F,col));xr-=cw[i]});yy+=rh[k]});
+      let xr=xr0;tb.th.forEach((t,i)=>{T(t,AX(xr,cw[i],i),y+hdh/2,AL(i),fit1(t,cw[i]-4,opt.fs?fs-1:D.th,0).z+'px '+F,PL.hfg);xr-=cw[i]});
+      yy=y+hdh;tb.rows.forEach((r,k)=>{let xr=xr0;r.forEach((c,i)=>{const bold=opt.bold&&opt.bold(i),col=tb.red&&tb.red[k]?(D.retC||'#b42318'):(opt.colr&&opt.colr(i))||PL.ink;const zz=D.mob&&AL(i)==='center'&&tb.th[i]==='المقاس'&&/^\s*[\d.]+\s*\/\s*[\d.]+\s*$/.test(String(c));if(zz){const q=String(c).split('/').map(v=>v.trim()),xc=xr-cw[i]/2,off=5+(cw[i]-10)/4,ff=(D.bold?'bold ':'')+fs+'px '+F,my=yy+rh[k]/2;const gp=Math.round(fs*.7);let mA=0,mB=0;x.save();x.font=ff;tb.rows.forEach(rr=>{const cc=String(rr[i]);if(/^\s*[\d.]+\s*\/\s*[\d.]+\s*$/.test(cc)){const z=cc.split('/').map(v=>v.trim());mA=Math.max(mA,x.measureText(z[0]).width);mB=Math.max(mB,x.measureText(z[1]).width)}});x.restore();x.save();x.font=(fs-2)+'px '+F;const xw=x.measureText('×').width;x.restore();const gp2=2,tot=mB+gp2+xw+gp2+mA,xs=xc-tot/2,dc=D.decC||col,TD=(v,xx)=>{const m=String(v).match(/^(\d*)(\.\d+)?$/);if(!m||!m[2]||dc===col){T(v,xx,my,'left',ff,col);return}T(m[1],xx,my,'left',ff,col);x.save();x.font=ff;const iw=x.measureText(m[1]).width;x.restore();T('\u200E'+m[2],xx+iw,my,'left',ff,dc)};TD(q[1],xs);T('×',xs+mB+gp2+xw/2,my,'center',(fs-2)+'px '+F,GR);TD(q[0],xs+mB+gp2+xw+gp2)}else lines[k][i].forEach((s,j)=>T(s,AX(xr,cw[i],i),yy+(rh[k]-lines[k][i].length*lhh)/2+lhh*j+lhh/2,AL(i),(bold||D.bold?'bold ':'')+FS[k][i]+'px '+F,col));xr-=cw[i]});yy+=rh[k]});
       x.strokeStyle=EDGEC;x.lineWidth=D.ew==null?1.2:+D.ew;rr(X,y,w,h,R);x.stroke();if(opt.lid)LR({t:'tbl',id:opt.lid,X,y,w,h,hdh,rows:rh.slice(),cw:cw.slice(),xr0,th:tb.th.slice()});return h};
     const tstyle=(a,b)=>a==='الإجمالي'?PL.tot:/^(المتبقي|الحساب بعد الدفعة)$/.test(a)?PL.gold:/^(المدفوع|صافي المدفوع|صافي الدفعة|المبلغ المدفوع)( \(.*\))?$/.test(a)?PL.paid:b?PL.lite:PL.lite2;
     const rowFont=(a,bold)=>{const kd=a==='الإجمالي'?'Tot':/^(المتبقي|الحساب بعد الدفعة)$/.test(a)?'Rem':/^(المدفوع|صافي المدفوع|صافي الدفعة|المبلغ المدفوع)( \(.*\))?$/.test(a)?'Paid':'',fz=+D['f'+kd]||(bold?D.sumBig:D.sum),bb=bold||(kd==='Paid'&&D.paidB);return{kd,fz,fo:(bb?'bold ':'')+fz+'px '+F}};
     /* مربع الإجماليات صغير على قد محتواه */
     const fitDims=()=>{let lw=0,vm=0;(o.sum||[]).filter(r=>!(D.hPrev&&r[0]==='رصيد سابق')).forEach(([a,b,bold])=>{x.font=rowFont(a,bold).fo;lw=Math.max(lw,x.measureText(String(a)).width);vm=Math.max(vm,x.measureText(String(b)).width)});
       const vwF=Math.max(64,vm+26);return{w:Math.min(IW*.62,Math.max(150,lw+vwF+30)),vw:vwF}};
-    const totals=(X,w,vw)=>{const rows=(o.sum||[]).filter(r=>!(D.hPrev&&r[0]==='رصيد سابق')).map(([a,b,bold])=>{const q=rowFont(a,bold),fz=q.fz,fo=q.fo,kd=q.kd,ls=wrap(a,w-vw-16,fo);return{a,b,fo,fz,ls,st:tstyle(a,bold),rh:Math.max(+D['h'+kd]||D.sumH,ls.length*(fz+4)+10)}}),h=rows.reduce((q,r)=>q+r.rh,0);
+    const totals=(X,w,vw)=>{const rows=(o.sum||[]).filter(r=>!(D.hPrev&&r[0]==='رصيد سابق')).map(([a,b,bold])=>{const q=rowFont(a,bold),fz=q.fz,fo=(_f=fitF(a,w-vw-16,q.fo)).font,kd=q.kd,ls=[_f.s];return{a,b,fo,fz,ls,st:tstyle(a,bold),rh:Math.max(+D['h'+kd]||D.sumH,ls.length*(fz+4)+10)}}),h=rows.reduce((q,r)=>q+r.rh,0);
       x.save();rr(X,y,w,h,R);x.clip();let yy=y;rows.forEach(r=>{x.fillStyle=r.st[0];x.fillRect(X,yy,w,r.rh);yy+=r.rh});
       x.strokeStyle=GRIDC;x.lineWidth=+D.gw||1;yy=y;rows.forEach((r,k)=>{yy+=r.rh;if(k<rows.length-1){x.beginPath();x.moveTo(X,yy);x.lineTo(X+w,yy);x.stroke()}});x.beginPath();x.moveTo(X+vw,y);x.lineTo(X+vw,y+h);x.stroke();x.restore();
       yy=y;rows.forEach(r=>{r.ls.forEach((s,j)=>T(s,X+w-10,yy+r.rh/2+(j-(r.ls.length-1)/2)*(r.fz+4),'right',r.fo,r.st[1]));T(r.b,X+vw/2,yy+r.rh/2,'center',r.fo,r.st[1]);yy+=r.rh});
@@ -388,8 +392,8 @@ function sheet(o){lastSpec=o;const D=invd();
         hS=h1+rowBox(W-P-sw,y+h1,cw,nq?['الإجمالي',String(it.c==null?'':it.c),it.v==null?'':f(it.v)]:['الإجمالي',String(it.c==null?'':it.c),it.q?fq(it.q):'-',it.v==null?'':f(it.v)],nq?[HEADC,D.sumA,D.sumA]:[HEADC,D.sumA,D.sumA,D.sumA],nq?[PL.hfg,PL.ink,PL.ink]:[PL.hfg,PL.ink,PL.ink,PL.ink],+D.itRow||D.sumH,[fo2],[0,0,R,R])}
       if(its&&!side){y+=hS+GP;hS=0}
       const X=side?P:(D.sumPos==='r'?W-P-tw:D.sumPos==='c'?(W-tw)/2:P);let hT=0,yy=y,nI=0,RW=[];
-      let hPre=0;rows0.forEach(([a,b,bold])=>{const q=rk(a,bold),ls=wrap(a,lw-8,q.ff);hPre+=Math.max(q.rh0,ls.length*(q.fz+4)+4)});x.save();rr(X,y,tw,hPre,+D.sumR);x.clip();
-      rows0.forEach(([a,b,bold])=>{const q=rk(a,bold),last=q.kd==='Rem',ls=wrap(a,lw-8,q.ff),rh=Math.max(q.rh0,ls.length*(q.fz+4)+4),
+      let hPre=0;rows0.forEach(([a,b,bold])=>{const q=rk(a,bold),ls=(_f=fitF(a,lw-8,q.ff),q.ff=_f.font,[_f.s]);hPre+=Math.max(q.rh0,ls.length*(q.fz+4)+4)});x.save();rr(X,y,tw,hPre,+D.sumR);x.clip();
+      rows0.forEach(([a,b,bold])=>{const q=rk(a,bold),last=q.kd==='Rem',ls=(_f=fitF(a,lw-8,q.ff),q.ff=_f.font,[_f.s]),rh=Math.max(q.rh0,ls.length*(q.fz+4)+4),
           lc=last?PL.gold:q.kd==='Tot'?PL.tot:[HEADC,PL.hfg],vc=last?PL.gold:q.kd==='Paid'?PL.paid:q.kd==='Tot'?[D.sumA,PL.ink]:[(nI++%2?D.sumB:D.sumA),PL.ink];
         x.save();x.fillStyle=lc[0];x.fillRect(X+vw,yy,lw,rh);x.fillStyle=vc[0];x.fillRect(X,yy,vw,rh);x.restore();
         x.strokeStyle=GRIDC;x.lineWidth=+D.gw||1;x.beginPath();x.moveTo(X+vw,yy);x.lineTo(X+vw,yy+rh);x.stroke();x.beginPath();x.moveTo(X,yy+rh);x.lineTo(X+tw,yy+rh);x.stroke();
@@ -456,7 +460,7 @@ async function showImg(cv,name,msg,auto,phone,rec){
   const hasN=!!waNum(curPhone),sh=$('ressh');
   sh.classList.toggle('hide',!canS);$('reswa').classList.toggle('hide',canS&&!hasN);
   sh.classList.toggle('main',!hasN);sh.classList.toggle('b-green',!hasN);sh.classList.toggle('alt',hasN);sh.textContent=hasN?'📤 مشاركة':'📤 إرسال للعميل';$('reswa').style.flex=hasN?'1 1 100%':'';if(hasN)$('resdl').before(sh);else $('reswa').before(sh);
-  $('reshint').textContent=hasN?'💬 بيفتح شات العميل والصورة متنسخة: دوس مطولاً في خانة الرسالة واختار «لصق». لو اللصق ما ظهرش، استخدم «📤 مشاركة».':canS?'لو عايز الزرار يفتح شات العميل على طول، اكتب رقمه في بياناته.':'الصورة بتتنسخ ويتفتح شات العميل. الصقها (اضغط مطولاً ثم لصق) وأرسل.';
+  $('reshint').textContent=hasN?'بيفتح شات العميل والصورة متنسخة: دوس مطولاً في خانة الرسالة واختار «لصق». لو اللصق ما ظهرش، استخدم «📤 مشاركة».':canS?'لو عايز الزرار يفتح شات العميل على طول، اكتب رقمه في بياناته.':'الصورة بتتنسخ ويتفتح شات العميل. الصقها (اضغط مطولاً ثم لصق) وأرسل.';
   $('resimg').src=imgURL;$('resm').textContent=baseMsg;$('res').classList.remove('hide');
   $('res').scrollTop=0;ordUI();
   if(auto)await downloadCur()}
@@ -641,7 +645,7 @@ function tblHtml(c){const all=rowsOf(c);if(!all.length)return'<p class="mute">م
 function drawDet(){const c=getC(selC),l=rowsOf(c);
   $('cuDet').innerHTML=`<button class="lnk" data-back="1">→ رجوع</button>
   <div class="card"><div class="ro" style="margin-bottom:6px;gap:6px"><b style="font-size:17px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</b><span class="cb ${bcls(c)} num">${bal(c)}</span><button class="ab" data-tg="ed" aria-label="تعديل بيانات العميل">✏️ تعديل</button></div>
-   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">${phoneParts(c.phone).slice(0,3).map((p,i)=>{const n=i?' '+(i+1):'';return(telNum(p)?`<a class="ab" href="tel:${telNum(p)}">📞${i?n:' اتصال'}</a>`:'')+(waNum(p).length>=9?`<a class="ab" target="_blank" rel="noopener" href="https://wa.me/${waNum(p)}"><i class="wai"></i>${i?n:' واتساب'}</a>`:'')}).join('')}<button class="ab" data-inv="1">🧾 فاتورة</button>${!ledger(c).length&&waNum(c.phone).length>=9?`<a class="ab" target="_blank" rel="noopener" href="https://wa.me/${waNum(c.phone)}?text=${encodeURIComponent('أهلاً '+c.name+'، يسعدنا التعامل معاك 🌹'+(shopN()?' — '+shopN():''))}">👋 ترحيب</a>`:''}${balOf(c)>0?`<button class="ab b-out" data-rem="1">📨 تذكير</button>`:''}</div>
+   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">${phoneParts(c.phone).slice(0,3).map((p,i)=>{const n=i?' '+(i+1):'';return(telNum(p)?`<a class="ab" href="tel:${telNum(p)}">📞${i?n:' اتصال'}</a>`:'')+(waNum(p).length>=9?`<a class="ab" target="_blank" rel="noopener" href="https://wa.me/${waNum(p)}"><i class="wai"></i>${i?n:' واتساب'}</a>`:'')}).join('')}<button class="ab" data-inv="1">🧾 فاتورة</button>${!ledger(c).length&&waNum(c.phone).length>=9?`<a class="ab" target="_blank" rel="noopener" href="https://wa.me/${waNum(c.phone)}?text=${encodeURIComponent('أهلاً '+c.name+'، يسعدنا التعامل معاك 🌹'+(shopN()?' — '+shopN():''))}">👋 ترحيب</a>`:''}${balOf(c)>0?`<button class="ab b-out" data-rem="1"><i class="wai"></i> تذكير</button>`:''}</div>
    ${(()=>{const l=ledger(c).filter(r=>r.type!=='pay');if(!l.length)return'';const tot=rd2(l.reduce((s,r)=>s+val(r),0)),first=Math.min(...ledger(c).map(r=>r.ts));return`<div class="mute" style="margin:0 0 6px;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="من ${dshort(first)}">🧾 ${plN(l.length,'فاتورة')} · مشتريات <b class="num">${f(tot)}</b> · متوسط <b class="num">${f(Math.round(tot/l.length))}</b></div>`})()}
    ${c.lim>0&&balOf(c)>c.lim?`<div style="color:var(--danger);font-size:13px;margin:0 0 6px">⚠ عدّى حد الدين (${f(c.lim)})</div>`:''}
    ${cuPm?`${pwHtml('cu',c)}<div class="btns"><button class="main b-green" data-pay="1">✅ تسجيل الدفعة</button><button class="alt" data-tg="pm" style="flex:none">✖️ إلغاء</button></div>`:`<button class="main b-green" data-tg="pm" style="width:100%">💵 تسجيل دفعة</button>`}
@@ -1560,7 +1564,7 @@ $('t-st').addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(
 /* ===== الربح ووضع العامل ===== */
 const byTag=()=>{try{const n=localStorage.getItem('wkName');return n?{by:n}:{}}catch(e){return{}}};
 const wkList=()=>{try{return JSON.parse(localStorage.getItem('wkList')||'[]')}catch(e){return[]}};
-function hWa(r){if(wkOn())return'';const c=getC(r.cid),w=c&&waNum(c.phone);return w?`<a class="ab wa qa" target="_blank" rel="noopener" href="https://wa.me/${w}?text=${encodeURIComponent(remText(c))}">💬</a>`:''}
+function hWa(r){if(wkOn())return'';const c=getC(r.cid),w=c&&waNum(c.phone);return w?`<a class="ab wa qa" target="_blank" rel="noopener" href="https://wa.me/${w}?text=${encodeURIComponent(remText(c))}"><i class="wai"></i></a>`:''}
 function wkDraw(){const sel=localStorage.getItem('wkSel')||'';$('wkL').innerHTML=wkList().map(n=>`<span class="tag ${n===sel?'ok':''}" data-wn="${esc(n)}" style="cursor:pointer">👷 ${esc(n)}${n===sel?' ✓':''} <b data-wd="${esc(n)}" style="margin-inline-start:6px">×</b></span>`).join(' ')||'<span class="mute">مفيش عمال متسجلين. الاسم اختياري، بيتكتب على كل فاتورة.</span>'}
 function wkOn(){try{return localStorage.getItem('wkMode')==='1'}catch(e){return false}}
 function wkApply(){document.body.classList.toggle('wk',wkOn())}
@@ -2129,7 +2133,7 @@ function repGo(){
   tb.rows=rows;
   if(iCmp!=='0'&&sb!=='d'){const now=Date.now(),part=R.b>now&&R.a<=now;let a2,b2,pl;
     if(R.u==='g'&&iCmp==='prev'){a2=R.a-(R.b-R.a);b2=R.a}else{const uu=R.u==='g'?'y':iCmp==='yoy'?'y':R.u;a2=shiftT(R.a,uu,-1);b2=shiftT(R.b,uu,-1)}
-    if(part)b2=Math.min(b2,a2+(now-R.a));pl=R.u==='g'?dshort(a2)+' ← '+dshort(b2-1):labT(a2,iCmp==='yoy'&&R.u==='d'?'d':R.u);
+    if(part)b2=Math.min(b2,a2+(now-R.a));pl=R.u==='g'||(part&&R.u!=='d')?dshort(a2)+' ← '+dshort(b2-1):labT(a2,iCmp==='yoy'&&R.u==='d'?'d':R.u);
     const P=sb==='o'||sb==='t'||sb==='x'?null:iAgg(a2,b2);
     if(P){const dif=rd2(tot-P.tot),pc=P.tot?Math.round(Math.abs(dif)/Math.abs(P.tot)*100)+'%':'';sum.push(['مقارنة بـ '+pl,f(P.tot)]);sum.push(['الفرق',dif?(dif>0?'زيادة ':'نقص ')+f(Math.abs(dif))+(pc?' ('+pc+')':''):'زي بعض',1])}}
   const lab=perLab(R),cv=sheet({title:'تقرير '+SNAME[sb],name:'',sub:sb==='d'?'الأرصدة لحد دلوقتي':lab,date:stamp(Date.now()),tables:[tb],sum,note});
