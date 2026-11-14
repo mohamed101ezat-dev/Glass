@@ -45,7 +45,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <link rel="apple-touch-startup-image" href="splash/14_15pro.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/12_13_14promax.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/14_15promax.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
-<link rel="stylesheet" href="css/style.css?v=247">
+<link rel="stylesheet" href="css/style.css?v=249">
 
 
 
@@ -156,19 +156,15 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
   </div>
   <div id="infoView" class="hide"><div class="card">
     <div class="ro" style="color:var(--ink);margin-bottom:4px"><button class="lnk" id="infoBack">→ رجوع للسجل</button><b>📊 تقرير</b></div>
-  <div class="rstp">1 · الفترة</div>
   <div id="iPer">
-  <div class="ichips"><span>يوم واحد:</span><button data-k="d">النهارده</button><button data-k="ys">أمس</button><button data-k="d2">قبل أمس</button><button data-k="d3">قبل 3 أيام</button><button data-k="d4">قبل 4 أيام</button><button data-k="d5">قبل 5 أيام</button><button data-k="d6">قبل 6 أيام</button></div>
-  <div class="ichips"><span>متراكم:</span><button data-k="w3">آخر 3 أيام</button><button data-k="w">آخر 7 أيام</button><button data-k="w30">آخر 30 يوم</button><button data-k="m">الشهر ده</button><button data-k="pm">الشهر اللي فات</button><button data-k="y">السنة</button><button data-k="c">📅 شهر</button><button data-k="g">📅 من ← إلى</button></div>
+  <div class="rper"><button data-k="d">النهارده</button><button data-k="ys">أمس</button><button data-k="w">7 أيام</button><button data-k="m">الشهر</button><button id="iMoreB" data-more="1">غيره ▾</button></div>
+  <div class="ichips hide" id="iMore"><button data-k="d2">قبل أمس</button><button data-k="d3">قبل 3 أيام</button><button data-k="d4">قبل 4 أيام</button><button data-k="d5">قبل 5 أيام</button><button data-k="d6">قبل 6 أيام</button><button data-k="w3">آخر 3 أيام</button><button data-k="w30">آخر 30 يوم</button><button data-k="pm">الشهر اللي فات</button><button data-k="y">السنة</button><button data-k="c">📅 شهر معين</button><button data-k="g">📅 من ← إلى</button></div>
   </div>
   <div class="ro hide" id="iRgB" style="gap:6px;margin:0 0 6px"><input type="date" id="iRF" aria-label="من" style="flex:1;min-width:0;height:32px"><span class="mute">←</span><input type="date" id="iRT" aria-label="إلى" style="flex:1;min-width:0;height:32px"></div>
   <div class="ro hide" id="iMoB" style="margin:0 0 6px"><input type="month" id="iMonth" aria-label="اختيار شهر" style="flex:1;min-width:0;height:32px"></div>
-  <div class="rstp">2 · عايز تعرف إيه</div>
-  <div class="ichips" id="iSub"><button data-k="s">💰 المبيعات</button><button data-k="p">💵 المدفوع</button><button data-k="d">📒 الديون</button><button data-k="t">↩️ المرتجع</button><button data-k="i">📦 الأصناف</button><button data-k="w">💳 طرق الدفع</button><button data-k="o" id="iOrd">🧾 الطلبيات</button><button data-k="r">📈 الربح</button></div>
-    <div id="infoSum"></div>
-  <div class="rstp">3 · مقارنة (اختياري)</div>
-  <div class="ichips cmp" id="iCmp"><span>قارن:</span><button data-k="0">بدون</button><button data-k="prev">بالفترة اللي قبلها</button><button data-k="yoy">بالسنة اللي فاتت</button></div>
-  <button class="main" id="iGo" style="width:100%;margin-top:8px">📄 عرض التقرير</button>
+  <div id="infoSum"></div>
+  <div id="iRows"></div>
+  <div id="iCmpL"></div>
     <div class="ro" style="justify-content:flex-start;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="ab" id="iExp">📊 تصدير Excel</button><button class="ab hide" id="clBtn">🗂 الإقفالات</button><button class="ab hide" id="dayClose">🧾 إقفال</button><button class="ab hide" id="monRep">📊 تقرير</button></div>
   </div></div>
   <div id="dbView" class="hide">
@@ -518,10 +514,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=247"></script>
+<script src="js/app.js?v=249"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=247"></script>
-<script src="js/features.js?v=247"></script>
+<script src="js/cutlist.js?v=249"></script>
+<script src="js/features.js?v=249"></script>
 </body>
 </html>
 

@@ -1234,3 +1234,16 @@ html.d3[data-theme] .bottom-nav{box-shadow:0 -1px 0 var(--d3hi) inset,0 -6px 16p
 #stMain .sti .sa{display:none}
 #stMain .sti .stt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #stMain .sgh{margin:6px 4px 3px!important}
+/* v248: شاشة التقرير الجديدة — الفترة في سطر، والأرقام في سطور بتتفتح */
+#infoView .rper{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:2px 0 4px}
+#infoView .rper button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;padding:5px 2px;font-size:12.5px;min-height:0;height:auto;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#infoView .rper button.on{background:var(--acc);border-color:var(--acc);color:var(--accInk)}
+#infoView #iMore{padding:0 0 4px}
+#infoView .rbox{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+#infoView .rrow{display:flex;align-items:center;gap:6px;width:100%;padding:7px 10px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;color:var(--ink);font:inherit;text-align:right;min-height:0;height:auto;cursor:pointer}
+#infoView .rrow:last-child{border-bottom:0}#infoView .rrow:active{background:var(--accLight)}
+#infoView .rrow .rl{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#infoView .rrow .rl small{color:var(--mute)}
+#infoView .rrow b{font-size:calc(var(--fs) + 3px);flex:none}#infoView .rrow b.cr{color:var(--crI)}
+#infoView .rrow i{color:var(--mute);font-style:normal;flex:none}
+#infoView #iCmpL{font-size:12px;color:var(--mute);margin:6px 2px 0}#infoView #iCmpL:empty{display:none}
