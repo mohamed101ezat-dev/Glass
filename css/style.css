@@ -1255,3 +1255,5 @@ html.d3[data-theme] .bottom-nav{box-shadow:0 -1px 0 var(--d3hi) inset,0 -6px 16p
 
 /* v252 */
 #infoView .rrow b.dr{color:var(--danger)}
+/* v261: لما فورم «➕ عميل» مفتوح، قايمة العملاء وترتيبها وعددها بتختفي — تظهر لما الفورم يتقفل */
+#cuMain:has(#cuAdd:not(.hide))>:not(.rowc):not(#cuAdd){display:none!important}
