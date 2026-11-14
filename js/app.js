@@ -1,6 +1,6 @@
 /* فواتير · التطبيق الأساسي (فواتير، عملاء، سجل، مديونين، إعدادات) */
 /* رقم النسخة: غيّر الرقم ده مع كل تحديث، والـ service worker بياخده لوحده */
-const APP_VER='238';
+const APP_VER='239';
 /* صفحة قديمة وصلت مع ملف أحدث منها (نت بطيء وقت التحديث): نعيد الفتح مرة بدل ما البرنامج يقع */
 (function(){const s=document.querySelector('script[src*="js/app.js"]'),m=s&&/[?&]v=(\d+)/.exec(s.src);if(!m||m[1]===APP_VER)return;let seen=APP_VER;try{seen=sessionStorage.getItem('verFix');sessionStorage.setItem('verFix',APP_VER)}catch(e){}if(seen===APP_VER)return;window.__bootOK=true;location.reload();throw new Error('stale-page')})();
 const $=id=>document.getElementById(id);
@@ -2286,20 +2286,3 @@ window.addEventListener('popstate',e=>{
 try{history.replaceState({base:1},'');history.pushState({d:0},'');navOK=true}catch(e){}
 new MutationObserver(()=>syncNav()).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
 const _dc=drawCusts;drawCusts=function(){const r=_dc.apply(this,arguments);syncNav();return r};
-/* v237: سحب الصفحة لتحت — إيد بتنزل من فوق تمسك الصفحة وتشدّها، ولما تسيب البيانات تتحدّث */
-(()=>{const NEED=80,MAX=150;let st=0,y0=0,x0=0,pull=0,sec=null,hand=null,tip=null;
-  const mk=()=>{if(hand)return hand;hand=document.createElement('div');hand.id='ptrHand';hand.setAttribute('aria-hidden','true');
-    hand.innerHTML='<div class="arm"></div><svg viewBox="0 0 90 80" width="90" height="80"><defs><linearGradient id="phA" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#d98c82"/><stop offset=".28" stop-color="#f4b9ad"/><stop offset=".5" stop-color="#fcd9cf"/><stop offset=".78" stop-color="#f1b0a4"/><stop offset="1" stop-color="#d4857b"/></linearGradient><radialGradient id="phB" cx=".42" cy=".3" r=".8"><stop offset="0" stop-color="#fde0d7"/><stop offset=".55" stop-color="#f4b7ab"/><stop offset="1" stop-color="#d98c82"/></radialGradient><radialGradient id="phC" cx=".4" cy=".25" r=".85"><stop offset="0" stop-color="#fee6de"/><stop offset=".6" stop-color="#f6bdb1"/><stop offset="1" stop-color="#dc9187"/></radialGradient></defs><rect x="25" y="0" width="40" height="30" fill="url(#phA)"/><ellipse cx="45" cy="74" rx="30" ry="5" fill="#000" opacity=".12"/><path d="M13 34Q13 17 30 15H60Q77 17 77 34V50Q77 68 45 70Q13 68 13 50Z" fill="url(#phB)"/><ellipse cx="13" cy="44" rx="8" ry="13" transform="rotate(14 13 44)" fill="url(#phC)"/><path d="M16 50Q45 44 74 50" stroke="#cf7f75" stroke-width="2" fill="none" opacity=".45"/><ellipse cx="24" cy="60" rx="9" ry="13" fill="url(#phC)"/><ellipse cx="38" cy="62" rx="9" ry="14" fill="url(#phC)"/><ellipse cx="52" cy="62" rx="9" ry="14" fill="url(#phC)"/><ellipse cx="66" cy="60" rx="9" ry="13" fill="url(#phC)"/><path d="M31 52v14M45 53v16M59 52v14" stroke="#cf7f75" stroke-width="1.6" stroke-linecap="round" opacity=".55"/></svg>';
-    document.body.appendChild(hand);tip=document.createElement('div');tip.id='ptrTip';document.body.appendChild(tip);return hand};
-  const scrolled=el=>{for(;el&&el!==document.body;el=el.parentElement)if(el.scrollTop>0)return true;return false};
-  const set=p=>{pull=p;if(sec)sec.style.transform=p?'translateY('+p+'px)':'';const h=mk();h.classList.toggle('show',p>0);h.style.height=(p?p+34:0)+'px';tip.textContent=p>=NEED?'سيب عشان تحدّث':''};
-  const end=()=>{const h=mk(),s=sec;if(s){s.style.transition='transform .35s cubic-bezier(.3,1.5,.5,1)';s.style.transform='';setTimeout(()=>{s.style.transition='';s.style.transform=''},380)}
-    h.style.transition='height .25s ease-in';h.style.height='0px';tip.textContent='';setTimeout(()=>{h.style.transition='';h.classList.remove('show')},260);st=0;pull=0;sec=null};
-  addEventListener('touchstart',e=>{st=0;if(e.touches.length!==1||window.scrollY>0)return;const t=e.target,s=t.closest&&t.closest('section');
-    if(!s||t.closest('canvas,input[type=range],textarea,select')||scrolled(t))return;sec=s;y0=e.touches[0].clientY;x0=e.touches[0].clientX;st=1},{passive:true});
-  addEventListener('touchmove',e=>{if(!st)return;const dy=e.touches[0].clientY-y0,dx=e.touches[0].clientX-x0;
-    if(st===1){if(dy<-4||Math.abs(dx)>Math.abs(dy)){st=0;return}if(dy<12)return;if(window.scrollY>0){st=0;return}st=2;if(document.activeElement&&document.activeElement.blur)document.activeElement.blur()}
-    if(e.cancelable)e.preventDefault();set(Math.max(0,Math.min(MAX,(dy-12)*.55)))},{passive:false});
-  const up=()=>{if(st!==2){st=0;return}const go=pull>=NEED;end();if(!go)return;
-    Promise.resolve().then(()=>syncNow()).then(ok=>{try{refreshAll()}catch(e){}toast(ok?'اتحدّث ✓':'اتحدّث من الجهاز (مفيش اتصال بالسحابة)')}).catch(()=>toast('ماقدرش يحدّث دلوقتي'))};
-  addEventListener('touchend',up);addEventListener('touchcancel',()=>{if(st===2)end();st=0})})();
