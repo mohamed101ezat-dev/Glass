@@ -45,7 +45,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <link rel="apple-touch-startup-image" href="splash/14_15pro.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/12_13_14promax.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
 <link rel="apple-touch-startup-image" href="splash/14_15promax.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
-<link rel="stylesheet" href="css/style.css?v=251">
+<link rel="stylesheet" href="css/style.css?v=253">
 
 
 
@@ -381,7 +381,7 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 <div class="card"><b>🔁 مصروفات ثابتة</b> <span class="mute">بتتسجل لوحدها في ميعادها</span>
   <div id="exfList" style="margin-top:4px"></div>
   <div class="g2" style="margin-top:6px"><div><input id="exfName" list="exfNames" placeholder="الاسم: قبض، كهربا، إيجار…" autocomplete="off" aria-label="اسم المصروف الثابت"><datalist id="exfNames"><option>قبض العمال</option><option>كهربا</option><option>مياه</option><option>إيجار</option><option>نت وتليفون</option></datalist></div><div><input id="exfAmt" inputmode="decimal" placeholder="المبلغ" autocomplete="off" aria-label="مبلغ المصروف الثابت"></div></div>
-  <div class="ro" style="gap:6px;margin-top:6px"><select id="exfPer" aria-label="كل قد إيه" style="flex:1;min-width:0"><option value="w">كل أسبوع</option><option value="m">كل شهر</option></select><select id="exfDay" aria-label="اليوم" style="flex:1;min-width:0"></select><button type="button" class="main" id="exfAdd" style="flex:none">➕ إضافة</button></div>
+  <div class="ro" style="gap:6px;margin-top:6px"><select id="exfPer" aria-label="كل قد إيه" style="flex:1;min-width:0"><option value="d">كل يوم</option><option value="w" selected>كل أسبوع</option><option value="m">كل شهر</option></select><select id="exfDay" aria-label="اليوم" style="flex:1;min-width:0"></select><button type="button" class="main" id="exfAdd" style="flex:none">➕ إضافة</button></div>
   <div class="info" id="exfMsg"></div></div>
 <div class="card"><label for="exMon">الشهر</label><input type="month" id="exMon"><div id="exSum" style="margin-top:6px"></div>
   <div class="mute" style="margin-top:4px">الصافي = المبيعات ناقص المصروفات ومشتريات الموردين. الشراء من مورد سجّله في الموردين بس، عشان ما يتحسبش مرتين.</div>
@@ -519,10 +519,10 @@ setTimeout(function(){if(!window.__bootOK)show('timeout')},15000)})();
 
 <div id="dd"></div>
 
-<script src="js/app.js?v=251"></script>
+<script src="js/app.js?v=253"></script>
 <!-- ===== CutList: مخطط التقطيع ===== -->
-<script src="js/cutlist.js?v=251"></script>
-<script src="js/features.js?v=251"></script>
+<script src="js/cutlist.js?v=253"></script>
+<script src="js/features.js?v=253"></script>
 </body>
 </html>
 
