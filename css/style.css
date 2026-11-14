@@ -1212,3 +1212,18 @@ button *,[role="button"] *{pointer-events:none}
 #infoView .ichips button{padding:3px 9px;font-size:12.5px}
 #infoView .ichips#iSub{padding-top:6px;margin-top:2px}
 #infoView .rstp{margin:6px 0 2px}
+/* ===== v240: شكل جديد — خط عربي واحد جوه التطبيق + أخضر غامق واحد + كروت بيضا. الإيموجي والمقاسات الصغيرة زي ما هي ===== */
+html[data-pal="sage"],html[data-pal="sage"][data-theme="light"]{--bg:#f4f6f5;--card:#fff;--line:#dfe6e2;--acc:#0f5c4a;--acc2:#3d8a75;--h1:#0f5c4a;--h2:#0f5c4a;--accB:#0f5c4a;--accLight:#e3f0eb;--tot:#eef3f1;--bgA:#f4f6f5;--bgB:#f4f6f5;--bgC:#f4f6f5;--g1:#dfe6e2;--g2:#e3f0eb;--g3:#eef3f1}
+/* v240: عمق 3D (الوضع الفاتح، اللون الهادي) — كروت مرفوعة، أزرار بحافة بتنضغط، خانات غاطسة */
+html[data-theme="light"][data-pal="sage"]{--d3:15,60,48;--soft:0 1px 0 #fff inset,0 2px 0 rgba(var(--d3),.10),0 8px 16px -8px rgba(var(--d3),.30)}
+html[data-theme="light"][data-pal="sage"] :is(.card,.stat-card,.rec,.hrow,.stile,.sti,.nfr):not(#t-cl *){box-shadow:var(--soft)!important;border-color:#d3ddd8!important}
+html[data-theme="light"][data-pal="sage"] :is(.card,.rec,.hrow,.stile,.nfr):not(#t-cl *){background:linear-gradient(180deg,#fff,#f8fbf9)!important}
+html[data-theme="light"][data-pal="sage"] .app-header{background:linear-gradient(180deg,#167a63,#0f5c4a 60%,#0b4a3b)!important;box-shadow:0 2px 0 #083a2e,0 6px 14px -4px rgba(var(--d3),.45)!important}
+html[data-theme="light"][data-pal="sage"] :is(button.main,a.main):not(#t-cl *){background:linear-gradient(180deg,#1a8068,#0f5c4a)!important;border:0!important;border-bottom:3px solid #083a2e!important;box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 6px 12px -6px rgba(var(--d3),.55)!important;transition:transform .08s,border-bottom-width .08s}
+html[data-theme="light"][data-pal="sage"] :is(button.main,a.main):not(#t-cl *):active{transform:translateY(2px);border-bottom-width:1px!important;box-shadow:none!important}
+html[data-theme="light"][data-pal="sage"] :is(button.alt:not(.spc),.ab,.qs button,.seg button,#infoView .ichips button):not(#t-cl *):not(.on){background:linear-gradient(180deg,#fff,#edf2ef);border-bottom:2px solid #c3cfc9;box-shadow:0 1px 0 #fff inset}
+html[data-theme="light"][data-pal="sage"] :is(button.alt,.ab,.qs button,.seg button,#infoView .ichips button):not(#t-cl *):active{transform:translateY(1px);border-bottom-width:1px}
+html[data-theme="light"][data-pal="sage"] :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea):not(#t-cl *){box-shadow:inset 0 2px 3px rgba(var(--d3),.10);border-color:#c5d0ca}
+html[data-theme="light"][data-pal="sage"] .bottom-nav{box-shadow:0 -1px 0 #fff inset,0 -6px 16px -6px rgba(var(--d3),.28)!important;background:linear-gradient(180deg,#fff,#f3f7f5)!important}
+html[data-theme="light"][data-pal="sage"] button.spc{border-bottom-width:3px;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 5px 10px -6px rgba(var(--d3),.4)}
+html[data-theme="light"][data-pal="sage"] button.spc:active{transform:translateY(2px);border-bottom-width:1px}
