@@ -1257,3 +1257,5 @@ html.d3[data-theme] .bottom-nav{box-shadow:0 -1px 0 var(--d3hi) inset,0 -6px 16p
 #infoView .rrow b.dr{color:var(--danger)}
 /* v261: لما فورم «➕ عميل» مفتوح، قايمة العملاء وترتيبها وعددها بتختفي — تظهر لما الفورم يتقفل */
 #cuMain:has(#cuAdd:not(.hide))>:not(.rowc):not(#cuAdd){display:none!important}
+/* v262: شريط زرار الحفظ بياخد لون خلفية الصفحة بدل الأبيض — مفيش شريط أبيض غريب مع الألوان التانية */
+.savebar,html.noanim .savebar{background:var(--bg)!important;box-shadow:none!important;-webkit-backdrop-filter:none;backdrop-filter:none}
