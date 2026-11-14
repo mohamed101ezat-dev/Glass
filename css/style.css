@@ -1227,3 +1227,6 @@ html[data-theme="light"][data-pal="sage"] :is(input:not([type=checkbox]):not([ty
 html[data-theme="light"][data-pal="sage"] .bottom-nav{box-shadow:0 -1px 0 #fff inset,0 -6px 16px -6px rgba(var(--d3),.28)!important;background:linear-gradient(180deg,#fff,#f3f7f5)!important}
 html[data-theme="light"][data-pal="sage"] button.spc{border-bottom-width:3px;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 5px 10px -6px rgba(var(--d3),.4)}
 html[data-theme="light"][data-pal="sage"] button.spc:active{transform:translateY(2px);border-bottom-width:1px}
+/* v243: الخط عادي مش تخين — العريض للأرقام المهمة والعناوين وزرار الحفظ بس، وبدرجة أخف */
+body :is(div,span,p,label,button,input,select,textarea,td,th,a,small,li,summary,h1,h2,h3,h4){font-weight:400!important}
+body :is(b,strong,th,.stat-value,button.main,a.main,h1,h2,h3),body :is(b,strong) *{font-weight:600!important}
